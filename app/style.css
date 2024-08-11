@@ -1,0 +1,76 @@
+.bgcolor{
+    min-height: 100vh;
+    background-color: #f1f2f9;
+    width: "100%";
+    padding: "2rem";
+}
+
+.Avialable-row{
+    color: green; 
+}
+
+.Occupied-row{
+    color: red; 
+}
+
+.tab-item:hover {
+    background-color: #dbcff0;
+    width: 100%;/* Change background color on hover */
+  }
+  
+      /* Style for tab item text hover */
+.tab-item:hover .MuiTypography-root .tab-icon{
+    color: #6b43af; /* Change text color on hover */
+}
+
+.apartmentIcon{
+    width: 10px;
+    height: inherit;
+    
+}
+
+.cardbg{
+    width: 145px;
+    cursor: pointer;
+
+
+}
+
+.tenantIcon{
+    width: 70px;
+    cursor: pointer;
+
+}
+
+.apartmentIcon{
+    width: 70px;
+    cursor: pointer;
+
+}
+
+.roomIcon{
+    width: 70px;
+    cursor: pointer;
+
+}
+
+.incomeIcon{
+    width: 70px;
+    cursor: pointer;
+  
+}
+
+.repairIcon{
+    width: 85px;
+    cursor: pointer;
+    background: 'none';
+    background: none; 
+
+}
+
+.home3dIcon{
+    width: 85px;
+    cursor: pointer;
+    background: 'none';
+    background: none; 
+}
