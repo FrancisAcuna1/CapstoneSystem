@@ -6,16 +6,15 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Navigator from '../navigator';
-import Header from '../header';
+import Navigator from '../../../DashboardLayout/navigator';
+import Header from '../../../DashboardLayout/header';
 import { Divider } from '@mui/material';
-import Content from '../components/content';
-import CardContent from '../components/cards';
 import dynamic from 'next/dynamic';
+import TenantRegistrationForm from '@/app/Landlord/ComponentLayout/TenantRegistration';
 
-const CardContentHeader = dynamic(() => import('../components/cards'), {
-  ssr: false
-  }) 
+// const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
+//   ssr: false
+//   }) 
 
 
 // function Copyright() {
@@ -224,8 +223,7 @@ export default function HomePage (){
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
           <Box component="main" sx={{ flex: 1, py: 2, px: 5, bgcolor: '#eaeff1' }}>
-              <h1>This is Home Page</h1>
-              <CardContentHeader/>
+              <TenantRegistrationForm/>
               {/* <Content/> */}
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>

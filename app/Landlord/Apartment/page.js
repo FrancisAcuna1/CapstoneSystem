@@ -6,14 +6,28 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Navigator from '../navigator';
-import Header from '../header';
+import Navigator from '../DashboardLayout/navigator';
+import Header from '../DashboardLayout/header';
 import { Divider } from '@mui/material';
+import ApartmentContent from '../ComponentLayout/ApartmentContent';
+import dynamic from 'next/dynamic';
+
+// const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
+//   ssr: false
+//   }) 
 
 
-
-
-
+// function Copyright() {
+//   return (
+//     <Typography variant="body2" color="text.secondary" align="center">
+//       {'Copyright © '}
+//       <Link color="inherit" href="https://mui.com/">
+//         Your Website
+//       </Link>{' '}
+//       {new Date().getFullYear()}.
+//     </Typography>
+//   );
+// }
 
 let theme = createTheme({
     palette: {
@@ -62,7 +76,7 @@ let theme = createTheme({
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            backgroundColor: '#eaeff1', // Neutral Color
+            backgroundColor: '#ebf2f0', // Neutral Color
           },
         },
       },
@@ -173,51 +187,52 @@ let theme = createTheme({
   
 const drawerWidth = 256;
 
-export default function ApartmentPage (){
-    const [mobileOpen, setMobileOpen] = React.useState(false);
-    const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
+export default function HomePage (){
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
 
-    const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-    };
-    return (
-        <>
-            <ThemeProvider theme={theme}>
-            <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-                <CssBaseline />
-                <Box
-                component="nav"
-                sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-                >
-                {isSmUp ? null : (
-                    <Navigator
-                    PaperProps={{ style: { width: drawerWidth } }}
-                    variant="temporary"
-                    open={mobileOpen}
-                    onClose={handleDrawerToggle}
-                    />
-                )}
-                <Navigator
-                    PaperProps={{ style: { width: drawerWidth } }}
-                    sx={{ display: { sm: 'block', xs: 'none' } }}
-                />
-                </Box>
-                <Divider />
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <Header onDrawerToggle={handleDrawerToggle} />
-                <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1' }}>
-                    <h1>This is Apartment Page</h1>
-                </Box>
-                <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-                    
-                </Box>
-                </Box>
-            </Box>
-            </ThemeProvider>
-            
-        </>
-    )
+  const handleDrawerToggle = () => {
+  setMobileOpen(!mobileOpen);
+  };
+
+  return (
+    <>
+      <ThemeProvider theme={theme}>
+      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+          <CssBaseline />
+          <Box
+          component="nav"
+          sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 1 } }}
+          >
+          {isSmUp ? null : (
+              <Navigator
+              PaperProps={{ style: { width: drawerWidth } }}
+              variant="temporary"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              
+              />
+          )}
+              <Navigator
+                PaperProps={{ style: { width: drawerWidth } }}
+                sx={{ display: { sm: 'block', xs: 'none' } }}
+                
+              />
+          </Box>
+          <Divider />
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <Header onDrawerToggle={handleDrawerToggle} />
+          <Box component="main" sx={{ flex: 1, py: 2, px: 5, bgcolor: '#eaeff1' }}>
+              <ApartmentContent/>
+              {/* <Content/> */}
+          </Box>
+          <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
+              {/* <Copyright/> */}
+          </Box>
+          </Box>
+      </Box>
+      </ThemeProvider>
+    
+    </>
+  )
 }
-
-
-

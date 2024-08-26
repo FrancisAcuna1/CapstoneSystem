@@ -34,7 +34,7 @@ const logonameStyle = {
 
 export default function Navigator(props) {
   const { ...other } = props;
-  const [selectedindex, setSelectedIndex] = React.useState(1);
+  const [selectedindex, setSelectedIndex] = useState(1);
   // const router = useRouter();
   // const [activeTab, setActiveTab] = useState('');
 
@@ -42,6 +42,7 @@ export default function Navigator(props) {
     setSelectedIndex(index)
     // setActiveTab(href)
   }
+  console.log(selectedindex)
 
 
 
@@ -84,7 +85,8 @@ export default function Navigator(props) {
             selected={selectedindex === 1}
             onClick={() => handleMenuItemClick(1)}
             component={Link}
-            href="/Dashboard/home"
+            href="/Landlord/Home"
+            
            
             sx={{
   	          mx: '0.7rem',
@@ -112,7 +114,7 @@ export default function Navigator(props) {
             selected={selectedindex === 2}
             onClick={() => handleMenuItemClick(2)}
             component={Link}
-            href="/Dashboard/apartment"
+            href="/Landlord/Apartment"
             
             sx={{
   	          mx: '0.7rem',

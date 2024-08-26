@@ -169,7 +169,7 @@ function Header(props) {
                 color="primary"
                 position="sticky"
                 elevation={1}
-                sx={ { zIndex: 0, py: 1.3,  backgroundColor: '#ebf2f0', backgroundImage: 'none',
+                sx={ { zIndex: 1, py: 1.3,  backgroundColor: '#ebf2f0', backgroundImage: 'none',
                    
                 }}
                 
@@ -177,7 +177,7 @@ function Header(props) {
                 <Toolbar
                   >
                     <Grid container alignItems="center">
-                        <Grid item sx={{display: { sm: 'none', xs: 'block' }}}>
+                        <Grid item sx={{display: { xs: 'none', xs: 'block' }}}>
                             <IconButton
                         
                                 aria-label="open drawer"
@@ -188,7 +188,7 @@ function Header(props) {
                                 <MenuIcon sx={{backgroundColor: '#8785d0', color: '#ebf2f0', fontSize: '30px', borderRadius: '5px'}}/>
                             </IconButton>
                         </Grid>
-                        <Grid item xs={6} sm={9} md={8} lg={4}>
+                        <Grid item xs={6} sm={6} md={6} lg={4}>
                             <Search >
                                 <SearchIconWrapper>
                                     <SearchIcon />
@@ -202,8 +202,8 @@ function Header(props) {
                         <Grid item xs={2} lg={3}>
 
                         </Grid>
-                        <Grid item xs={3} sm={3} md={4} lg={5}>
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '0.5rem'}}>
+                        <Grid item xs={3} sm={4} md={4} lg={5}>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '0.1rem'}}>
                                 <Box sx={{mx: '1.4rem', mt:'0.5rem'}}>
                                     <Badge badgeContent={4} color="error">
                                         <MailIcon color='primary' sx={{fontSize: '25px'}}/>
@@ -243,10 +243,11 @@ function Header(props) {
                             </Box>
                         </Grid>
                     </Grid>
+                    {renderMenu}
+            {renderMobileMenu}
                 </Toolbar>
             </AppBar>
-            {renderMenu}
-            {renderMobileMenu}
+            
         </React.Fragment>
     );
 }

@@ -36,30 +36,109 @@
 
 }
 
+/* Start of TenantIcon CSS */
 .tenantIcon{
     width: 70px;
     cursor: pointer;
 
 }
+@media (max-width: 1200px) { /* Large devices (desktops, 992px and up) */
+    .tenantIcon {
+        width: 65px;
+    }
+}
 
+@media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
+    .tenantIcon {
+        width: 58px;
+    }
+}
+
+@media (max-width: 768px) { /* Extra small (landscape phones, 576px and up) */
+    .tenantIcon {
+        width: 70px;
+    }
+}
+/* end  */
+
+/* Start of Apartment Icon CSS */
 .apartmentIcon{
     width: 70px;
     cursor: pointer;
 
 }
 
+@media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
+    .apartmentIcon {
+        width: 65px;
+    }
+}
+
+@media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
+    .apartmentIcon {
+        width: 57px;
+    }
+}
+
+@media (max-width: 768px) { /* Extra small (landscape phones, 576px and up) */
+    .apartmentIcon {
+        width: 70px;
+    }
+}
+/* End */
+/* Start of RoomIcon CSS */
 .roomIcon{
     width: 70px;
     cursor: pointer;
 
 }
 
-.incomeIcon{
-    width: 70px;
-    cursor: pointer;
-  
+@media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
+    .roomIcon {
+        width: 65px;
+    }
 }
 
+@media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
+    .roomIcon {
+        width: 57px;
+    }
+}
+
+@media (max-width: 768px) { /* Extra Small devices (landscape phones, 576px and up) */
+    .roomIcon {
+        width: 70px;
+    }
+}
+/* End */
+/* Start of IncomeICon CSS */
+.incomeIcon {
+    width: 70px;
+    cursor: pointer;
+}
+
+@media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
+    .incomeIcon {
+        width: 65px;
+    }
+}
+
+@media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
+    .incomeIcon {
+        width: 58px;
+    }
+}
+
+@media (max-width: 768px) { /* Small devices (landscape phones, 576px and up) */
+    .incomeIcon {
+        width: 70px;
+    }
+}
+
+/* end */
+
+
+/* Start for 3d Repair */
 .repairIcon{
     width: 85px;
     cursor: pointer;
@@ -68,9 +147,79 @@
 
 }
 
+@media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
+    .repairIcon {
+        width: 65px;
+    }
+}
+
+@media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
+    .repairIcon {
+        width: 65px;
+    }
+}
+
+@media (max-width: 768px) { /* ExtraSmall devices (landscape phones, 576px and up) */
+    .repairIcon {
+        width: 70px;
+    }
+}
+/* end */
+
+/* Start of Home3Dicon CSS responsive */
 .home3dIcon{
     width: 85px;
     cursor: pointer;
     background: 'none';
     background: none; 
+}
+
+
+@media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
+    .home3dIcon {
+        width: 65px;
+    }
+}
+
+@media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
+    .home3dIcon {
+        width: 63px;
+    }
+}
+
+@media (max-width: 768px) { /* ExtraSmall devices (landscape phones, 576px and up) */
+    .home3dIcon {
+        width: 70px;
+    }
+}
+/* end */
+
+.apartmentunitIcon{
+    width: '100%';
+    cursor: pointer;
+    background: 'none';
+    background: none; 
+    object-fit: contain;
+}
+
+.hdroomIcon{
+    width: 120px;
+}
+
+@media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
+    .hdroomIcon {
+        width: 155px;
+    }
+}
+
+@media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
+    .hdroomIcon {
+        width: 170px;
+    }
+}
+
+@media (max-width: 768px) { /* ExtraSmall devices (landscape phones, 576px and up) */
+    .hdroomIcon {
+        width: 130px;
+    }
 }
