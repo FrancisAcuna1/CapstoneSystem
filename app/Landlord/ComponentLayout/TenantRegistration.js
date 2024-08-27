@@ -13,13 +13,13 @@ export default function TenantRegistrationForm(){
             <Grid item xs={12} sx={{marginLeft: '5px', mt:2}}>
                 <Breadcrumbs aria-label="breadcrumb"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '16px' } }}>
                     {/* <Typography color="inherit">Navigation</Typography> */}
-                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Dashboard/home">
+                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Home">
                         Home
                     </Link>
-                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Dashboard/apartment">
+                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Apartment">
                         Apartment
                     </Link>
-                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Dashboard/apartment/[id]">
+                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Apartment/[id]">
                         List of Units
                     </Link>
                     <Typography letterSpacing={2} color="text.primary"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '16px' } }}>Register Tenant</Typography>

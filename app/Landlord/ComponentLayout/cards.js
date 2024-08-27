@@ -12,8 +12,7 @@ import TurnedInOutlinedIcon from '@mui/icons-material/TurnedInOutlined';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import dynamic from 'next/dynamic';
-import RoomTable from './rooms';
-import TenantList from './tenantlist';
+
 
 
 const IncomeChartHeader = dynamic(() => import('./income'), {
@@ -23,12 +22,19 @@ const ExpensesChartHeader = dynamic(() => import('./expenses'), {
     ssr: false
 }) 
 
+const RoomTable = dynamic(() => import('./rooms'), {
+    ssr: false
+}) 
+const TenantList = dynamic(() => import('./tenantlist'), {
+    ssr: false
+})
+
 
 export default function CardContent (){
     return (
         <>
             <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
-                <Grid container spacing={2}>
+                <Grid container spacing={2} sx={{alignItems: 'center'}}>
                     <Grid item xs={12} sm={6} md={4} lg={3}>
                         <Paper elevation={2} style={{maxWidth: '590px', padding: '25px', borderRadius: '15px', }}>
                             <Grid container justifyContent={'space-between'}>  
@@ -218,7 +224,7 @@ export default function CardContent (){
                         <Paper
                             elevation={2}
                             sx={{
-                                maxWidth: { xs: 478, sm: 520, md: 820, lg: 890 }, 
+                                maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 }, 
                                 height: { xs: '50vh', lg: '64vh' },
                                 padding: "1rem 0rem 2.7rem 0rem",
                                 borderRadius: '15px',
@@ -236,7 +242,7 @@ export default function CardContent (){
                         <Paper
                             elevation={2}
                             sx={{
-                                maxWidth: { xs: 478, sm: 520,  md: 820, lg: 890 }, 
+                                maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 }, 
                                 height: { xs: '50vh', lg: '64vh' },
                                 padding: "1rem 0rem 2.7rem 0rem",
                                 borderRadius: '15px',

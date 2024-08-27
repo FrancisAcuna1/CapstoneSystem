@@ -9,7 +9,7 @@ import Link from '@mui/material/Link';
 import Navigator from '../DashboardLayout/navigator';
 import Header from '../DashboardLayout/header';
 import { Divider } from '@mui/material';
-// import Content from '../components/content';
+import Content from '../ComponentLayout/content';
 import dynamic from 'next/dynamic';
 
 const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
@@ -202,7 +202,7 @@ export default function HomePage (){
           <CssBaseline />
           <Box
           component="nav"
-          sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 1 } }}
+          sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
           >
           {isSmUp ? null : (
               <Navigator
@@ -222,7 +222,7 @@ export default function HomePage (){
           <Divider />
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
-          <Box component="main" sx={{ flex: 1, py: 2, px: 5, bgcolor: '#eaeff1' }}>
+          <Box component="main" sx={{ flex: 1, py: 2, px: 4, bgcolor: '#eaeff1' }}>
               <h1>This is Home Page</h1>
               <CardContentHeader/>
               {/* <Content/> */}

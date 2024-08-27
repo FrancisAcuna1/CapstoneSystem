@@ -153,7 +153,7 @@ export default function ApartmentContent (){
             <Grid item xs={12} sx={{marginLeft: '5px', mt:2}}>
                 <Breadcrumbs aria-label="breadcrumb" sx={{ fontSize: { xs: '14px', sm: '15px', md: '16px' } }}>
                     {/* <Typography color="inherit">Navigation</Typography> */}
-                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Dashboard/home">
+                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Home">
                         Home
                     </Link>
                     <Typography letterSpacing={2} color="text.primary" sx={{ fontSize: { xs: '14px', sm: '15px', md: '16px' } }}>Apartment</Typography>
@@ -199,12 +199,12 @@ export default function ApartmentContent (){
            <Grid container spacing={2} sx={{mt:0.1}}>
             
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                    <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
-                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.9rem', sm: '-0.5rem', md: '-1rem', lg:'-0.1rem'}, width: { xs: '18rem', sm: '15rem', md:'16rem', lg: '18rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
+                    <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
+                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '2.4rem', sm: '-0.5rem', md: '-1rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
                             <img
                             src="/hdpartment.png" 
-                            style={{ width: '65%', height: 'auto', objectFit: 'contain',  }}
+                            style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
                             />
                         </Box>
@@ -223,7 +223,7 @@ export default function ApartmentContent (){
                                     ? 'rgba(255, 255, 255, 0.4)'
                                     : 'rgba(0, 0, 0, 0.4)',
                                 backdropFilter: 'blur(30px)',
-                                maxHeight: 37,
+                                maxHeight: {xs: 42, sm: 39, md: 39, lg: 37},
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 boxShadow:
@@ -234,11 +234,11 @@ export default function ApartmentContent (){
                         >
                         <Grid container justifyContent={'space-between'}  alignItems="center">
                             <Grid item >
-                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{ sm: '0.3rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'1rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
+                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '0.5rem', sm: '0.9rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'2.2rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
                             </Grid>
                             <Divider orientation="vertical" color='black' variant="middle" flexItem />
                             <Grid item >
-                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{md: '0.2rem', lg:'0.3rem'},  ml: {sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
+                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '-0.1rem', md: '0.2rem', lg:'0.6rem'},  ml: {xs:'2.2rem', sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mb: {xs:'0.5rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
                             </Grid>
                         </Grid>
                         </Box>
@@ -251,12 +251,12 @@ export default function ApartmentContent (){
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                    <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
-                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.9rem', sm: '-0.5rem', md: '-1rem', lg:'-0.1rem'}, width: { xs: '18rem', sm: '15rem', md:'16rem', lg: '18rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
+                    <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
+                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '2.4rem', sm: '-0.5rem', md: '-1rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
                             <img
                             src="/hdpartment.png" 
-                            style={{ width: '65%', height: 'auto', objectFit: 'contain',  }}
+                            style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
                             />
                         </Box>
@@ -275,7 +275,7 @@ export default function ApartmentContent (){
                                     ? 'rgba(255, 255, 255, 0.4)'
                                     : 'rgba(0, 0, 0, 0.4)',
                                 backdropFilter: 'blur(30px)',
-                                maxHeight: 37,
+                                maxHeight: {xs: 42, sm: 39, md: 39, lg: 37},
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 boxShadow:
@@ -286,11 +286,11 @@ export default function ApartmentContent (){
                         >
                         <Grid container justifyContent={'space-between'}  alignItems="center">
                             <Grid item >
-                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{ sm: '0.3rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'1rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
+                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '0.5rem', sm: '0.9rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'2.2rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
                             </Grid>
                             <Divider orientation="vertical" color='black' variant="middle" flexItem />
                             <Grid item >
-                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{md: '0.2rem', lg:'0.3rem'},  ml: {sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
+                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '-0.1rem', md: '0.2rem', lg:'0.6rem'},  ml: {xs:'2.2rem', sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mb: {xs:'0.5rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
                             </Grid>
                         </Grid>
                         </Box>
@@ -298,69 +298,17 @@ export default function ApartmentContent (){
                         <Typography variant="body1" color={'gray'} sx={{fontSize: {xs: '14px', sm: '12px', md: '13px' ,lg:'14px'}}} letterSpacing={1} gutterBottom>Magsaysay st. Brgy Cogon, Sorsogon City</Typography>
                         
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='/Dashboard/apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
-                        </Box>
-                    </Paper>   
-                </Grid>
-                <Grid item xs={12} sm={6} md={4} lg={3}>
-                <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
-                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.9rem', sm: '-0.5rem', md: '-1rem', lg:'-0.1rem'}, width: { xs: '18rem', sm: '15rem', md:'16rem', lg: '18rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
-                            {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
-                            <img
-                            src="/hdpartment.png" 
-                            style={{ width: '65%', height: 'auto', objectFit: 'contain',  }}
-                            alt="proptrack logo" 
-                            />
-                        </Box>
-                        <Box 
-                            sx={(theme) => ({
-                                mt: '1rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                flexShrink: 0,
-                                borderRadius: '10px',
-                                padding: {xs: '10px', sm: '23px', md: '23px', lg: '10px'},
-                                
-                                bgcolor:
-                                    theme.palette.mode === 'light'
-                                    ? 'rgba(255, 255, 255, 0.4)'
-                                    : 'rgba(0, 0, 0, 0.4)',
-                                backdropFilter: 'blur(30px)',
-                                maxHeight: 37,
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                boxShadow:
-                                    theme.palette.mode === 'light'
-                                    ? `0 0 1px rgba(85, 166, 246, 0.1), 1px 1.5px 2px -1px rgba(85, 166, 246, 0.15), 4px 4px 12px -2.5px rgba(85, 166, 246, 0.15)`
-                                    : '0 0 1px rgba(2, 31, 59, 0.7), 1px 1.5px 2px -1px rgba(2, 31, 59, 0.65), 4px 4px 12px -2.5px rgba(2, 31, 59, 0.65)',
-                            })}
-                        >
-                        <Grid container justifyContent={'space-between'}  alignItems="center">
-                            <Grid item >
-                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{ sm: '0.3rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'1rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
-                            </Grid>
-                            <Divider orientation="vertical" color='black' variant="middle" flexItem />
-                            <Grid item >
-                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{md: '0.2rem', lg:'0.3rem'},  ml: {sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
-                            </Grid>
-                        </Grid>
-                        </Box>
-                        <Typography variant="h5" component="div" sx={{fontSize: {xs: '24px', sm: '21px', md: '22px', lg: '24px'}, fontWeight: 540, mt: 2}} letterSpacing={2} >Apartment no.1 </Typography>
-                        <Typography variant="body1" color={'gray'} sx={{fontSize: {xs: '14px', sm: '12px', md: '13px' ,lg:'14px'}}} letterSpacing={1} gutterBottom>Magsaysay st. Brgy Cogon, Sorsogon City</Typography>
-                        
-                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='/Dashboard/apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
+                            <Button href='/Landlord/Apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
                         </Box>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                    <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
-                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.9rem', sm: '-0.5rem', md: '-1rem', lg:'-0.1rem'}, width: { xs: '18rem', sm: '15rem', md:'16rem', lg: '18rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
+                    <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
+                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '2.4rem', sm: '-0.5rem', md: '-1rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
                             <img
                             src="/hdpartment.png" 
-                            style={{ width: '65%', height: 'auto', objectFit: 'contain',  }}
+                            style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
                             />
                         </Box>
@@ -379,7 +327,7 @@ export default function ApartmentContent (){
                                     ? 'rgba(255, 255, 255, 0.4)'
                                     : 'rgba(0, 0, 0, 0.4)',
                                 backdropFilter: 'blur(30px)',
-                                maxHeight: 37,
+                                maxHeight: {xs: 42, sm: 39, md: 39, lg: 37},
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 boxShadow:
@@ -390,11 +338,11 @@ export default function ApartmentContent (){
                         >
                         <Grid container justifyContent={'space-between'}  alignItems="center">
                             <Grid item >
-                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{ sm: '0.3rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'1rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
+                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '0.5rem', sm: '0.9rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'2.2rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
                             </Grid>
                             <Divider orientation="vertical" color='black' variant="middle" flexItem />
                             <Grid item >
-                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{md: '0.2rem', lg:'0.3rem'},  ml: {sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
+                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '-0.1rem', md: '0.2rem', lg:'0.6rem'},  ml: {xs:'2.2rem', sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mb: {xs:'0.5rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
                             </Grid>
                         </Grid>
                         </Box>
@@ -402,18 +350,70 @@ export default function ApartmentContent (){
                         <Typography variant="body1" color={'gray'} sx={{fontSize: {xs: '14px', sm: '12px', md: '13px' ,lg:'14px'}}} letterSpacing={1} gutterBottom>Magsaysay st. Brgy Cogon, Sorsogon City</Typography>
                         
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='/Dashboard/apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
+                            <Button href='/Landlord/Apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
                         </Box>
-                    </Paper>       
+                    </Paper>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                    <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
+                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '2.4rem', sm: '-0.5rem', md: '-1rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
+                            {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
+                            <img
+                            src="/hdpartment.png" 
+                            style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
+                            alt="proptrack logo" 
+                            />
+                        </Box>
+                        <Box 
+                            sx={(theme) => ({
+                                mt: '1rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                flexShrink: 0,
+                                borderRadius: '10px',
+                                padding: {xs: '10px', sm: '23px', md: '23px', lg: '10px'},
+                                
+                                bgcolor:
+                                    theme.palette.mode === 'light'
+                                    ? 'rgba(255, 255, 255, 0.4)'
+                                    : 'rgba(0, 0, 0, 0.4)',
+                                backdropFilter: 'blur(30px)',
+                                maxHeight: {xs: 42, sm: 39, md: 39, lg: 37},
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                boxShadow:
+                                    theme.palette.mode === 'light'
+                                    ? `0 0 1px rgba(85, 166, 246, 0.1), 1px 1.5px 2px -1px rgba(85, 166, 246, 0.15), 4px 4px 12px -2.5px rgba(85, 166, 246, 0.15)`
+                                    : '0 0 1px rgba(2, 31, 59, 0.7), 1px 1.5px 2px -1px rgba(2, 31, 59, 0.65), 4px 4px 12px -2.5px rgba(2, 31, 59, 0.65)',
+                            })}
+                        >
+                        <Grid container justifyContent={'space-between'}  alignItems="center">
+                            <Grid item >
+                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '0.5rem', sm: '0.9rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'2.2rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
+                            </Grid>
+                            <Divider orientation="vertical" color='black' variant="middle" flexItem />
+                            <Grid item >
+                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '-0.1rem', md: '0.2rem', lg:'0.6rem'},  ml: {xs:'2.2rem', sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mb: {xs:'0.5rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
+                            </Grid>
+                        </Grid>
+                        </Box>
+                        <Typography variant="h5" component="div" sx={{fontSize: {xs: '24px', sm: '21px', md: '22px', lg: '24px'}, fontWeight: 540, mt: 2}} letterSpacing={2} >Apartment no.1 </Typography>
+                        <Typography variant="body1" color={'gray'} sx={{fontSize: {xs: '14px', sm: '12px', md: '13px' ,lg:'14px'}}} letterSpacing={1} gutterBottom>Magsaysay st. Brgy Cogon, Sorsogon City</Typography>
+                        
+                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
+                            <Button href='/Landlord/Apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
+                        </Box>
+                    </Paper>  
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
-                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.9rem', sm: '-0.5rem', md: '-1rem', lg:'-0.1rem'}, width: { xs: '18rem', sm: '15rem', md:'16rem', lg: '18rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
+                    <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
+                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '2.4rem', sm: '-0.5rem', md: '-1rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
                             <img
                             src="/hdpartment.png" 
-                            style={{ width: '65%', height: 'auto', objectFit: 'contain',  }}
+                            style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
                             />
                         </Box>
@@ -432,7 +432,7 @@ export default function ApartmentContent (){
                                     ? 'rgba(255, 255, 255, 0.4)'
                                     : 'rgba(0, 0, 0, 0.4)',
                                 backdropFilter: 'blur(30px)',
-                                maxHeight: 37,
+                                maxHeight: {xs: 42, sm: 39, md: 39, lg: 37},
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 boxShadow:
@@ -443,11 +443,11 @@ export default function ApartmentContent (){
                         >
                         <Grid container justifyContent={'space-between'}  alignItems="center">
                             <Grid item >
-                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{ sm: '0.3rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'1rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
+                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '0.5rem', sm: '0.9rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'2.2rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
                             </Grid>
                             <Divider orientation="vertical" color='black' variant="middle" flexItem />
                             <Grid item >
-                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{md: '0.2rem', lg:'0.3rem'},  ml: {sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
+                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '-0.1rem', md: '0.2rem', lg:'0.6rem'},  ml: {xs:'2.2rem', sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mb: {xs:'0.5rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
                             </Grid>
                         </Grid>
                         </Box>
@@ -455,17 +455,17 @@ export default function ApartmentContent (){
                         <Typography variant="body1" color={'gray'} sx={{fontSize: {xs: '14px', sm: '12px', md: '13px' ,lg:'14px'}}} letterSpacing={1} gutterBottom>Magsaysay st. Brgy Cogon, Sorsogon City</Typography>
                         
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='/Dashboard/apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
+                            <Button href='/Landlord/Apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
                         </Box>
-                    </Paper>
+                    </Paper> 
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
-                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.9rem', sm: '-0.5rem', md: '-1rem', lg:'-0.1rem'}, width: { xs: '18rem', sm: '15rem', md:'16rem', lg: '18rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
+                    <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
+                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '2.4rem', sm: '-0.5rem', md: '-1rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
                             <img
                             src="/hdpartment.png" 
-                            style={{ width: '65%', height: 'auto', objectFit: 'contain',  }}
+                            style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
                             />
                         </Box>
@@ -484,7 +484,7 @@ export default function ApartmentContent (){
                                     ? 'rgba(255, 255, 255, 0.4)'
                                     : 'rgba(0, 0, 0, 0.4)',
                                 backdropFilter: 'blur(30px)',
-                                maxHeight: 37,
+                                maxHeight: {xs: 42, sm: 39, md: 39, lg: 37},
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 boxShadow:
@@ -495,11 +495,11 @@ export default function ApartmentContent (){
                         >
                         <Grid container justifyContent={'space-between'}  alignItems="center">
                             <Grid item >
-                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{ sm: '0.3rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'1rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
+                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '0.5rem', sm: '0.9rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'2.2rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
                             </Grid>
                             <Divider orientation="vertical" color='black' variant="middle" flexItem />
                             <Grid item >
-                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{md: '0.2rem', lg:'0.3rem'},  ml: {sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
+                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '-0.1rem', md: '0.2rem', lg:'0.6rem'},  ml: {xs:'2.2rem', sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mb: {xs:'0.5rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
                             </Grid>
                         </Grid>
                         </Box>
@@ -507,17 +507,17 @@ export default function ApartmentContent (){
                         <Typography variant="body1" color={'gray'} sx={{fontSize: {xs: '14px', sm: '12px', md: '13px' ,lg:'14px'}}} letterSpacing={1} gutterBottom>Magsaysay st. Brgy Cogon, Sorsogon City</Typography>
                         
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='/Dashboard/apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
+                            <Button href='/Landlord/Apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
                         </Box>
-                    </Paper>
+                    </Paper> 
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
-                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.9rem', sm: '-0.5rem', md: '-1rem', lg:'-0.1rem'}, width: { xs: '18rem', sm: '15rem', md:'16rem', lg: '18rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
+                    <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
+                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '2.4rem', sm: '-0.5rem', md: '-1rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
                             <img
                             src="/hdpartment.png" 
-                            style={{ width: '65%', height: 'auto', objectFit: 'contain',  }}
+                            style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
                             />
                         </Box>
@@ -536,7 +536,7 @@ export default function ApartmentContent (){
                                     ? 'rgba(255, 255, 255, 0.4)'
                                     : 'rgba(0, 0, 0, 0.4)',
                                 backdropFilter: 'blur(30px)',
-                                maxHeight: 37,
+                                maxHeight: {xs: 42, sm: 39, md: 39, lg: 37},
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 boxShadow:
@@ -547,11 +547,11 @@ export default function ApartmentContent (){
                         >
                         <Grid container justifyContent={'space-between'}  alignItems="center">
                             <Grid item >
-                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{ sm: '0.3rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'1rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
+                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '0.5rem', sm: '0.9rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'2.2rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
                             </Grid>
                             <Divider orientation="vertical" color='black' variant="middle" flexItem />
                             <Grid item >
-                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{md: '0.2rem', lg:'0.3rem'},  ml: {sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
+                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '-0.1rem', md: '0.2rem', lg:'0.6rem'},  ml: {xs:'2.2rem', sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mb: {xs:'0.5rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
                             </Grid>
                         </Grid>
                         </Box>
@@ -559,17 +559,17 @@ export default function ApartmentContent (){
                         <Typography variant="body1" color={'gray'} sx={{fontSize: {xs: '14px', sm: '12px', md: '13px' ,lg:'14px'}}} letterSpacing={1} gutterBottom>Magsaysay st. Brgy Cogon, Sorsogon City</Typography>
                         
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='/Dashboard/apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
+                            <Button href='/Landlord/Apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
                         </Box>
-                    </Paper>
+                    </Paper> 
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                    <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
-                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.9rem', sm: '-0.5rem', md: '-1rem', lg:'-0.1rem'}, width: { xs: '18rem', sm: '15rem', md:'16rem', lg: '18rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
+                    <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
+                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '2.4rem', sm: '-0.5rem', md: '-1rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
                             <img
                             src="/hdpartment.png" 
-                            style={{ width: '65%', height: 'auto', objectFit: 'contain',  }}
+                            style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
                             />
                         </Box>
@@ -588,7 +588,7 @@ export default function ApartmentContent (){
                                     ? 'rgba(255, 255, 255, 0.4)'
                                     : 'rgba(0, 0, 0, 0.4)',
                                 backdropFilter: 'blur(30px)',
-                                maxHeight: 37,
+                                maxHeight: {xs: 42, sm: 39, md: 39, lg: 37},
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 boxShadow:
@@ -599,11 +599,11 @@ export default function ApartmentContent (){
                         >
                         <Grid container justifyContent={'space-between'}  alignItems="center">
                             <Grid item >
-                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{ sm: '0.3rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'1rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
+                            <Typography variant="body1" color={'primary'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '0.5rem', sm: '0.9rem', md: '0.3rem', lg:'0.1rem'},  ml:{xs:'2.2rem', sm: '1.4rem', md: '1.5rem', lg:'0rem'}, }} letterSpacing={1} >Available Units: 10</Typography>
                             </Grid>
                             <Divider orientation="vertical" color='black' variant="middle" flexItem />
                             <Grid item >
-                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{md: '0.2rem', lg:'0.3rem'},  ml: {sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
+                                <Typography variant="body1" color={'#f78028'} sx={{fontSize: {xs: 13, sm: 12, md: 12, lg: 13}, mt:{xs: '-0.1rem', md: '0.2rem', lg:'0.6rem'},  ml: {xs:'2.2rem', sm: '1.4rem', md:'1.5rem', lg: '0rem'}, mb: {xs:'0.5rem'}, mr:{xs:'1rem', lg:'0rem'}}} letterSpacing={1} gutterBottom>Occupied Units: 10</Typography>
                             </Grid>
                         </Grid>
                         </Box>
@@ -611,9 +611,9 @@ export default function ApartmentContent (){
                         <Typography variant="body1" color={'gray'} sx={{fontSize: {xs: '14px', sm: '12px', md: '13px' ,lg:'14px'}}} letterSpacing={1} gutterBottom>Magsaysay st. Brgy Cogon, Sorsogon City</Typography>
                         
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='/Dashboard/apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
+                            <Button href='/Landlord/Apartment/[id]' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.4rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px', lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Units</Button>
                         </Box>
-                    </Paper>       
+                    </Paper>      
                 </Grid>
            </Grid>
         </Box>

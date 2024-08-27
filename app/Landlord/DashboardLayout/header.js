@@ -1,7 +1,7 @@
 'use client'
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { AppBar, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Avatar, StyledBadge, Tooltip, Breadcrumbs } from '@mui/material';
+import { AppBar, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Typography, Avatar, StyledBadge, Tooltip, Breadcrumbs } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -174,80 +174,77 @@ function Header(props) {
                 }}
                 
             >
-                <Toolbar
-                  >
-                    <Grid container alignItems="center">
-                        <Grid item sx={{display: { xs: 'none', xs: 'block' }}}>
-                            <IconButton
-                        
-                                aria-label="open drawer"
-                                onClick={onDrawerToggle}
-                                edge="start"
-                                sx={{ display: { sm: 'none' }, }}
-                            >
-                                <MenuIcon sx={{backgroundColor: '#8785d0', color: '#ebf2f0', fontSize: '30px', borderRadius: '5px'}}/>
-                            </IconButton>
-                        </Grid>
-                        <Grid item xs={6} sm={6} md={6} lg={4}>
-                            <Search >
-                                <SearchIconWrapper>
-                                    <SearchIcon />
-                                </SearchIconWrapper>
-                                <StyledInputBase
-                                    placeholder="Search…"
-                                    inputProps={{ 'aria-label': 'search' }}
-                                />
-                            </Search>
-                        </Grid>
-                        <Grid item xs={2} lg={3}>
 
-                        </Grid>
-                        <Grid item xs={3} sm={4} md={4} lg={5}>
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '0.1rem'}}>
-                                <Box sx={{mx: '1.4rem', mt:'0.5rem'}}>
-                                    <Badge badgeContent={4} color="error">
-                                        <MailIcon color='primary' sx={{fontSize: '25px'}}/>
-                                    </Badge>
-                                </Box>
-                                <Box sx={{mr: '0.9rem', mt:'0.5rem'}}>
-                                    <Badge badgeContent={17} color="error">
-                                        <NotificationsIcon color='primary' sx={{ fontSize: '25px'}}/>
-                                    </Badge>
-                                </Box>
-                                {/* <IconButton size="large" aria-label="show 4 new mails" sx={{mx: '0.4rem', color:"#eaeff1"}}>
-                                    <Badge badgeContent={4} color="error">
-                                        <MailIcon />
-                                    </Badge>
-                                </IconButton> */}
-                                {/* <IconButton size="large" aria-label="show 17 new notifications" sx={{color:"#eaeff1"}} >
-                                    <Badge badgeContent={17} color="error">
-                                        <NotificationsIcon />
-                                    </Badge>
-                                </IconButton> */}
-                                <Avatar
-                                    size="large"
-                                    edge="end"
-                                    aria-label="account of current user"
-                                    aria-controls={menuId}
-                                    aria-haspopup="true"
-                                    onClick={handleProfileMenuOpen}
-                                    color="inherit"
-                                    sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px' }}
-                                    src="/user.png"
-                                >
-                                    
-                                </Avatar>
-                            
-                                
-                            
-                            </Box>
-                        </Grid>
-                    </Grid>
-                    {renderMenu}
-            {renderMobileMenu}
-                </Toolbar>
+            <Toolbar>
+                <IconButton
+                    size="large"
+                    edge="start"
+                    color="inherit"
+                    aria-label="open drawer"
+                    sx={{ mr: 0.1, mt:'0.5rem',  display: { xs: 'none', xs: 'block' }} }
+                    onClick={onDrawerToggle}
+                >
+                     <MenuIcon sx={{ display: { sm: 'none' }, backgroundColor: '#8785d0', color: '#ebf2f0', fontSize: '30px', borderRadius: '5px', }}/>
+                </IconButton>
+               
+                <Search>
+                    <SearchIconWrapper>
+                    <SearchIcon />
+                    </SearchIconWrapper>
+                    <StyledInputBase
+                    placeholder="Search…"
+                    inputProps={{ 'aria-label': 'search' }}
+                    />
+                </Search>
+                
+                <Box sx={{ flexGrow: 1 }} />
+                <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                    <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                        <Badge badgeContent={4} color="error">
+                            <MailIcon color='primary' sx={{fontSize: '25px'}}/>
+                        </Badge>
+                    </IconButton>
+                    <IconButton
+                    size="large"
+                    aria-label="show 17 new notifications"
+                    color="inherit"
+                    >
+                        <Badge badgeContent={17} color="error">
+                            <NotificationsIcon color='primary' sx={{ fontSize: '25px'}}/>
+                        </Badge>
+                    </IconButton>
+                    <Avatar
+                        size="large"
+                        edge="end"
+                        aria-label="account of current user"
+                        aria-controls={menuId}
+                        aria-haspopup="true"
+                        onClick={handleProfileMenuOpen}
+                        color="inherit"
+                        sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px' }}
+                        src="/user.png"
+                    >
+                        
+                    </Avatar>
+                </Box>
+                <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+                    <IconButton
+                    size="large"
+                    aria-label="show more"
+                    aria-controls={mobileMenuId}
+                    aria-haspopup="true"
+                    onClick={handleMobileMenuOpen}
+                    color="primary"
+                    >
+                    <MoreIcon />
+                    </IconButton>
+                </Box>
+            </Toolbar>
+                
+                    
             </AppBar>
-            
+            {renderMenu}
+            {renderMobileMenu}
         </React.Fragment>
     );
 }

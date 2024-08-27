@@ -156,10 +156,10 @@ export default function UnitPage(){
             <Grid item xs={12} sx={{marginLeft: '5px', mt:2}}>
                 <Breadcrumbs aria-label="breadcrumb"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '16px' } }}>
                     {/* <Typography color="inherit">Navigation</Typography> */}
-                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Dashboard/home">
+                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Home">
                         Home
                     </Link>
-                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Dashboard/apartment">
+                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Apartment">
                         Apartment
                     </Link>
                     <Typography letterSpacing={2} color="text.primary"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '16px' } }}>List of Units</Typography>

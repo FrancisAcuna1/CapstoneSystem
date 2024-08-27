@@ -194,6 +194,33 @@
 }
 /* end */
 
+/* Start for Apartment */
+.hdpartment{
+    width: 85px;
+    cursor: pointer;
+    background: 'none';
+    background: none; 
+}
+@media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
+    .home3dIcon {
+        width: 65px;
+    }
+}
+
+@media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
+    .home3dIcon {
+        width: 63px;
+    }
+}
+
+@media (max-width: 768px) { /* ExtraSmall devices (landscape phones, 576px and up) */
+    .home3dIcon {
+        width: 20px;
+    }
+}
+
+/* end */
+
 .apartmentunitIcon{
     width: '100%';
     cursor: pointer;
