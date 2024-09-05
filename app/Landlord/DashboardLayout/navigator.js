@@ -3,8 +3,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {Drawer, Typography, MenuItem} from '@mui/material';
-import Box from '@mui/material/Box';
+import {Drawer, Typography, MenuItem, Grid, Box} from '@mui/material';
 import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
 import NightShelterOutlinedIcon from '@mui/icons-material/NightShelterOutlined';
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
@@ -16,19 +15,20 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import Image from 'next/image';
 
 
-const logoStyle = {
-    width: '145px',
-    cursor: 'pointer',
-    marginLeft: '-1.5rem',
-    marginTop: '-4rem',
-};
-const logonameStyle = {
-    width: '135px',
-    height: 'auto',
-    cursor: 'pointer',
-    marginTop: '-1.5rem',
-    marginLeft: '-3.5rem'
 
+const logoStyle = {
+  width: '150px',
+  cursor: 'pointer',
+  marginLeft: '-1.5rem',
+  marginTop: '-1rem'
+};
+
+const logonameStyle = {
+  width: '150px',
+  height: '120px',
+  cursor: 'pointer',
+  marginTop: '-0.5rem',
+  marginLeft: '-3rem',
 };
  
 
@@ -62,22 +62,26 @@ export default function Navigator(props) {
 
   return (
     <Drawer  variant="permanent" {...other}>
-      <Box>
-      <Image
-          src="/logo1.png" 
-          style={logoStyle}
-          alt="proptrack logo" 
-          width={100}  // Replace with your desired width
-          height={100} // Replace with your desired height
-      />
-      <Image
-          width={100}  // Replace with your desired width
-          height={100} // Replace with your desired height
-          src="/logotitle.png" 
-          style={logonameStyle}
-          alt="proptrack logo" 
-      />
-      </Box>
+       <Grid container alignItems="center" justifyContent="center">
+            <Grid item>
+                <Image
+                    src="/logo1.png" 
+                    style={logoStyle}
+                    alt="proptrack logo" 
+                    width={200}  // Replace with your desired width
+                    height={125} // Replace with your desired height
+                />
+            </Grid>
+            <Grid item>
+                <Image
+                    src="/logotitle.png" 
+                    style={logonameStyle}
+                    alt="proptrack logo" 
+                    width={300}  // Replace with your desired width
+                    height={100} // Replace with your desired height
+                />
+            </Grid>
+        </Grid>
 
       <Box
         sx={{ width: 250, my:'-0.9rem'}}
