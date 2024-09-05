@@ -10,6 +10,7 @@ import { styled, css, } from '@mui/system';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
+import Image from 'next/image';
 
 
 
@@ -21,10 +22,11 @@ const Backdrop = React.forwardRef((props, ref) => {
       </Fade>
     );
   });
+  Backdrop.displayName = 'Backdrop';
   
-  Backdrop.propTypes = {
-    open: PropTypes.bool,
-  };
+//   Backdrop.propTypes = {
+//     open: PropTypes.bool,
+//   };
   
   const blue = {
     200: '#99CCFF',
@@ -202,10 +204,13 @@ export default function ApartmentContent (){
                     <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.5rem', sm: '4.9rem', md: '3rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
-                            <img
+                            <Image
+                             layout="responsive"
                             src="/hdpartment.png" 
                             style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
-                            alt="proptrack logo" 
+                            alt="proptrack logo"
+                            width={250}  // Replace with your desired width
+                            height={70}// Replace with your desired height
                             />
                         </Box>
                         <Box 
@@ -254,10 +259,12 @@ export default function ApartmentContent (){
                     <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.5rem', sm: '4.9rem', md: '3rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
-                            <img
+                            <Image
                             src="/hdpartment.png" 
                             style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
+                            width={250}  // Replace with your desired width
+                            height={70}// Replace with your desired height
                             />
                         </Box>
                         <Box 
@@ -306,10 +313,12 @@ export default function ApartmentContent (){
                     <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.5rem', sm: '4.9rem', md: '3rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
-                            <img
+                            <Image
                             src="/hdpartment.png" 
                             style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
+                             width={250}  // Replace with your desired width
+                            height={70}
                             />
                         </Box>
                         <Box 
@@ -358,10 +367,12 @@ export default function ApartmentContent (){
                     <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.5rem', sm: '4.9rem', md: '3rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
-                            <img
+                            <Image
                             src="/hdpartment.png" 
                             style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
+                             width={250}  // Replace with your desired width
+                            height={70}
                             />
                         </Box>
                         <Box 
@@ -411,10 +422,12 @@ export default function ApartmentContent (){
                     <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.5rem', sm: '4.9rem', md: '3rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
-                            <img
+                            <Image
                             src="/hdpartment.png" 
                             style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
+                             width={250}  // Replace with your desired width
+                            height={70}
                             />
                         </Box>
                         <Box 
@@ -463,10 +476,12 @@ export default function ApartmentContent (){
                     <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.5rem', sm: '4.9rem', md: '3rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
-                            <img
+                            <Image
                             src="/hdpartment.png" 
                             style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
+                             width={250}  // Replace with your desired width
+                            height={70}
                             />
                         </Box>
                         <Box 
@@ -515,10 +530,12 @@ export default function ApartmentContent (){
                     <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.5rem', sm: '4.9rem', md: '3rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
-                            <img
+                            <Image
                             src="/hdpartment.png" 
                             style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
+                             width={250}  // Replace with your desired width
+                            height={70}
                             />
                         </Box>
                         <Box 
@@ -567,10 +584,12 @@ export default function ApartmentContent (){
                     <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 },   padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', ml:{xs: '3.5rem', sm: '4.9rem', md: '3rem', lg:'3rem'}, width: { xs: '10rem', sm: '10rem', md:'10rem', lg: '12rem' }, height: { xs: '10rem', sm: '8rem', md: '9rem', lg: 'auto' }}}>
                             {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
-                            <img
+                            <Image
                             src="/hdpartment.png" 
                             style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
                             alt="proptrack logo" 
+                             width={250}  // Replace with your desired width
+                            height={70}
                             />
                         </Box>
                         <Box 

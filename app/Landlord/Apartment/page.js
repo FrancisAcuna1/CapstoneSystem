@@ -9,12 +9,12 @@ import Link from '@mui/material/Link';
 import Navigator from '../DashboardLayout/navigator';
 import Header from '../DashboardLayout/header';
 import { Divider } from '@mui/material';
-import ApartmentContent from '../ComponentLayout/ApartmentComponent/page';
+// import ApartmentContent from '../ComponentLayout/ApartmentComponent/page';
 import dynamic from 'next/dynamic';
 
-// const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
-//   ssr: false
-//   }) 
+const ApartmentContent = dynamic(() => import('../ComponentLayout/ApartmentComponent/page'), {
+  ssr: false
+  }) 
 
 
 // function Copyright() {

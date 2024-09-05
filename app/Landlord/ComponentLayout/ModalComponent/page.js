@@ -23,10 +23,10 @@ const Backdrop = React.forwardRef((props, ref) => {
       </Fade>
     );
   });
-  
-  Backdrop.propTypes = {
-    open: PropTypes.bool,
-  };
+  Backdrop.displayName = 'Backdrop';
+  // Backdrop.propTypes = {
+  //   open: PropTypes.bool,
+  // };
   
   const blue = {
     200: '#99CCFF',

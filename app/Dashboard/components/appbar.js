@@ -14,6 +14,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { createTheme, useTheme } from '@mui/material/styles';
 import { ThemeProvider } from 'styled-components';
+import Image from 'next/image';
 
 const logoStyle = {
   width: '140px',
@@ -115,12 +116,12 @@ export default function AppAppBar() {
                     px: 0,
                 }}
                 >
-                  <img
+                  <Image
                      src="/logo1.png" 
                      style={logoStyle}
                      alt="proptrack logo" 
                   />
-                  <img
+                  <Image
                   src="/logotitle.png" 
                   style={logonameStyle}
                   alt="proptrack logo" 

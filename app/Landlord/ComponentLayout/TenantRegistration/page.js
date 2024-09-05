@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Grid, Box, Paper, Typography, Button, Divider, Link, Fade, Breadcrumbs, TextField, FormControl, InputLabel, Select, MenuItem, Menu} from '@mui/material';
 import RegisterComponent from '../RegistrationFormComponent/page';
+import Image from 'next/image';
 
 export default function TenantRegistrationForm(){
     return(
@@ -43,10 +44,12 @@ export default function TenantRegistrationForm(){
                                 </Typography>
                             </Grid>
                             <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                                <img
+                                <Image
                                 src="/3Dnewbedroom.png"
                                 style={{ width: '105px', height: 'auto', objectFit: 'contain' }}
                                 alt="proptrack logo"
+                                width={250}  // Replace with your desired width
+                                height={70}// Replace with your desired height
                                 />
                             </Grid>
                         </Grid>

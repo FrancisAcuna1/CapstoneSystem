@@ -13,6 +13,7 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import { ThemeProvider } from 'styled-components';
 import '/app/style.css';
+import Image from 'next/image';
 
 const Backdrop = React.forwardRef((props, ref) => {
     const { open, ...other } = props;
@@ -22,10 +23,10 @@ const Backdrop = React.forwardRef((props, ref) => {
       </Fade>
     );
   });
-  
-  Backdrop.propTypes = {
-    open: PropTypes.bool,
-  };
+Backdrop.displayName = 'Backdrop';
+//   Backdrop.propTypes = {
+//     open: PropTypes.bool,
+//   };
   
   const blue = {
     200: '#99CCFF',
@@ -220,7 +221,9 @@ export default function UnitPage(){
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
                             <Grid item sx={{display: 'flex', justifyContent:{ lg:'flex-end'}, alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'}}}>
-                                <img
+                                <Image
+                                width={350}  // Replace with your desired width
+                                height={100}// Replace with your desired height
                                 src="/3Dnewbedroom.png"
                                 // style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
                                 className='hdroomIcon'
@@ -249,11 +252,13 @@ export default function UnitPage(){
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
                             <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'} }}>
-                                <img
+                                <Image
                                 src="/hdlock.png"
                                 className='hdlockIcon'
                                 // style={{ width: '90px', height: 'auto', objectFit: 'contain' }}
                                 alt="proptrack logo"
+                                width={350}  // Replace with your desired width
+                                height={100}// Replace with your desired height
                                 />
                             </Grid>
                             <Grid item>
@@ -268,7 +273,7 @@ export default function UnitPage(){
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='/Landlord/Apartment/[id]/OccupiedUnits' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: {xs:'2rem', sm:'2rem',md:'2rem', lg: '1.3rem'}, mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
+                            <Button href='/Landlord/Apartment/[id]/OccupiedUnits' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: {xs:'2rem', sm:'2rem',md:'2rem', lg: '2rem'}, mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
                         </Box>
                     </Paper>
                 </Grid>
@@ -276,11 +281,13 @@ export default function UnitPage(){
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
                             <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'} }}>
-                                <img
+                                <Image
                                 src="/hdlock.png"
                                 className='hdlockIcon'
                                 // style={{ width: '90px', height: 'auto', objectFit: 'contain' }}
                                 alt="proptrack logo"
+                                width={350}  // Replace with your desired width
+                                height={100}// Replace with your desired height
                                 />
                             </Grid>
                             <Grid item>
@@ -295,7 +302,7 @@ export default function UnitPage(){
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: {xs:'2rem', sm:'2rem',md:'2rem', lg: '1.3rem'}, mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
+                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: {xs:'2rem', sm:'2rem',md:'2rem', lg: '2rem'}, mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
                         </Box>
                     </Paper>
                 </Grid>
@@ -303,11 +310,13 @@ export default function UnitPage(){
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
                             <Grid item sx={{display: 'flex', justifyContent:{ lg:'flex-end'}, alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'}}}>
-                                <img
+                                <Image
                                 src="/3Dnewbedroom.png"
                                 // style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
                                 className='hdroomIcon'
                                 alt="proptrack logo"
+                                width={350}  // Replace with your desired width
+                                height={100}// Replace with your desired height
                                 />
                             </Grid>
                             <Grid item>
@@ -332,11 +341,13 @@ export default function UnitPage(){
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
                             <Grid item sx={{display: 'flex', justifyContent:{ lg:'flex-end'}, alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'}}}>
-                                <img
+                                <Image
                                 src="/3Dnewbedroom.png"
                                 // style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
                                 className='hdroomIcon'
                                 alt="proptrack logo"
+                                width={350}  // Replace with your desired width
+                                height={100}// Replace with your desired height
                                 />
                             </Grid>
                             <Grid item>
@@ -360,11 +371,13 @@ export default function UnitPage(){
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
                             <Grid item sx={{display: 'flex', justifyContent:{ lg:'flex-end'}, alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'}}}>
-                                <img
+                                <Image
                                 src="/3Dnewbedroom.png"
                                 // style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
                                 className='hdroomIcon'
                                 alt="proptrack logo"
+                                width={350}  // Replace with your desired width
+                                height={100}// Replace with your desired height
                                 />
                             </Grid>
                             <Grid item>
@@ -388,11 +401,13 @@ export default function UnitPage(){
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
                             <Grid item sx={{display: 'flex', justifyContent:{ lg:'flex-end'}, alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'}}}>
-                                <img
+                                <Image
                                 src="/3Dnewbedroom.png"
                                 // style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
                                 className='hdroomIcon'
                                 alt="proptrack logo"
+                                width={350}  // Replace with your desired width
+                                height={100}// Replace with your desired height
                                 />
                             </Grid>
                             <Grid item>
@@ -416,11 +431,13 @@ export default function UnitPage(){
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
                             <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'} }}>
-                                <img
+                                <Image
                                 src="/hdlock.png"
                                 className='hdlockIcon'
                                 // style={{ width: '90px', height: 'auto', objectFit: 'contain' }}
                                 alt="proptrack logo"
+                                width={350}  // Replace with your desired width
+                                height={100}// Replace with your desired height
                                 />
                             </Grid>
                             <Grid item>
@@ -435,7 +452,7 @@ export default function UnitPage(){
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: {xs:'2rem', sm:'2rem',md:'2rem', lg: '1.3rem'}, mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
+                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: {xs:'2rem', sm:'2rem',md:'2rem', lg: '2rem'}, mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
                         </Box>
                     </Paper>
                 </Grid>

@@ -12,6 +12,7 @@ import TurnedInOutlinedIcon from '@mui/icons-material/TurnedInOutlined';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 
 
 
@@ -48,10 +49,12 @@ export default function CardContent (){
                                 <Grid item>
                                 <Box   sx={{  justifyContent: 'center', marginTop: '0.7rem' }}>
                                 {/* <GroupOutlinedIcon fontSize="medium" sx={{color: 'white', fontSize: '30px'}}/> */}
-                                <img
+                                <Image
                                     src="/tenanticon.png" 
                                     className='tenantIcon'
                                     alt="proptrack logo" 
+                                    width={50}  // Replace with your desired width
+                                    height={70} // Replace with your desired height
                                 />
                                 </Box>
                                 </Grid>
@@ -73,10 +76,12 @@ export default function CardContent (){
                                 <Grid item>
                                 <Box   sx={{  justifyContent: 'center', marginTop: '0.7rem'  }}>
                                 {/* <GroupOutlinedIcon fontSize="medium" sx={{color: 'white', fontSize: '30px'}}/> */}
-                                <img
+                                <Image
                                     src="/apartment.png" 
                                     className='apartmentIcon'
                                     alt="proptrack logo" 
+                                    width={50}  // Replace with your desired width
+                                    height={70}// Replace with your desired height
                                 />
                                 </Box>
                                 </Grid>
@@ -97,10 +102,12 @@ export default function CardContent (){
                                 <Grid item>
                                 <Box   sx={{  justifyContent: 'center', marginTop: '0.7rem' }}>
                                 {/* <GroupOutlinedIcon fontSize="medium" sx={{color: 'white', fontSize: '30px'}}/> */}
-                                <img
+                                <Image
                                     src="/roomicon.png" 
                                     className='roomIcon'
                                     alt="proptrack logo" 
+                                    width={50}  // Replace with your desired width
+                                    height={70}// Replace with your desired height
                                 />
                                 </Box>
                                 </Grid>
@@ -121,10 +128,12 @@ export default function CardContent (){
                                 <Grid item>
                                 <Box   sx={{maxWidth: {xs: 200, lg: 'auto'},  justifyContent: 'center',  marginTop: '0.1rem', mr: '-0.4rem'}}>
                                 {/* <GroupOutlinedIcon fontSize="medium" sx={{color: 'white', fontSize: '30px'}}/> */}
-                                <img
+                                <Image
                                     src="/income.png" 
                                     className='incomeIcon'
                                     alt="proptrack logo" 
+                                    width={50}  // Replace with your desired width
+                                    height={70}// Replace with your desired height
                                 />
                                 </Box>
                                 </Grid>
@@ -155,7 +164,7 @@ export default function CardContent (){
                             </Grid>
                             <Grid container spacing={2} justifyContent="space-between" alignItems="stretch" sx={{ marginTop: '0.4rem' }}>
                                 <Grid item xs={12} sm={6}>
-                                    <Paper elevation={2} sx={{maxWidth: { xs: 'auto', lg: 800 }, height: { xs: '22vh', sm: '15vh', md: '14vh', lg: '22.5vh' }, padding: "1rem 0.9rem 3.5rem 0.9rem", borderRadius: "15px",  justifyContent: 'center', alignItems: 'center',}}>
+                                    <Paper elevation={2} sx={{maxWidth: { xs: 'auto', lg: 800 }, height: { xs: '24vh', sm: '16vh', md: '14vh', lg: '22.5vh' }, padding: "1rem 0.9rem 3.5rem 0.9rem", borderRadius: "15px",  justifyContent: 'center', alignItems: 'center',}}>
                                         <Grid container justifyContent={'space-between'}>
                                             <Grid item>
                                                 <Typography variant="h3" color="black" sx={{ml: '1rem', mt:'1rem' }} letterSpacing={2} gutterBottom>
@@ -165,10 +174,12 @@ export default function CardContent (){
                                             <Grid item>
                                                 <Box sx={{mr:'1rem', mt:'0.4rem', color: 'secondary'}}>
                                                     {/* <TurnedInOutlinedIcon sx={{fontSize: '3.3rem', color:'#f78028'}} /> */}
-                                                    <img
+                                                    <Image
                                                     src="/3D home.png" 
                                                     className='home3dIcon'
                                                     alt="proptrack logo" 
+                                                    width={59}  // Replace with your desired width
+                                                    height={72} // Replace with your desired height
                                                     />
                                                 </Box>
                                                 
@@ -186,7 +197,7 @@ export default function CardContent (){
                                 </Grid>
 
                                 <Grid item xs={12} sm={6}>
-                                    <Paper elevation={2} sx={{ maxWidth: { xs: 'auto',  lg: 800 },  height: { xs: '22vh', sm:'15vh', md:'14vh', lg: '22.5vh' },  padding: "1rem 0.9rem 3.5rem 0.9rem",  borderRadius: "15px",  justifyContent: 'center',  lignItems: 'center',}}
+                                    <Paper elevation={2} sx={{ maxWidth: { xs: 'auto',  lg: 800 },  height: { xs: '24vh', sm:'16vh', md:'14vh', lg: '22.5vh' },  padding: "1rem 0.9rem 3.5rem 0.9rem",  borderRadius: "15px",  justifyContent: 'center',  lignItems: 'center',}}
                                     >
                                         <Grid container justifyContent={'space-between'}>
                                             <Grid item>
@@ -197,10 +208,12 @@ export default function CardContent (){
                                             <Grid item>
                                                 <Box sx={{mr:'1rem', mt:'0.4rem', color: 'secondary'}}>
                                                     {/* <EngineeringIcon sx={{fontSize: '3.3rem', color:'green'}} /> */}
-                                                    <img
+                                                    <Image
                                                     src="/3D rep.png" 
                                                     className='repairIcon'
                                                     alt="proptrack logo" 
+                                                    width={60}  // Replace with your desired width
+                                                    height={72} // Replace with your desired height
                                                     />
                                                 </Box>
                                                 

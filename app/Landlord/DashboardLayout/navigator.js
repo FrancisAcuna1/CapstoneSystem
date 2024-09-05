@@ -13,6 +13,7 @@ import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRou
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import Image from 'next/image';
 
 
 const logoStyle = {
@@ -62,12 +63,16 @@ export default function Navigator(props) {
   return (
     <Drawer  variant="permanent" {...other}>
       <Box>
-      <img
+      <Image
           src="/logo1.png" 
           style={logoStyle}
           alt="proptrack logo" 
+          width={100}  // Replace with your desired width
+          height={100} // Replace with your desired height
       />
-      <img
+      <Image
+          width={100}  // Replace with your desired width
+          height={100} // Replace with your desired height
           src="/logotitle.png" 
           style={logonameStyle}
           alt="proptrack logo" 

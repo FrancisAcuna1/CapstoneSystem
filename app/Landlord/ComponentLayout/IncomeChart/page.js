@@ -1,7 +1,10 @@
 "use client"
 import React from "react";
 import { useState } from "react";
-import Chart from "react-apexcharts";
+// import Chart from "react-apexcharts";
+import dynamic from 'next/dynamic';
+const ChartNoSSR = dynamic(() => import('react-apexcharts'), { ssr: false });
+
 
 export default function IncomeChart (){
    const [expenses, setExpenses] = useState({
@@ -37,7 +40,7 @@ export default function IncomeChart (){
 
     return (
         <>
-             <Chart options={expenses.options} series={expenses.series} type="area" height={'100%'} width={'100%'} />
+             <ChartNoSSR options={expenses.options} series={expenses.series} type="area" height={'100%'} width={'100%'} />
         </>
     )
 }
