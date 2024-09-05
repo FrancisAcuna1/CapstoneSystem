@@ -1,10 +1,24 @@
+.body {
+    background: linear-gradient(to bottom right, #e0f7fa, #ece0fa);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+
+
 .bgcolor{
     min-height: 100vh;
     background-color: #f1f2f9;
     width: "100%";
     padding: "2rem";
 }
-
+button{
+    background-color: #e0e0e2;
+}
 .Avialable-row{
     color: green; 
 }
@@ -125,7 +139,7 @@
 
 @media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
     .incomeIcon {
-        width: 58px;
+        width: 60px;
     }
 }
 
@@ -149,7 +163,7 @@
 
 @media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
     .repairIcon {
-        width: 65px;
+        width: 78px;
     }
 }
 
@@ -161,7 +175,7 @@
 
 @media (max-width: 768px) { /* ExtraSmall devices (landscape phones, 576px and up) */
     .repairIcon {
-        width: 70px;
+        width: 59px;
     }
 }
 /* end */
@@ -177,7 +191,7 @@
 
 @media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
     .home3dIcon {
-        width: 65px;
+        width: 75px;
     }
 }
 
@@ -189,7 +203,7 @@
 
 @media (max-width: 768px) { /* ExtraSmall devices (landscape phones, 576px and up) */
     .home3dIcon {
-        width: 70px;
+        width: 58px;
     }
 }
 /* end */
@@ -202,20 +216,20 @@
     background: none; 
 }
 @media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
-    .home3dIcon {
+    .hdpartment {
         width: 65px;
     }
 }
 
 @media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
-    .home3dIcon {
+    .hdpartment {
         width: 63px;
     }
 }
 
 @media (max-width: 768px) { /* ExtraSmall devices (landscape phones, 576px and up) */
-    .home3dIcon {
-        width: 20px;
+    .hdpartment {
+        width: 90px;
     }
 }
 
@@ -229,24 +243,95 @@
     object-fit: contain;
 }
 
+/* start for hdroomIcon */
+
 .hdroomIcon{
     width: 120px;
 }
 
 @media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
     .hdroomIcon {
-        width: 155px;
+        width: 145px;
     }
 }
 
 @media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
     .hdroomIcon {
-        width: 170px;
+        width: 150px;
     }
 }
 
 @media (max-width: 768px) { /* ExtraSmall devices (landscape phones, 576px and up) */
     .hdroomIcon {
-        width: 130px;
+        width: 140px;
     }
 }
+/* end for hdroomIcon */
+
+/* start for hdlockIcon */
+.hdlockIcon{
+    width: 90px;
+}
+@media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
+    .hdlockIcon {
+        width: 89px;
+    }
+}
+
+@media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
+    .hdlockIcon {
+        width: 99px;
+    }
+}
+
+@media (max-width: 768px) { /* ExtraSmall devices (landscape phones, 576px and up) */
+    .hdlockIcon {
+        width: 79px;
+    }
+}
+
+
+/*  */
+
+
+
+/* FUll CALENDAR */
+.fc-header-toolbar {
+    /* Default styles for large screens */
+    justify-content: space-between;
+    font-size: 12px;
+    /* padding: 10px; */
+    
+  }
+
+  
+  /* For medium screens */
+  @media (max-width: 960px) {
+    .fc-header-toolbar {
+        justify-content: space-between;
+        font-size: 12px;
+        margin-right: -1rem;
+        /* margin-left: -0.1rem; */
+    }
+    .fc-header-toolbar .fc-toolbar-chunk {
+      flex-basis: 100%;
+    }
+  }
+
+
+  
+  /* For small screens */
+  @media (max-width: 600px) {
+    .fc-header-toolbar {
+        flex-wrap: wrap;
+        flex-direction: start;
+        margin-left: -10px;
+        font-size: 12px;
+        
+    }
+    .fc-header-toolbar .fc-toolbar-chunk {
+      margin-bottom: 10px;
+    }
+  }
+
+  

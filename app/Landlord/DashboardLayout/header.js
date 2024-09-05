@@ -28,8 +28,8 @@ const Search = styled('div')(({ theme }) => ({
     marginLeft: 0,
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(3),
-      width: 'auto',
+      marginLeft: theme.spacing(2),
+      width: '40%',
     },
     border: `1px solid ${alpha(theme.palette.common.black, 0.5)}`, // Border color
   }));
@@ -181,10 +181,10 @@ function Header(props) {
                     edge="start"
                     color="inherit"
                     aria-label="open drawer"
-                    sx={{ mr: 0.1, mt:'0.5rem',  display: { xs: 'none', xs: 'block' }} }
+                    sx={{  mt:'0.5rem',  display: { xs: 'none', xs: 'block', }} }
                     onClick={onDrawerToggle}
                 >
-                     <MenuIcon sx={{ display: { sm: 'none' }, backgroundColor: '#8785d0', color: '#ebf2f0', fontSize: '30px', borderRadius: '5px', }}/>
+                     <MenuIcon sx={{ display: { lg: 'none' }, backgroundColor: '#8785d0', color: '#ebf2f0', fontSize: '30px', borderRadius: '5px', }}/>
                 </IconButton>
                
                 <Search>
@@ -198,19 +198,20 @@ function Header(props) {
                 </Search>
                 
                 <Box sx={{ flexGrow: 1 }} />
-                <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                    <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                <Box sx={{ display: { xs: 'none', md: 'none', lg: 'flex' } }}>
+                    <IconButton size="small" aria-label="show 4 new mails" sx={{mr: '0.3rem', backgroundColor: "#8785d0", "&:hover": {backgroundColor: '#b6bdf1'}}}>
                         <Badge badgeContent={4} color="error">
-                            <MailIcon color='primary' sx={{fontSize: '25px'}}/>
+                            <MailIcon  sx={{color: 'white', fontSize: '25px'}}/>
                         </Badge>
                     </IconButton>
                     <IconButton
                     size="large"
                     aria-label="show 17 new notifications"
                     color="inherit"
+                    sx={{mr: '0.3rem', backgroundColor: "#8785d0", "&:hover": {backgroundColor: '#b6bdf1'}}}
                     >
                         <Badge badgeContent={17} color="error">
-                            <NotificationsIcon color='primary' sx={{ fontSize: '25px'}}/>
+                            <NotificationsIcon sx={{color: 'white', fontSize: '25px'}}/>
                         </Badge>
                     </IconButton>
                     <Avatar
@@ -227,7 +228,7 @@ function Header(props) {
                         
                     </Avatar>
                 </Box>
-                <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+                <Box sx={{ display: { xs: 'flex', md: 'flex', lg: 'none'} }}>
                     <IconButton
                     size="large"
                     aria-label="show more"

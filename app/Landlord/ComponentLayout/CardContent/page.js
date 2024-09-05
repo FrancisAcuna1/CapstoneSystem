@@ -15,17 +15,17 @@ import dynamic from 'next/dynamic';
 
 
 
-const IncomeChartHeader = dynamic(() => import('./income'), {
+const IncomeChartHeader = dynamic(() => import('../IncomeChart/page'), {
 ssr: false
 }) 
-const ExpensesChartHeader = dynamic(() => import('./expenses'), {
+const ExpensesChartHeader = dynamic(() => import('../ExpensesChart/page'), {
     ssr: false
 }) 
 
-const RoomTable = dynamic(() => import('./rooms'), {
+const RoomTable = dynamic(() => import('../RoomsTableComponent/page'), {
     ssr: false
 }) 
-const TenantList = dynamic(() => import('./tenantlist'), {
+const TenantList = dynamic(() => import('../TenantListTable/page'), {
     ssr: false
 })
 
@@ -34,7 +34,10 @@ export default function CardContent (){
     return (
         <>
             <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
-                <Grid container spacing={2} sx={{alignItems: 'center'}}>
+            <Typography variant="h5" gutterBottom letterSpacing={3} sx={{marginLeft: '5px', fontSize: '22px', fontWeight:'bold',   mt:5, mb:'2.5rem'}}>
+                Dashboard
+            </Typography>
+                <Grid container spacing={2} sx={{alignItems: 'center', }}>
                     <Grid item xs={12} sm={6} md={4} lg={3}>
                         <Paper elevation={2} style={{maxWidth: '590px', padding: '25px', borderRadius: '15px', }}>
                             <Grid container justifyContent={'space-between'}>  
@@ -137,7 +140,7 @@ export default function CardContent (){
 
                 <Grid container spacing={2}>
                     <Grid item xs={12} lg={7}>
-                        <Paper elevation={2} sx={{maxWidth: {xs: 800, md: 820, lg: 890},  height: { xs: '50vh', lg: '64vh' }, marginTop: '2rem', padding: "1.8rem 1rem 4rem 1rem", borderRadius: "15px",  justifyContent: 'center', alignItems: 'center',}}>
+                        <Paper elevation={2} sx={{maxWidth: {xs: 800, md: 940, lg: 890},  height: { xs: '50vh', lg: '64vh' }, marginTop: '2rem', padding: "1.8rem 1rem 4rem 1rem", borderRadius: "15px",  justifyContent: 'center', alignItems: 'center',}}>
                         <Typography variant="h5" color={'black'} sx={{fontSize: '20px', marginTop: '0.6rem', ml: '1rem'}} letterSpacing={2} gutterBottom>Monthly Income</Typography>
                             <IncomeChartHeader/>
                         </Paper>
@@ -145,14 +148,14 @@ export default function CardContent (){
                     <Grid item xs={12} lg={5} >
                         <Grid container direction={'column'} height={'100%'}>
                             <Grid item>
-                                <Paper elevation={2} sx={{overflowX: 'none', maxWidth: {xs: 800 , md: 820, lg: 890},  height: { xs: '50vh', lg: '38vh' }, padding: "1.8rem 1rem 3.5rem 1rem", marginTop: '2rem', borderRadius: "15px",  justifyContent: 'center', alignItems: 'center',}}>
+                                <Paper elevation={2} sx={{overflowX: 'none', maxWidth: {xs: 800 , md: 940, lg: 890},  height: { xs: '50vh', lg: '38vh' }, padding: "1.8rem 1rem 3.5rem 1rem", marginTop: '2rem', borderRadius: "15px",  justifyContent: 'center', alignItems: 'center',}}>
                                 <Typography variant="h5" color={'black'} sx={{fontSize: '20px', marginTop: '0.6rem', ml: '1rem'}} letterSpacing={2} gutterBottom>Monthly Expenses</Typography>
                                 <ExpensesChartHeader/>
                                 </Paper>
                             </Grid>
                             <Grid container spacing={2} justifyContent="space-between" alignItems="stretch" sx={{ marginTop: '0.4rem' }}>
                                 <Grid item xs={12} sm={6}>
-                                    <Paper elevation={2} sx={{maxWidth: { xs: 'auto', lg: 800 }, height: { xs: '22vh', lg: '22.5vh' }, padding: "1rem 0.9rem 3.5rem 0.9rem", borderRadius: "15px",  justifyContent: 'center', alignItems: 'center',}}>
+                                    <Paper elevation={2} sx={{maxWidth: { xs: 'auto', lg: 800 }, height: { xs: '22vh', sm: '15vh', md: '14vh', lg: '22.5vh' }, padding: "1rem 0.9rem 3.5rem 0.9rem", borderRadius: "15px",  justifyContent: 'center', alignItems: 'center',}}>
                                         <Grid container justifyContent={'space-between'}>
                                             <Grid item>
                                                 <Typography variant="h3" color="black" sx={{ml: '1rem', mt:'1rem' }} letterSpacing={2} gutterBottom>
@@ -172,7 +175,7 @@ export default function CardContent (){
                                             </Grid>
                                         </Grid>
                                        
-                                        <Typography variant="h5" color="black" sx={{fontSize: {xs: '20px' ,sm: '18px', md: '18px' , lg: '20px' ,}, mt: {xs: '0rem', sm: '1rem', xl: '0.6rem'}, ml: '1rem' }} letterSpacing={2} gutterBottom>
+                                        <Typography variant="h5" color="black" sx={{fontSize: {xs: '20px' ,sm: '18px', md: '18px' , lg: '20px' ,}, mt: {xs: '0rem',  md:'0.1rem', xl: '0.6rem'}, ml: '1rem' }} letterSpacing={2} gutterBottom>
                                             Available Rooms
                                         </Typography>
                                         <Typography variant="body1" color="#a55555" sx={{fontSize: {xs: '13px' ,sm: '12px', md: '12px' , lg: '13px' ,}, marginTop: '0.1rem', ml: '1rem' }} letterSpacing={2} gutterBottom>
@@ -183,7 +186,7 @@ export default function CardContent (){
                                 </Grid>
 
                                 <Grid item xs={12} sm={6}>
-                                    <Paper elevation={2} sx={{ maxWidth: { xs: 'auto',  lg: 800 },  height: { xs: '22vh', lg: '22.5vh' },  padding: "1rem 0.9rem 3.5rem 0.9rem",  borderRadius: "15px",  justifyContent: 'center',  lignItems: 'center',}}
+                                    <Paper elevation={2} sx={{ maxWidth: { xs: 'auto',  lg: 800 },  height: { xs: '22vh', sm:'15vh', md:'14vh', lg: '22.5vh' },  padding: "1rem 0.9rem 3.5rem 0.9rem",  borderRadius: "15px",  justifyContent: 'center',  lignItems: 'center',}}
                                     >
                                         <Grid container justifyContent={'space-between'}>
                                             <Grid item>
@@ -224,8 +227,8 @@ export default function CardContent (){
                         <Paper
                             elevation={2}
                             sx={{
-                                maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 }, 
-                                height: { xs: '50vh', lg: '64vh' },
+                                maxWidth: { xs: 312, sm: 741,  md: 940, lg: 890 }, 
+                                height: { xs: '50vh', md:'43vh', lg: '64vh' },
                                 padding: "1rem 0rem 2.7rem 0rem",
                                 borderRadius: '15px',
                                 marginTop: '2rem',
@@ -242,8 +245,8 @@ export default function CardContent (){
                         <Paper
                             elevation={2}
                             sx={{
-                                maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 }, 
-                                height: { xs: '50vh', lg: '64vh' },
+                                maxWidth: { xs: 312, sm: 730,  md: 940, lg: 890 }, 
+                                height: { xs: '50vh', md: '43vh', lg: '64vh' },
                                 padding: "1rem 0rem 2.7rem 0rem",
                                 borderRadius: '15px',
                                 marginTop: '2rem',

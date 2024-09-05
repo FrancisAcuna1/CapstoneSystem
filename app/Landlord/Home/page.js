@@ -9,10 +9,10 @@ import Link from '@mui/material/Link';
 import Navigator from '../DashboardLayout/navigator';
 import Header from '../DashboardLayout/header';
 import { Divider } from '@mui/material';
-import Content from '../ComponentLayout/content';
+// import Content from '../ComponentLayout/content';
 import dynamic from 'next/dynamic';
 
-const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
+const CardContentHeader = dynamic(() => import('../ComponentLayout/CardContent/page'), {
   ssr: false
   }) 
 
@@ -184,12 +184,16 @@ let theme = createTheme({
     },
   };
 
+
+  
+
   
 const drawerWidth = 256;
 
 export default function HomePage (){
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
+  // this code 'isSmUp is Enable the Burger Icon for mobile view
+  const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
 
   const handleDrawerToggle = () => {
   setMobileOpen(!mobileOpen);
@@ -202,7 +206,7 @@ export default function HomePage (){
           <CssBaseline />
           <Box
           component="nav"
-          sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+          sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 1 } }}
           >
           {isSmUp ? null : (
               <Navigator
@@ -213,9 +217,10 @@ export default function HomePage (){
               
               />
           )}
+              {/* this code is for mobile view navigator */}
               <Navigator
                 PaperProps={{ style: { width: drawerWidth } }}
-                sx={{ display: { sm: 'block', xs: 'none' } }}
+                sx={{ display: { sm: 'none', xs: 'none', lg:'block' } }} 
                 
               />
           </Box>
@@ -223,7 +228,7 @@ export default function HomePage (){
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
           <Box component="main" sx={{ flex: 1, py: 2, px: 4, bgcolor: '#eaeff1' }}>
-              <h1>This is Home Page</h1>
+              {/* <h5>This is Home Page</h5> */}
               <CardContentHeader/>
               {/* <Content/> */}
           </Box>

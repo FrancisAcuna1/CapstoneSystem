@@ -23,10 +23,10 @@ export default function RoomTable (){
     const column = [
         { field: 'col1', headerName: 'Room No.', width: 150, p: 10, },
         { field: 'col2', headerName: 'Monthly Rate', width: 150, p: 10 },
-        { field: 'col3', headerName: 'Status', width: 160, p: 12,  renderCell: (params) => (
+        { field: 'col3', headerName: 'Status', width: 160, p: 10,  renderCell: (params) => (
           <Chip 
-              label={params.value} 
-              color={params.value === 'Available' ? 'primary' : 'secondary'} 
+                label={params.value} 
+                color={params.value === 'Available' ? 'primary' : 'secondary'} 
           />
           ),
        },
@@ -40,24 +40,47 @@ export default function RoomTable (){
 
     return (
         <>
-            <DataGrid 
-                rows={rows} 
-                columns={column}   
+             <DataGrid
+                sx={{height: '100%'}}
+                checkboxSelection
+                rows={rows}
+                columns={column}
+                getRowClassName={(params) =>
+                    params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
+                }
                 initialState={{
-                    pagination: {
-                        paginationModel: { page: 0, pageSize: 8 },
+                    pagination: { paginationModel: { pageSize: 20 } },
+                }}
+                pageSizeOptions={[12, 20, 50]}
+                disableColumnResize
+                density="compact"
+                slotProps={{
+                    filterPanel: {
+                    filterFormProps: {
+                        logicOperatorInputProps: {
+                        variant: 'outlined',
+                        size: 'small',
+                        },
+                        columnInputProps: {
+                        variant: 'outlined',
+                        size: 'small',
+                        sx: { mt: 'auto' },
+                        },
+                        operatorInputProps: {
+                        variant: 'outlined',
+                        size: 'small',
+                        sx: { mt: 'auto' },
+                        },
+                        valueInputProps: {
+                        InputComponentProps: {
+                            variant: 'outlined',
+                            size: 'small',
+                        },
+                        },
+                    },
                     },
                 }}
-                pageSizeOptions={[5, 10]}
-                checkboxSelection
-                sx={{ 
-                    // width: 500, 
-                    height: '100%', 
-                    overflowX: 'auto', 
-                    justifyContent: 'center', 
-                    textAlign: 'center' 
-                }} 
-            />
+                />
         </>
     )
 }

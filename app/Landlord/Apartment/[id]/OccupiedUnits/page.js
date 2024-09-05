@@ -10,7 +10,7 @@ import Navigator from '../../../DashboardLayout/navigator';
 import Header from '../../../DashboardLayout/header';
 import { Divider } from '@mui/material';
 import dynamic from 'next/dynamic';
-import TenantRegistration from '../../../ComponentLayout/TenantRegistration/page';
+import OccupiedTenantInformation from '../../../ComponentLayout/OccupiedUnitInfo/page';
 
 // const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
 //   ssr: false
@@ -187,7 +187,7 @@ let theme = createTheme({
   
 const drawerWidth = 256;
 
-export default function RegisterTenantPage (){
+export default function OccupiedTenantPage (){
   const [mobileOpen, setMobileOpen] = React.useState(false);
    // this code 'isSmUp is Enable the Burger Icon for mobile view
    const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
@@ -224,7 +224,7 @@ export default function RegisterTenantPage (){
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
           <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-              <TenantRegistration/>
+             <OccupiedTenantInformation/>
               {/* <Content/> */}
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>

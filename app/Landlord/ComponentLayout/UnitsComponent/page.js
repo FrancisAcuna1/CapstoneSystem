@@ -154,7 +154,7 @@ export default function UnitPage(){
                 List of Units
             </Typography>
             <Grid item xs={12} sx={{marginLeft: '5px', mt:2}}>
-                <Breadcrumbs aria-label="breadcrumb"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '16px' } }}>
+                <Breadcrumbs aria-label="breadcrumb"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '15px' } }}>
                     {/* <Typography color="inherit">Navigation</Typography> */}
                     <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Home">
                         Home
@@ -162,7 +162,7 @@ export default function UnitPage(){
                     <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Apartment">
                         Apartment
                     </Link>
-                    <Typography letterSpacing={2} color="text.primary"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '16px' } }}>List of Units</Typography>
+                    <Typography letterSpacing={2} color="text.primary"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '15px' } }}>List of Units</Typography>
                 </Breadcrumbs>
             </Grid>
 
@@ -178,8 +178,8 @@ export default function UnitPage(){
                     </Grid>
                 </Grid>
                 <Grid item>
-                    <Box sx={{ display: 'flex', justifySelf: 'end', mt:1.5 }}>
-                        <Button variant="contained" onClick={handleOpen} sx={{background: '#f78028','&:hover': {backgroundColor: '#ffab40',}, borderRadius: '15px', p:1.5, }}>
+                    <Box sx={{ display: 'flex', justifySelf: 'end', mt:1.5, ml:'-1rem' }}>
+                        <Button variant="contained" onClick={handleOpen} sx={{background: '#f78028','&:hover': {backgroundColor: '#ffab40',}, borderRadius: '15px',fontSize: {xs:'14px', sm: '15px', md:'15px', lg: '15px'}, p:{xs: 1, lg:1.5}, }}>
                         <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
                             Add New Room
                         </Button>
@@ -215,20 +215,11 @@ export default function UnitPage(){
             </Grid>
 
             <Grid container spacing={2} sx={{mt: '0.1rem'}}>
-                <Grid item xs={12} sm={6} md={4} lg={3}>
+                <Grid item xs={12} sm={6} md={4} lg={3} zeroMinWidth>
                     {/* Goods na ang responsive */}
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
-                            <Grid item>
-                                <Typography variant="h5" letterSpacing={2} sx={{fontSize: {xs: '24px', sm: '21px', md: '22px', lg: '24px'}, ml: '0.3rem', mt: '0.1rem',  fontWeight: 540 }}>
-                                Unit no. 1
-                                </Typography>
-                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: {xs: '14px', sm: '13px', md: '13px' ,lg:'14px'}, fontWeight: 540 }}>
-                                Monthly Rate: ₱10,000.00
-                                </Typography>
-                            </Grid>
-                            
-                            <Grid item sx={{display: 'flex', justifyContent:{md: 'center', lg:'flex-end'}, alignItems: 'center', mt: {sm: '1rem', md:'0.9rem', lg: '0rem'}, ml:{sm:'1rem', md:'1.5rem'}     }}>
+                            <Grid item sx={{display: 'flex', justifyContent:{ lg:'flex-end'}, alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'}}}>
                                 <img
                                 src="/3Dnewbedroom.png"
                                 // style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
@@ -236,6 +227,16 @@ export default function UnitPage(){
                                 alt="proptrack logo"
                                 />
                             </Grid>
+                            <Grid item>
+                                <Typography noWrap variant="h5" letterSpacing={2} sx={{fontSize: {xs: '24px', sm: '24px', md: '22px', lg: '24px'}, ml: '0.3rem', mt: '0.5rem',  fontWeight: 540 }}>
+                                Unit no. 1
+                                </Typography>
+                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: {xs: '14px', sm: '15px', md: '13px' ,lg:'15px'}, fontWeight: 540 }}>
+                                Monthly Rate: ₱10,000.00
+                                </Typography>
+                            </Grid>
+                            
+                            
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
@@ -247,75 +248,82 @@ export default function UnitPage(){
                 <Grid item xs={12} sm={6} md={4} lg={3}>
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
-                            <Grid item>
-                                <Typography variant="h5" letterSpacing={2} sx={{ ml: '0.3rem', mt: '0.1rem', fontSize: '24px', fontWeight: 540 }}>
-                                Unit no. 1
-                                </Typography>
-                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: '15px', fontWeight: 540 }}>
-                                Monthly Rate: ₱10,000.00
-                                </Typography>
-                            </Grid>
-                            <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'} }}>
                                 <img
                                 src="/hdlock.png"
-                                style={{ width: '70px', height: 'auto', objectFit: 'contain' }}
+                                className='hdlockIcon'
+                                // style={{ width: '90px', height: 'auto', objectFit: 'contain' }}
                                 alt="proptrack logo"
                                 />
                             </Grid>
+                            <Grid item>
+                                <Typography noWrap variant="h5" letterSpacing={2} sx={{fontSize: {xs: '24px', sm: '24px', md: '22px', lg: '24px'}, ml: '0.3rem', mt: {xs: '0.7rem', sm:'0.7rem', md:'1rem', lg:'0rem'},  fontWeight: 540 }}>
+                                    Unit no. 1
+                                </Typography>
+                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: {xs: '14px', sm: '15px', md: '13px' ,lg:'15px'}, fontWeight: 540 }}>
+                                Monthly Rate: ₱10,000.00
+                                </Typography>
+                            </Grid>
+                           
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: 16, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
+                            <Button href='/Landlord/Apartment/[id]/OccupiedUnits' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: {xs:'2rem', sm:'2rem',md:'2rem', lg: '1.3rem'}, mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
                         </Box>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={3}>
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
-                            <Grid item>
-                                <Typography variant="h5" letterSpacing={2} sx={{ ml: '0.3rem', mt: '0.1rem', fontSize: '24px', fontWeight: 540 }}>
-                                Unit no. 1
-                                </Typography>
-                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: '15px', fontWeight: 540 }}>
-                                Monthly Rate: ₱10,000.00
-                                </Typography>
-                            </Grid>
-                            <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'} }}>
                                 <img
                                 src="/hdlock.png"
-                                style={{ width: '70px', height: 'auto', objectFit: 'contain' }}
+                                className='hdlockIcon'
+                                // style={{ width: '90px', height: 'auto', objectFit: 'contain' }}
                                 alt="proptrack logo"
                                 />
                             </Grid>
+                            <Grid item>
+                                <Typography noWrap variant="h5" letterSpacing={2} sx={{fontSize: {xs: '24px', sm: '24px', md: '22px', lg: '24px'}, ml: '0.3rem', mt: {xs: '0.7rem', sm:'0.7rem', md:'1rem', lg:'0rem'},  fontWeight: 540 }}>
+                                    Unit no. 1
+                                </Typography>
+                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: {xs: '14px', sm: '15px', md: '13px' ,lg:'15px'}, fontWeight: 540 }}>
+                                Monthly Rate: ₱10,000.00
+                                </Typography>
+                            </Grid>
+                           
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: 16, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
+                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: {xs:'2rem', sm:'2rem',md:'2rem', lg: '1.3rem'}, mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
                         </Box>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={3}>
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
-                            <Grid item>
-                                <Typography variant="h5" letterSpacing={2} sx={{ ml: '0.3rem', mt: '0.1rem', fontSize: '24px', fontWeight: 540 }}>
-                                Unit no. 1
-                                </Typography>
-                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: '15px', fontWeight: 540 }}>
-                                Monthly Rate: ₱10,000.00
-                                </Typography>
-                            </Grid>
-                            <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <Grid item sx={{display: 'flex', justifyContent:{ lg:'flex-end'}, alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'}}}>
                                 <img
                                 src="/3Dnewbedroom.png"
-                                style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
+                                // style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
+                                className='hdroomIcon'
                                 alt="proptrack logo"
                                 />
                             </Grid>
+                            <Grid item>
+                                <Typography noWrap variant="h5" letterSpacing={2} sx={{fontSize: {xs: '24px', sm: '24px', md: '22px', lg: '24px'}, ml: '0.3rem', mt: '0.5rem',  fontWeight: 540 }}>
+                                Unit no. 1
+                                </Typography>
+                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: {xs: '14px', sm: '15px', md: '13px' ,lg:'15px'}, fontWeight: 540 }}>
+                                Monthly Rate: ₱10,000.00
+                                </Typography>
+                            </Grid>
+                            
+                            
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: 16, borderRadius: '12px'}} ><CreateOutlinedIcon sx={{mr:'0.2rem'}}/>Register New Tenant</Button>
+                            <Button href='/Landlord/Apartment/[id]/RegisterTenant' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><CreateOutlinedIcon sx={{ml: {md: '-0.2rem'}, mr:'0.3rem', fontSize: {xs: '25px', sm: '20px', md: '20px' ,lg:'25px'}, }}/>Register New Tenant</Button>
                         </Box>
                     </Paper>
                 </Grid>
@@ -323,100 +331,111 @@ export default function UnitPage(){
                 <Grid item xs={12} sm={6} md={4} lg={3}>
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
-                            <Grid item>
-                                <Typography variant="h5" letterSpacing={2} sx={{ ml: '0.3rem', mt: '0.1rem', fontSize: '24px', fontWeight: 540 }}>
-                                Unit no. 1
-                                </Typography>
-                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: '15px', fontWeight: 540 }}>
-                                Monthly Rate: ₱10,000.00
-                                </Typography>
-                            </Grid>
-                            <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <Grid item sx={{display: 'flex', justifyContent:{ lg:'flex-end'}, alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'}}}>
                                 <img
                                 src="/3Dnewbedroom.png"
-                                style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
+                                // style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
+                                className='hdroomIcon'
                                 alt="proptrack logo"
                                 />
                             </Grid>
+                            <Grid item>
+                                <Typography noWrap variant="h5" letterSpacing={2} sx={{fontSize: {xs: '24px', sm: '24px', md: '22px', lg: '24px'}, ml: '0.3rem', mt: '0.5rem',  fontWeight: 540 }}>
+                                Unit no. 1
+                                </Typography>
+                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: {xs: '14px', sm: '15px', md: '13px' ,lg:'15px'}, fontWeight: 540 }}>
+                                Monthly Rate: ₱10,000.00
+                                </Typography>
+                            </Grid>
+                            
+                            
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: 16, borderRadius: '12px'}} ><CreateOutlinedIcon sx={{mr:'0.2rem'}}/>Register New Tenant</Button>
+                            <Button href='/Landlord/Apartment/[id]/RegisterTenant' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><CreateOutlinedIcon sx={{ml: {md: '-0.2rem'}, mr:'0.3rem', fontSize: {xs: '25px', sm: '20px', md: '20px' ,lg:'25px'}, }}/>Register New Tenant</Button>
                         </Box>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={3}>
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
-                            <Grid item>
-                                <Typography variant="h5" letterSpacing={2} sx={{ ml: '0.3rem', mt: '0.1rem', fontSize: '24px', fontWeight: 540 }}>
-                                Unit no. 1
-                                </Typography>
-                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: '15px', fontWeight: 540 }}>
-                                Monthly Rate: ₱10,000.00
-                                </Typography>
-                            </Grid>
-                            <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <Grid item sx={{display: 'flex', justifyContent:{ lg:'flex-end'}, alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'}}}>
                                 <img
                                 src="/3Dnewbedroom.png"
-                                style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
+                                // style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
+                                className='hdroomIcon'
                                 alt="proptrack logo"
                                 />
                             </Grid>
+                            <Grid item>
+                                <Typography noWrap variant="h5" letterSpacing={2} sx={{fontSize: {xs: '24px', sm: '24px', md: '22px', lg: '24px'}, ml: '0.3rem', mt: '0.5rem',  fontWeight: 540 }}>
+                                Unit no. 1
+                                </Typography>
+                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: {xs: '14px', sm: '15px', md: '13px' ,lg:'15px'}, fontWeight: 540 }}>
+                                Monthly Rate: ₱10,000.00
+                                </Typography>
+                            </Grid>
+                            
+                            
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: 16, borderRadius: '12px'}} ><CreateOutlinedIcon sx={{mr:'0.2rem'}}/>Register New Tenant</Button>
+                            <Button href='/Landlord/Apartment/[id]/RegisterTenant' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><CreateOutlinedIcon sx={{ml: {md: '-0.2rem'}, mr:'0.3rem', fontSize: {xs: '25px', sm: '20px', md: '20px' ,lg:'25px'}, }}/>Register New Tenant</Button>
                         </Box>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={3}>
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
-                            <Grid item>
-                                <Typography variant="h5" letterSpacing={2} sx={{ ml: '0.3rem', mt: '0.1rem', fontSize: '24px', fontWeight: 540 }}>
-                                Unit no. 1
-                                </Typography>
-                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: '15px', fontWeight: 540 }}>
-                                Monthly Rate: ₱10,000.00
-                                </Typography>
-                            </Grid>
-                            <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <Grid item sx={{display: 'flex', justifyContent:{ lg:'flex-end'}, alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'}}}>
                                 <img
                                 src="/3Dnewbedroom.png"
-                                style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
+                                // style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
+                                className='hdroomIcon'
                                 alt="proptrack logo"
                                 />
                             </Grid>
+                            <Grid item>
+                                <Typography noWrap variant="h5" letterSpacing={2} sx={{fontSize: {xs: '24px', sm: '24px', md: '22px', lg: '24px'}, ml: '0.3rem', mt: '0.5rem',  fontWeight: 540 }}>
+                                Unit no. 1
+                                </Typography>
+                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: {xs: '14px', sm: '15px', md: '13px' ,lg:'15px'}, fontWeight: 540 }}>
+                                Monthly Rate: ₱10,000.00
+                                </Typography>
+                            </Grid>
+                            
+                            
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: 16, borderRadius: '12px'}} ><CreateOutlinedIcon sx={{mr:'0.2rem'}}/>Register New Tenant</Button>
+                            <Button href='/Landlord/Apartment/[id]/RegisterTenant' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><CreateOutlinedIcon sx={{ml: {md: '-0.2rem'}, mr:'0.3rem', fontSize: {xs: '25px', sm: '20px', md: '20px' ,lg:'25px'}, }}/>Register New Tenant</Button>
                         </Box>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={3}>
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container justifyContent="space-between" alignItems="center">
-                            <Grid item>
-                                <Typography variant="h5" letterSpacing={2} sx={{ ml: '0.3rem', mt: '0.1rem', fontSize: '24px', fontWeight: 540 }}>
-                                Unit no. 1
-                                </Typography>
-                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: '15px', fontWeight: 540 }}>
-                                Monthly Rate: ₱10,000.00
-                                </Typography>
-                            </Grid>
-                            <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <Grid item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: {sm: '0.1rem', md:'0.1rem', lg: '0rem'}, ml:{sm:'0.3rem', md:'0.3rem', lg: '0.2rem'} }}>
                                 <img
                                 src="/hdlock.png"
-                                style={{ width: '70px', height: 'auto', objectFit: 'contain' }}
+                                className='hdlockIcon'
+                                // style={{ width: '90px', height: 'auto', objectFit: 'contain' }}
                                 alt="proptrack logo"
                                 />
                             </Grid>
+                            <Grid item>
+                                <Typography noWrap variant="h5" letterSpacing={2} sx={{fontSize: {xs: '24px', sm: '24px', md: '22px', lg: '24px'}, ml: '0.3rem', mt: {xs: '0.7rem', sm:'0.7rem', md:'1rem', lg:'0rem'},  fontWeight: 540 }}>
+                                    Unit no. 1
+                                </Typography>
+                                <Typography variant="body1" letterSpacing={2} color="#f78028" sx={{ maxWidth: { xs: 225, lg: 125 }, ml: '0.3rem', mt: '0.1rem', fontSize: {xs: '14px', sm: '15px', md: '13px' ,lg:'15px'}, fontWeight: 540 }}>
+                                Monthly Rate: ₱10,000.00
+                                </Typography>
+                            </Grid>
+                           
                         </Grid>
 
                         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '2rem', mb: '-0.1rem', fontSize: 16, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
+                            <Button href='#' variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: {xs:'2rem', sm:'2rem',md:'2rem', lg: '1.3rem'}, mb: '-0.1rem', fontSize: {xs: '16px', sm: '15px', md: '15px' ,lg:'16px'}, borderRadius: '12px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>View Tenant Info</Button>
                         </Box>
                     </Paper>
                 </Grid>

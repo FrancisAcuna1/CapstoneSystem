@@ -167,7 +167,7 @@ export default function Navigator(props) {
 
           <MenuItem 
             component={Link}
-            href='#'
+            href='/Landlord/MaintenanceRequest'
             selected={selectedindex === 4}
             onClick={() => handleMenuItemClick(4)}
             sx={{
@@ -190,9 +190,9 @@ export default function Navigator(props) {
               </Typography>
           </MenuItem>
 
-          <MenuItem
+          {/* <MenuItem
             component={Link}
-            href='#'
+            href='/Landlord/CreateMaintenanceTask'
             selected={selectedindex === 5}
             onClick={() => handleMenuItemClick(5)}
             sx={{
@@ -213,13 +213,13 @@ export default function Navigator(props) {
               <Typography variant="body2"  sx={{ml:'0.4rem',  fontFamily: 'Poppins, Arial, sans-serif', fontWeight: 300, fontSize: '0.9rem', letterSpacing: '1px', textAlign: 'center' }}>
                   Add Maintenance 
               </Typography>
-          </MenuItem>
+          </MenuItem> */}
 
           <MenuItem
             component={Link}
-            href='#'
-            selected={selectedindex === 6} 
-            onClick={() => handleMenuItemClick(6)}
+            href='/Landlord/CreateMaintenanceTask'
+            selected={selectedindex === 5} 
+            onClick={() => handleMenuItemClick(5)}
             sx={{
   	          mx: '0.7rem',
   	          my: '0.8rem',
@@ -236,7 +236,7 @@ export default function Navigator(props) {
           >
               <CalendarMonthRoundedIcon sx={{ mx: '0.4rem', fontsize:'27px' }} />
               <Typography variant="body2"  sx={{ml:'0.4rem',  fontFamily: 'Poppins, Arial, sans-serif', fontWeight: 300, fontSize: '0.9rem', letterSpacing: '1px', textAlign: 'center' }}>
-                  List of Maintenance 
+                  Maintenance Schedule
               </Typography>
           </MenuItem>
 

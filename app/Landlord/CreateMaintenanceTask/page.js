@@ -6,15 +6,17 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Navigator from '../../../DashboardLayout/navigator';
-import Header from '../../../DashboardLayout/header';
+import Navigator from '../DashboardLayout/navigator';
+import Header from '../DashboardLayout/header';
 import { Divider } from '@mui/material';
 import dynamic from 'next/dynamic';
-import TenantRegistration from '../../../ComponentLayout/TenantRegistration/page';
-
-// const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
+// import MaintenaceRequestComponent from '../ComponentLayout/MaintenanceRequestComponent/page'
+// const CreateMaintenanceTask = dynamic(() => import('../ComponentLayout/CreateMaintenance/page'), {
 //   ssr: false
 //   }) 
+const CalendarComponent = dynamic(() => import('../ComponentLayout/CalendarComponent/page'), {
+ssr: false
+}) 
 
 
 // function Copyright() {
@@ -187,7 +189,7 @@ let theme = createTheme({
   
 const drawerWidth = 256;
 
-export default function RegisterTenantPage (){
+export default function CreateMaintenanceTaskPage (){
   const [mobileOpen, setMobileOpen] = React.useState(false);
    // this code 'isSmUp is Enable the Burger Icon for mobile view
    const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
@@ -224,7 +226,7 @@ export default function RegisterTenantPage (){
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
           <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-              <TenantRegistration/>
+              <CalendarComponent/>
               {/* <Content/> */}
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
