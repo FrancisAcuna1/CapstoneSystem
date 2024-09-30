@@ -8,7 +8,7 @@ import LoginPage from './Authentication/Login/page';
 import '/app/style.css';
 
 
-function App() {
+export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {
@@ -17,7 +17,7 @@ function App() {
 
   return (
    
-    <Box  className='body'>
+    <Box  className={'body'}>
     
       <LoginPage/>
     
@@ -28,4 +28,4 @@ function App() {
   );
 }
 
-export default App;
+

@@ -1,5 +1,8 @@
 "use client"
 import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from "next-auth/react"
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,12 +12,16 @@ import Link from '@mui/material/Link';
 import Navigator from '../DashboardLayout/navigator';
 import Header from '../DashboardLayout/header';
 import { Divider } from '@mui/material';
-// import Content from '../ComponentLayout/content';
+// import ApartmentContent from '../ComponentLayout/ApartmentComponent/page';
 import dynamic from 'next/dynamic';
-
-const CardContentHeader = dynamic(() => import('../ComponentLayout/CardContent/page'), {
+import { UserButton } from '@clerk/nextjs'
+const CardContentHeader = dynamic(() => import('../ComponentLayout/HeroContent/HomeContent'), {
   ssr: false
   }) 
+
+const LoadingState = dynamic(() => import('../ComponentLayout/Labraries/LoadingState'), {
+  ssr: false
+}) 
 
 
 // function Copyright() {
@@ -76,7 +83,7 @@ let theme = createTheme({
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            backgroundColor: '#ebf2f0', // Neutral Color
+            backgroundColor: '#ffffff', // Neutral Color
           },
         },
       },
@@ -184,61 +191,85 @@ let theme = createTheme({
     },
   };
 
-
   
+const drawerWidth = 265;
 
-  
-const drawerWidth = 256;
 
 export default function HomePage (){
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  console.log("Session: ", session);
+  console.log("Status: ", status);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  // this code 'isSmUp is Enable the Burger Icon for mobile view
+ // this code 'isSmUp is Enable the Burger Icon for mobile view
   const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
 
   const handleDrawerToggle = () => {
   setMobileOpen(!mobileOpen);
   };
 
-  return (
-    <>
-      <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-          <CssBaseline />
-          <Box
-          component="nav"
-          sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 1 } }}
-          >
-          {isSmUp ? null : (
-              <Navigator
-              PaperProps={{ style: { width: drawerWidth } }}
-              variant="temporary"
-              open={mobileOpen}
-              onClose={handleDrawerToggle}
-              
-              />
-          )}
-              {/* this code is for mobile view navigator */}
-              <Navigator
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.push('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    // return <>
+    //   {/* <LoadingState/> */}
+    // </>
+    return <p>Loading...</p>; // You can add a loading spinner here if needed
+  }
+
+  if (status === "authenticated"){
+    return (
+      <>
+        <ThemeProvider theme={theme}>
+        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+            <CssBaseline />
+            <Box
+            component="nav"
+            sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 1 } }}
+            >
+            {isSmUp ? null : (
+                <Navigator
                 PaperProps={{ style: { width: drawerWidth } }}
-                sx={{ display: { sm: 'none', xs: 'none', lg:'block' } }} 
+                variant="temporary"
+                open={mobileOpen}
+                onClose={handleDrawerToggle}
                 
-              />
-          </Box>
-          <Divider />
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Header onDrawerToggle={handleDrawerToggle} />
-          <Box component="main" sx={{ flex: 1, py: 2, px: 4, bgcolor: '#eaeff1' }}>
-              {/* <h5>This is Home Page</h5> */}
-              <CardContentHeader/>
-              {/* <Content/> */}
-          </Box>
-          <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-              {/* <Copyright/> */}
-          </Box>
-          </Box>
-      </Box>
-      </ThemeProvider>
-    
-    </>
-  )
+                />
+            )}
+                <Navigator
+                  PaperProps={{ style: { width: drawerWidth } }}
+                  sx={{ display: { sm: 'none', xs: 'none', lg:'block' } }}
+                  
+                />
+            </Box>
+            <Divider />
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Header onDrawerToggle={handleDrawerToggle} />
+            <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
+                <CardContentHeader/>
+                {/* <Content/> */}
+                
+            </Box>
+            <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
+                {/* <Copyright/> */}
+            </Box>
+            </Box>
+        </Box>
+        </ThemeProvider>
+      
+      </>
+    )
+
+  }
+
+  return null;
+
+  
+
+  
 }

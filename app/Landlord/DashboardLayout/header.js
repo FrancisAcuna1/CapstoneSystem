@@ -7,12 +7,17 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import HelpIcon from '@mui/icons-material/Help';
 import MenuIcon from '@mui/icons-material/Menu';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import MuiAppBar  from '@mui/material/AppBar';
+import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { UserProfile } from '@clerk/clerk-react';
+import { UserButton } from '@clerk/nextjs'
+import { signOut } from "next-auth/react";
+
+
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -60,7 +65,14 @@ const Search = styled('div')(({ theme }) => ({
     },
   }));
 
-
+  const CustomPage = () => {
+    return (
+      <div>
+        <h1>Custom Profile Page</h1>
+        <p>This is the custom profile page</p>
+      </div>
+    )
+  }
 
 
 function Header(props) {
@@ -106,7 +118,7 @@ function Header(props) {
         onClose={handleMenuClose}
         >
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={() => router.push('/')}>Log out</MenuItem>
+        <MenuItem onClick={() => signOut({ callbackUrl: '/' })}>Log out</MenuItem>
         </Menu>
     );
 
@@ -130,7 +142,7 @@ function Header(props) {
         <MenuItem>
             <IconButton size="large" aria-label="show 4 new mails" color="inherit">
             <Badge badgeContent={4} color="error">
-                <MailIcon />
+                <MailOutlineIcon />
             </Badge>
             </IconButton>
             <p>Messages</p>
@@ -142,7 +154,7 @@ function Header(props) {
             color="inherit"
             >
             <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
+                <NotificationsActiveOutlinedIcon />
             </Badge>
             </IconButton>
             <p>Notifications</p>
@@ -169,7 +181,7 @@ function Header(props) {
                 color="primary"
                 position="sticky"
                 elevation={1}
-                sx={ { zIndex: 1, py: 1.3,  backgroundColor: '#ebf2f0', backgroundImage: 'none',
+                sx={ { zIndex: 1, py: 1.3,  backgroundColor: '#ffffff', backgroundImage: 'none',
                    
                 }}
                 
@@ -199,19 +211,19 @@ function Header(props) {
                 
                 <Box sx={{ flexGrow: 1 }} />
                 <Box sx={{ display: { xs: 'none', md: 'none', lg: 'flex' } }}>
-                    <IconButton size="small" aria-label="show 4 new mails" sx={{mr: '0.3rem', backgroundColor: "#8785d0", "&:hover": {backgroundColor: '#b6bdf1'}}}>
+                    <IconButton size="small" aria-label="show 4 new mails" sx={{mr: '0.1rem', "&:hover": {backgroundColor: '#d9defa'}}}>
                         <Badge badgeContent={4} color="error">
-                            <MailIcon  sx={{color: 'white', fontSize: '25px'}}/>
+                            <MailOutlineIcon  sx={{color: '#212121', }}/>
                         </Badge>
                     </IconButton>
                     <IconButton
                     size="large"
                     aria-label="show 17 new notifications"
                     color="inherit"
-                    sx={{mr: '0.3rem', backgroundColor: "#8785d0", "&:hover": {backgroundColor: '#b6bdf1'}}}
+                    sx={{mr: '0.3rem', "&:hover": {backgroundColor: '#d9defa'}}}
                     >
-                        <Badge badgeContent={17} color="error">
-                            <NotificationsIcon sx={{color: 'white', fontSize: '25px'}}/>
+                        <Badge badgeContent={17} color="primary">
+                            <NotificationsActiveOutlinedIcon sx={{color: '#212121',}}/>
                         </Badge>
                     </IconButton>
                     <Avatar
@@ -227,7 +239,26 @@ function Header(props) {
                     >
                         
                     </Avatar>
+                    
                 </Box>
+                {/* <header>
+                    <UserButton>
+                      
+                        <UserButton.UserProfilePage label="Custom Page" url="custom" labelIcon={'icon'}>
+                        <CustomPage />
+                        </UserButton.UserProfilePage>
+
+                        
+                        <UserButton.UserProfilePage label="Terms" labelIcon={'DotIcon2'} url="terms">
+                        <div>
+                            <h1>Custom Terms Page</h1>
+                            <p>This is the custom terms page</p>
+                        </div>
+                        </UserButton.UserProfilePage>
+                    </UserButton>
+                </header> */}
+              
+                {/* <UserButton.UserProfilePage /> */}
                 <Box sx={{ display: { xs: 'flex', md: 'flex', lg: 'none'} }}>
                     <IconButton
                     size="large"

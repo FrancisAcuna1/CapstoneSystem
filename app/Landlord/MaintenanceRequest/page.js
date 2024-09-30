@@ -11,7 +11,7 @@ import Header from '../DashboardLayout/header';
 import { Divider } from '@mui/material';
 import dynamic from 'next/dynamic';
 // import MaintenaceRequestComponent from '../ComponentLayout/MaintenanceRequestComponent/page'
-const MaintenaceRequestComponent = dynamic(() => import('../ComponentLayout/MaintenanceRequestComponent/page'), {
+const MaintenaceRequestComponent = dynamic(() => import('../ComponentLayout/HeroContent/MaintenanceRequestComponent'), {
   ssr: false
   }) 
 
@@ -75,7 +75,7 @@ let theme = createTheme({
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            backgroundColor: '#ebf2f0', // Neutral Color
+            backgroundColor: '#ffffff', // Neutral Color
           },
         },
       },
@@ -182,7 +182,6 @@ let theme = createTheme({
       },
     },
   };
-
   
 const drawerWidth = 256;
 

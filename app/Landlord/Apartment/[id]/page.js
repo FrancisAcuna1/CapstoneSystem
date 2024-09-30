@@ -9,9 +9,9 @@ import Link from '@mui/material/Link';
 import Navigator from '../../DashboardLayout/navigator';
 import Header from '../../DashboardLayout/header';
 import { Divider } from '@mui/material';
-import UnitsContent from '../../ComponentLayout/UnitsComponent/page';
+import UnitsContent from '../../ComponentLayout/HeroContent/UnitsComponent';
 import dynamic from 'next/dynamic';
-
+import ListofUnitComponent from '../../ComponentLayout/HeroContent/PropertyTypeComponent';
 // const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
 //   ssr: false
 //   }) 
@@ -43,7 +43,7 @@ let theme = createTheme({
         main: '#a55555',    // Alert/Warn Color
       },
       background: {
-        default: '#eaeff1', // Neutral Color for backgrounds
+        default: '#ebf2f0', // Neutral Color for backgrounds
       },
     },
     typography: {
@@ -76,7 +76,7 @@ let theme = createTheme({
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            backgroundColor: '#ebf2f0', // Neutral Color
+            backgroundColor: '#ffffff', // Neutral Color
           },
         },
       },
@@ -223,8 +223,9 @@ export default function UnitsContentPage (){
           <Divider />
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
-          <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-              <UnitsContent/>
+          <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#ebf2f0' }}>
+            <ListofUnitComponent/>
+              {/* <UnitsContent/> */}
               {/* <Content/> */}
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>

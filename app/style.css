@@ -293,6 +293,31 @@ button{
 
 /*  */
 
+/* Status Card Icon */
+.DoneIcon{
+    width: 100px;
+    height: 90px;
+}
+@media (max-width: 1200px) { /* Medium devices (desktops, 992px and up) */
+    .DoneIcon {
+        width: 20px;
+    }
+}
+
+@media (max-width: 998px) { /* Small devices (tablets, 768px and up) */
+    .DoneIcon {
+        width: 20px;
+    }
+}
+
+@media (max-width: 768px) { /* ExtraSmall devices (landscape phones, 576px and up) */
+    .DoneIcon {
+        width: 60px;
+    }
+}
+
+
+
 
 
 /* FUll CALENDAR */
@@ -333,5 +358,14 @@ button{
       margin-bottom: 10px;
     }
   }
+
+
+/* Sort Icon Transition */
+.fc-toolbar-chunk .fc-button .fc-icon {
+    
+    transition: 'transform 0.3s ease',
+    
+    
+}
 
   

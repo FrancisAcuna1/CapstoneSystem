@@ -1,18 +1,20 @@
 "use client"
 import * as React from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
+import {Box} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Navigator from '../DashboardLayout/navigator';
 import Header from '../DashboardLayout/header';
 import { Divider } from '@mui/material';
-// import ApartmentContent from '../ComponentLayout/ApartmentComponent/page';
 import dynamic from 'next/dynamic';
 
-const ApartmentContent = dynamic(() => import('../ComponentLayout/ApartmentComponent/page'), {
+const PropertyContent = dynamic(() => import('../ComponentLayout/HeroContent/PropertyComponent'), {
   ssr: false
   }) 
 
@@ -76,7 +78,7 @@ let theme = createTheme({
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            backgroundColor: '#ebf2f0', // Neutral Color
+            backgroundColor: '#ffffff', // Neutral Color
           },
         },
       },
@@ -188,6 +190,10 @@ let theme = createTheme({
 const drawerWidth = 256;
 
 export default function ApartmentPage (){
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  console.log("Session: ", session);
+  console.log("Status: ", status);
   const [mobileOpen, setMobileOpen] = React.useState(false);
  // this code 'isSmUp is Enable the Burger Icon for mobile view
   const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
@@ -196,44 +202,65 @@ export default function ApartmentPage (){
   setMobileOpen(!mobileOpen);
   };
 
-  return (
-    <>
-      <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-          <CssBaseline />
-          <Box
-          component="nav"
-          sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 1 } }}
-          >
-          {isSmUp ? null : (
-              <Navigator
-              PaperProps={{ style: { width: drawerWidth } }}
-              variant="temporary"
-              open={mobileOpen}
-              onClose={handleDrawerToggle}
-              
-              />
-          )}
-              <Navigator
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.push('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    // return <>
+    //   <LoadingState/>
+    // </>
+    return <p>Loading...</p>; // You can add a loading spinner here if needed
+  }
+
+  if (status == "authenticated"){
+    return (
+      <>
+        <ThemeProvider theme={theme}>
+        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+            <CssBaseline />
+            <Box
+            component="nav"
+            sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 1 } }}
+            >
+            {isSmUp ? null : (
+                <Navigator
                 PaperProps={{ style: { width: drawerWidth } }}
-                sx={{ display: { sm: 'none', xs: 'none', lg:'block' } }}
+                variant="temporary"
+                open={mobileOpen}
+                onClose={handleDrawerToggle}
                 
-              />
-          </Box>
-          <Divider />
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Header onDrawerToggle={handleDrawerToggle} />
-          <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-              <ApartmentContent/>
-              {/* <Content/> */}
-          </Box>
-          <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-              {/* <Copyright/> */}
-          </Box>
-          </Box>
-      </Box>
-      </ThemeProvider>
-    
-    </>
-  )
+                />
+            )}
+                <Navigator
+                  PaperProps={{ style: { width: drawerWidth } }}
+                  sx={{ display: { sm: 'none', xs: 'none', lg:'block' } }}
+                  
+                />
+            </Box>
+            <Divider />
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Header onDrawerToggle={handleDrawerToggle} />
+            <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
+                <PropertyContent/>
+                {/* <Content/> */}
+            </Box>
+            <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
+                {/* <Copyright/> */}
+            </Box>
+            </Box>
+        </Box>
+        </ThemeProvider>
+      
+      </>
+    )
+
+  }
+  null;
+
+
+  
 }

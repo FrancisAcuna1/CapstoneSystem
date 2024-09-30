@@ -1,30 +1,16 @@
 'use client'
 import React from 'react';
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Link,
-  IconButton,
-  InputAdornment,
-  Container,
-  CssBaseline,
-  Avatar,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  Input
-} from '@mui/material';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession, signIn } from 'next-auth/react'
+import { Box, Grid, Button, TextField, Typography, Link, IconButton, InputAdornment, Container, CssBaseline, Avatar, LinearProgress, Alert} from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import GoogleIcon from '@mui/icons-material/Google';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import { useState } from 'react';
+import TwitterIcon from '@mui/icons-material/Twitter';;
 import { createTheme, } from '@mui/material';
 import { ThemeProvider } from 'styled-components';
 import LockPersonIcon from "@mui/icons-material/LockPerson";
-
 
 const theme = createTheme({
    
@@ -96,6 +82,71 @@ const theme = createTheme({
   
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const router = useRouter();
+  const [login, setLogin] = useState({
+    username: '',
+    password: '',
+  });
+
+  const handleChange = (e) => {
+      const { name, value } = e.target;
+      setLogin({
+          ...login,
+          [name]: value
+      });
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(false);
+    // signIn();
+
+    
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(login),
+      });
+    //   const response = signIn("credentials", { 
+    //   redirect: false,
+    //   username: login.username,
+    //   password: login.password,
+    // });
+
+      const data = await response.json();
+      console.log("Response data:", data);
+      console.log("Response status:", response.status);
+
+      if (response.ok) {
+        if (data.token && data.user_type) {
+          localStorage.setItem('userDetails', JSON.stringify(data));
+          console.log('Login successful:', data);
+          // Assuming that the name is present in the response, otherwise handle accordingly
+          console.log('role:', data.user_type)
+          router.push(`/${data.user_type}/Home`);
+        } else {
+          console.error('Missing token or name in response:', data);
+          setError(true);
+        }
+      } else {
+        console.error('Login failed:', data);
+        setError(true);
+        setLoading(false);
+        // Handle login failure, e.g., display an error message
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      setLoading(false);
+    }
+  };
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -113,7 +164,7 @@ export default function LoginPage() {
             maxWidth={430}
             sx={{
             margin: 'auto',
-            marginTop: 2,
+           
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -123,6 +174,7 @@ export default function LoginPage() {
             boxShadow: 3,
             }}
         >
+          {isLoading && <LinearProgress color="secondary" sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mb: 2, mt:1 }}>
                 <Avatar sx={{ bgcolor: "#673ab7", height: "60px", width: "65px" }}>
                     <LockPersonIcon fontSize="large" />
@@ -131,21 +183,31 @@ export default function LoginPage() {
             <Typography component="h1" variant="h5" sx={{fontWeight: 550, fontStyle: 'Poppins, serif',}} >
             Sign in
             </Typography>
+            {error && (
+              <Grid item mt={2} mb={2} textAlign={'center'}>
+                  <Alert severity="error" color="error">
+                      Incorrect Username or Password!
+                  </Alert>
+              </Grid>
+            )}
+
             {/* <Typography variant="body2" sx={{mt:1}}>
                 Don’t have an account?{' '}
                 <Link href="#" variant="body2">
                     Get started
                 </Link>
             </Typography> */}
-            <Box component="form" noValidate sx={{ mt: 3 }}>
+            <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={handleSubmit}>
             <TextField
                 margin="normal"
                 required
                 fullWidth
                 id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                label="Username"
+                name="username"
+                value={login.username}
+                onChange={handleChange}
+                autoComplete="username"
                 autoFocus
                 borderRadius={2} 
                 color='secondary'
@@ -171,6 +233,8 @@ export default function LoginPage() {
               required
               name="password"
               label="Password"
+              value={login.password}
+              onChange={handleChange}
               type={!showPassword ? 'password' : 'text'}
               id="password"
               autoComplete="current-password"
@@ -214,7 +278,7 @@ export default function LoginPage() {
             <Button
                 type="submit"
                 fullWidth
-                href='/Landlord/Home'
+                // href='/Landlord/Home'
                 sx={{ mt: 4, mb: 2, p:1.5, borderRadius: 3, fontStyle: 'Poppins, serif', fontSize: '0.950rem', fontWeight: 'bold', textTransform: 'none',  backgroundColor: '#6823a8', '&:hover': {backgroundColor: '#905dc0',}, color: 'white', }}
 
             >

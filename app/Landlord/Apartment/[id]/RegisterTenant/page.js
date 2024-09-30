@@ -10,7 +10,7 @@ import Navigator from '../../../DashboardLayout/navigator';
 import Header from '../../../DashboardLayout/header';
 import { Divider } from '@mui/material';
 import dynamic from 'next/dynamic';
-import TenantRegistration from '../../../ComponentLayout/TenantRegistration/page';
+import TenantRegistration from '../../../ComponentLayout/HeroContent/TenantRegistrationComponent';
 
 // const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
 //   ssr: false
@@ -76,7 +76,7 @@ let theme = createTheme({
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            backgroundColor: '#ebf2f0', // Neutral Color
+            backgroundColor: '#ffffff', // Neutral Color
           },
         },
       },
