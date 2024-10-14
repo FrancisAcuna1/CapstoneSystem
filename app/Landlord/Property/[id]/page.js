@@ -1,20 +1,19 @@
 "use client"
 import * as React from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useState, useEffect} from 'react';
+import { useParams, useRouter} from 'next/navigation';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
+import {Box, LinearProgress} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Navigator from '../../../../DashboardLayout/navigator';
-import Header from '../../../../DashboardLayout/header';
+import Navigator from '../../DashboardLayout/navigator';
+import Header from '../../DashboardLayout/header';
 import { Divider } from '@mui/material';
+import UnitsContent from '../../ComponentLayout/HeroContent/UnitsComponent';
 import dynamic from 'next/dynamic';
-import PropertyTypeComponent from '../../../../ComponentLayout/HeroContent/PropertyTypeComponent';
-import BoardingHouseDetailsComponent from '../../../../ComponentLayout/HeroContent/boardinghouseComponent';
-// import TenantRegistration from '../../../ComponentLayout/HeroContent/TenantRegistrationComponent';
-// import ApartmentDetails from '@/app/Landlord/ComponentLayout/TableComponent/ApartmentPropertyTable';
+import PropertyTypeComponent from '../../ComponentLayout/HeroContent/PropertyTypeComponent';
 // const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
 //   ssr: false
 //   }) 
@@ -46,7 +45,7 @@ let theme = createTheme({
         main: '#a55555',    // Alert/Warn Color
       },
       background: {
-        default: '#eaeff1', // Neutral Color for backgrounds
+        default: '#ebf2f0', // Neutral Color for backgrounds
       },
     },
     typography: {
@@ -190,11 +189,13 @@ let theme = createTheme({
   
 const drawerWidth = 256;
 
-export default function BoardingHouseDetailsPage (){
-
+export default function PropertyTypePage(){
+  const [loading, setLoading] = useState(false);
   const params = useParams();
   const propertyId = params.id;
-  console.log('id', propertyId);
+  console.log('id', propertyId)
+  console.log('loading:', loading);
+  
 
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -204,8 +205,6 @@ export default function BoardingHouseDetailsPage (){
   const handleDrawerToggle = () => {
   setMobileOpen(!mobileOpen);
   };
-
-  
 
   return (
     <>
@@ -225,19 +224,24 @@ export default function BoardingHouseDetailsPage (){
               
               />
           )}
+          
               <Navigator
                 PaperProps={{ style: { width: drawerWidth } }}
                 sx={{ display: { sm: 'none', xs: 'none', lg: 'block' } }}
                 
               />
           </Box>
+
           <Divider />
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
-          <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-              {/* <h1>Boarding House Details page</h1> */}
-              {/* <BoardingHouseDetailsComponent/> */}
-              <PropertyTypeComponent propertyId={propertyId} />
+          {loading && <LinearProgress color='primary' sx={{ position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
+          <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#ebf2f0' }}>
+         
+        
+            <PropertyTypeComponent propertyId={propertyId} loading={loading} setLoading={setLoading}/>
+              {/* <UnitsContent/> */}
+              {/* <Content/> */}
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
               {/* <Copyright/> */}

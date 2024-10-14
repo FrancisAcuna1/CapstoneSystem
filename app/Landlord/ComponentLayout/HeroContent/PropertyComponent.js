@@ -7,35 +7,36 @@ import { useTheme } from '@mui/material/styles';
 import { Modal as BaseModal } from '@mui/base/Modal';
 import PropTypes from 'prop-types';
 import { styled, css, } from '@mui/system';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import Image from 'next/image';
+import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 import AddApartmentModal from '../ModalComponent/AddEstateModal';
 import SuccessSnackbar from '../Labraries/snackbar';
+import ErrorSnackbar from '../Labraries/ErrorSnackbar'
 import { SnackbarProvider } from 'notistack';
-import LoadingState from '../Labraries/LoadingState';
 import { useRouter } from 'next/navigation';
 
 
-export default function PropertyComponent (){
+export default function PropertyComponent ({loading, setLoading}){
     const router = useRouter();
     const [property, setProperty] = useState([]);
+    const [editproperty, setEditProperty] = useState(null);
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const [successful, setSuccessful] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-
+    const [error, setError] = useState(null);
+    // const theme = useTheme();
+    // const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    console.log(editproperty)
+    
 
     useEffect(() => {
         const fetchedData = async () => {
             const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+            console.log(userDataString)
             const userData = JSON.parse(userDataString); // parse the datastring into json 
-            const accessToken = userData.token;
+            const accessToken = userData.accessToken;
             if (accessToken){
                 console.log('Access Token Found', accessToken)
 
@@ -75,6 +76,23 @@ export default function PropertyComponent (){
         
     }, [])
 
+    const handleEdit = (id) => {
+        console.log('Edit Property:', id)
+        setEditProperty(id);
+        setOpen(true);
+    }
+
+    const handleClick = (id) => {
+        setLoading(true);
+        try {
+            router.push(`/Landlord/Property/${id}`);
+        }catch (error) {
+            console.error(error);
+        } finally {
+        setLoading(false);
+        }
+    }
+
 
   
 
@@ -85,10 +103,14 @@ export default function PropertyComponent (){
                     setSuccessful={setSuccessful}
                     successful={successful}          
                 />
+                <ErrorSnackbar
+                    error={error}
+                    setError={setError}          
+                />
             </SnackbarProvider>
             
              <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '5px', fontSize: '24px', fontWeight: 'bold',  mt:5}}>
-                List of Property
+                List  of Estate Property
             </Typography>
             <Grid item xs={12} sx={{marginLeft: '5px', mt:2}}>
                 <Breadcrumbs aria-label="breadcrumb" sx={{ fontSize: { xs: '14px', sm: '15px', md: '15px' } }}>
@@ -112,6 +134,10 @@ export default function PropertyComponent (){
                         handleClose={handleClose}
                         setSuccessful={setSuccessful}
                         successful={successful}
+                        error={error}
+                        setError={setError}
+                        editproperty={editproperty}
+                        setEditProperty={setEditProperty}
 
                     />
                 </Grid>
@@ -146,7 +172,7 @@ export default function PropertyComponent (){
                 property.map((item, index) => {
                     return (
                     <Grid key={index} item xs={12} sm={6} md={4} lg={3}>
-                        <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 }, height:433,   padding: '25px', marginTop: '15px', borderRadius: '10px'}}>  
+                        <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 }, height:434,   padding: '25px', marginTop: '15px', borderRadius: '10px'}}>  
                             <CardMedia
                                 sx={{ height: 150 }}
                                 image={`http://127.0.0.1:8000/ApartmentImage/${item.image}`} // Use the URL of the first image
@@ -198,15 +224,71 @@ export default function PropertyComponent (){
                                     {/* Magsaysay st. Brgy Cogon, Sorsogon City */}
                                     {item.street}. Brgy {item.barangay}, {item.municipality}
                                 </Typography>
-                                <p>id {item.id}</p>
+                              
 
                             </Box>
                             
                             
-                            <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
-                                <Button onClick={() => router.push(`/Landlord/Property/${item.id}`)} variant="contained" sx={{width: '100%', background: '#8785d0', '&:hover':{background: '#b6bdf1'}, mt: '1.9rem', fontSize: {xs: '15px', sm: '16px', md: '15px', lg:'16px'}, borderRadius: '8px'}} ><VisibilityOutlinedIcon sx={{mr:'0.2rem'}}/>
-                                    View Property Types
-                                </Button>
+                            <Box sx={{display: 'flex', justifyContent: {xs:'flex-start', lg:'space-between'}, alignItems: {xs: 'flex-start', lg: 'center'}, gap:1}}>
+                                <Box>
+                                    <Button 
+                                        onClick={() => handleClick(item.id)} 
+                                        variant="contained" 
+                                        sx={{     
+                                            background: '#8785d0', 
+                                            '&:hover':{background: '#b6bdf1'}, 
+                                            mt: '1.9rem', 
+                                            fontSize: {xs: '16px', sm: '16px', md: '15px', lg:'16px'},  
+                                            borderRadius: '8px'
+                                        }} 
+                                    >        
+                                        <Box
+                                        component="span"
+                                        sx={{ display: { xs: 'inline', lg: 'none' } }}
+                                        >
+                                             View Property Type
+                                        </Box>
+                                        <Box
+                                        component="span"
+                                        sx={{ display: { xs: 'none', lg: 'inline' },}} // Hide text on mobile
+                                        >
+                                            <VisibilityOutlinedIcon sx={{mr:{xs:'0', lg:'0.3rem'}, mb: '-0.4rem' }}/> 
+                                             View Property Type
+                                        </Box> 
+                                    </Button>
+                                </Box>
+                                <Box>
+                                    <Button 
+                                        variant='outlined' 
+                                        onClick={() => handleEdit(item.id)}
+                                        sx={{
+                                            background: '', 
+                                            '&:hover':{background: '#b6bdf1'}, 
+                                            mt: '1.9rem', 
+                                            fontSize: {xs: '12px', sm: '16px', md: '15px', lg:'16px'}, 
+                                            borderRadius: '8px'
+                                        }}>
+                                        <Box
+                                        component="span"
+                                        sx={{
+                                             display: { xs: 'inline', lg: 'none' },
+                                             height: 28
+                                            
+                                        }}
+                                        >
+                                            <DriveFileRenameOutlineOutlinedIcon
+                                            sx={{ mr: { xs: 0, lg: '0.2rem' } }}
+                                            />
+                                        </Box>
+                                        <Box
+                                        component="span"
+                                        sx={{ display: { xs: 'none', lg: 'inline' } }} // Hide text on mobile
+                                        >
+                                           
+                                            Edit
+                                        </Box>  
+                                    </Button>
+                                </Box>
                             </Box>
                         </Paper>
                     </Grid>

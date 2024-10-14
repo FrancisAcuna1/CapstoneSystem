@@ -1,22 +1,20 @@
 "use client"
 import * as React from 'react';
-import { useState, useEffect} from 'react';
-import { useParams, useRouter} from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
+import {Box, LinearProgress} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Navigator from '../../DashboardLayout/navigator';
 import Header from '../../DashboardLayout/header';
 import { Divider } from '@mui/material';
-import UnitsContent from '../../ComponentLayout/HeroContent/UnitsComponent';
 import dynamic from 'next/dynamic';
-import PropertyTypeComponent from '../../ComponentLayout/HeroContent/PropertyTypeComponent';
-// const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
-//   ssr: false
-//   }) 
+import EditTenantComponent from '../../ComponentLayout/HeroContent/EditTenantComponent';
+// import MaintenaceRequestComponent from '../ComponentLayout/MaintenanceRequestComponent/page'
+
 
 
 // function Copyright() {
@@ -45,7 +43,7 @@ let theme = createTheme({
         main: '#a55555',    // Alert/Warn Color
       },
       background: {
-        default: '#ebf2f0', // Neutral Color for backgrounds
+        default: '#eaeff1', // Neutral Color for backgrounds
       },
     },
     typography: {
@@ -185,64 +183,67 @@ let theme = createTheme({
       },
     },
   };
-
   
 const drawerWidth = 256;
 
-export default function PropertyTypePage(){
-  // const params = useParams();
-  // const propertyId = params.id;
-  // console.log('id', propertyId)
+export default function TenantInformationPage (){
+    const [loading, setLoading]= useState(false)
+    const params = useParams();
+    const tenantId = params.id;
+    console.log(tenantId)
 
 
+    const [mobileOpen, setMobileOpen] = React.useState(false);
+    // this code 'isSmUp is Enable the Burger Icon for mobile view
+    const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
 
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-   // this code 'isSmUp is Enable the Burger Icon for mobile view
-   const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
+    const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+    };
 
-  const handleDrawerToggle = () => {
-  setMobileOpen(!mobileOpen);
-  };
-
-  return (
-    <>
-      <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-          <CssBaseline />
-          <Box
-          component="nav"
-          sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 1 } }}
-          >
-          {isSmUp ? null : (
-              <Navigator
-              PaperProps={{ style: { width: drawerWidth } }}
-              variant="temporary"
-              open={mobileOpen}
-              onClose={handleDrawerToggle}
-              
-              />
-          )}
-              <Navigator
+    return (
+        <>
+        <ThemeProvider theme={theme}>
+        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+            <CssBaseline />
+            <Box
+            component="nav"
+            sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 1 } }}
+            >
+            {isSmUp ? null : (
+                <Navigator
                 PaperProps={{ style: { width: drawerWidth } }}
-                sx={{ display: { sm: 'none', xs: 'none', lg: 'block' } }}
+                variant="temporary"
+                open={mobileOpen}
+                onClose={handleDrawerToggle}
                 
-              />
-          </Box>
-          <Divider />
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Header onDrawerToggle={handleDrawerToggle} />
-          <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#ebf2f0' }}>
-            <PropertyTypeComponent/>
-              {/* <UnitsContent/> */}
-              {/* <Content/> */}
-          </Box>
-          <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-              {/* <Copyright/> */}
-          </Box>
-          </Box>
-      </Box>
-      </ThemeProvider>
-    
-    </>
-  )
+                />
+            )}
+                <Navigator
+                    PaperProps={{ style: { width: drawerWidth } }}
+                    sx={{ display: { sm: 'none', xs: 'none', lg: 'block' } }}
+                    
+                />
+            </Box>
+            <Divider />
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Header onDrawerToggle={handleDrawerToggle} />
+            {loading && <LinearProgress sx={{ color:"#673ab7", position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
+            <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
+                <EditTenantComponent
+                    loading={loading}
+                    setLoading={setLoading}
+                    tenantId={tenantId}
+                />
+                {/* <Content/> */}
+            </Box>
+            <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
+                {/* <Copyright/> */}
+            </Box>
+            </Box>
+        </Box>
+        </ThemeProvider>
+        
+        </>
+    )
 }

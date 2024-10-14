@@ -13,6 +13,10 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import MuiAppBar  from '@mui/material/AppBar';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { signOut } from "next-auth/react";
+
+
+
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
 const Search = styled('div')(({ theme }) => ({
@@ -87,6 +91,14 @@ function Header(props) {
         setMobileMoreAnchorEl(event.currentTarget);
     };
 
+    const handleLogout = async () => {
+        await signOut({ redirect: false });
+        localStorage.removeItem('userDetails'); // Clear user data
+        sessionStorage.clear(); // Clear token
+        // Redirect to login page
+        window.location.href = '/';
+    };
+
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
         <Menu
@@ -105,7 +117,7 @@ function Header(props) {
         onClose={handleMenuClose}
         >
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={() => router.push('/')}>Log out</MenuItem>
+        <MenuItem onClick={handleLogout}>Log out</MenuItem>
         </Menu>
     );
 

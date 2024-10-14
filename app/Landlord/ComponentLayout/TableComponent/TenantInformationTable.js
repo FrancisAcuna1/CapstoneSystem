@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper, TextField, IconButton, InputAdornment, Avatar, Toolbar, Typography, Box, Tooltip, InputBase, inputProps, Breadcrumbs, Link, Grid, Chip, Fab, Button, Fade, FormControl, InputLabel, Select, MenuItem} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -81,15 +81,16 @@ const StyledTableRow = styled(TableRow)(({ theme, isSelected }) => ({
         color: '#263238'
 }));
 
-const CustomTooltip = styled(({ className, ...props }) => (
+const DeleteTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
-))({
+  ))({
     '& .MuiTooltip-tooltip': {
-    backgroundColor: '#e57373', // Background color of the tooltip
-    color: '#ffffff', // Text color
-    borderRadius: '4px',
+      backgroundColor: '#e57373', // Background color of the tooltip
+      color: '#ffffff', // Text color
+      borderRadius: '4px',
     },
 });
+
 
 const AcceptToolTip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -111,49 +112,70 @@ const GeneralTooltip = styled(({ className, ...props }) => (
     },
 });
 
-const unitsData = [
-  { id: 1, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'Active', tenant: 'John Doe', contact: '09369223915' },
-  { id: 2, name: 'Unit 102',  propertype:'Apartment', startoccupancy: '05-29-2024', location: 'Building A', status: 'Active', tenant: 'Mark Villiar', contact: '09769243995'  },
-  { id: 3, name: 'Unit 103',  propertype:'Bedspacer', startoccupancy: '01-03-2023', location: 'Building B', status: 'Active', tenant: 'Jane Smith', contact: '09369223915' },
-  { id: 4, name: 'Unit 104',  propertype:'Apartment', startoccupancy: '08-23-2023', location: 'Building B', status: 'In-Active', tenant: 'Mark Doe', contact: '09369223915' },
-  { id: 5, name: 'Unit 105',  propertype:'Bedspacer', startoccupancy: '02-03-2024', location: 'Building B', status: 'Active', tenant: 'Izer Alindogan', contact: '09397865491'},
-  { id: 6, name: 'Unit 106',  propertype:'Bedspacer', startoccupancy: '06-18-2023', location: 'Building B', status: 'Active', tenant: 'John Domasig', contact: '09369223915' },
-  { id: 7, name: 'Unit 107',  propertype:'Apartment', startoccupancy: '04-16-2024', location: 'Building B', status: 'In-Active', tenant: 'Kim Denso', contact: '09097865491' },
-  { id: 8, name: 'Unit 108',  propertype:'Apartment', startoccupancy: '01-23-2024', location: 'Building B', status: 'In-Active', tenant: 'Anne Jebulan', contact: '09887765149' },
-  { id: 9, name: 'Unit 109',  propertype:'BedSpacer', startoccupancy: '01-23-2023', location: 'Building B', status: 'Active', tenant: 'Maria Jalmasco', contact: '09369223915'},
-  { id: 10, name: 'Unit 110', propertype:'Apartment', startoccupancy: '03-06-2024', location: 'Building B', status: 'Active', tenant: 'Jake Pure', contact: '09234189123' },
-  { id: 12, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'Active', tenant: 'John Mark Erlano', contact: '09369223915' },
-  { id: 13, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'Active', tenant: 'Ericson Hugo', contact: '09369223915' },
-  { id: 14, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building C', status: 'Active', tenant: 'MJ Tolintino', contact: '09369223915' },
-  { id: 15, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building D', status: 'In-Active', tenant: 'Mark Tahimik', contact: '09369223915' },
-  { id: 16, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building D', status: 'In-Active', tenant: 'Angeline Tatlonghari', contact: '09369223915' },
-  { id: 17, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building D', status: 'Active', tenant: 'Ian Garcia', contact: '09369223915' },
-  { id: 18, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building C', status: 'Active', tenant: 'John Balia', contact: '09369223915' },
-  { id: 19, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'Active', tenant: 'Edwin Nicolas', contact: '09369223915' },
-  { id: 20, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'In-Active', tenant: 'Maloi My Baby', contact: '09369223915' },
-  { id: 21, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building B', status: 'Active', tenant: 'Mikha My Love', contact: '09369223915' },
-  { id: 22, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'In-Active', tenant: 'Collet Acuna', contact: '09369223915' },
-  { id: 23, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'Active', tenant: 'Carlos Yolo', contact: '09369223915' },
-  { id: 24, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'Active', tenant: 'Jessica Soho', contact: '09369223915' },
-  { id: 25, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'Active', tenant: 'Teddy Manapao', contact: '09369223915' },
-  { id: 26, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'In-Active', tenant: 'Jade Mercado', contact: '09369223915' },
-  { id: 27, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'In-Active', tenant: 'Mark Jade Boral', contact: '09369223915' },
-  { id: 28, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'In-Active', tenant: 'Terresa Trapane', contact: '09369223915' },
-  { id: 29, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'In-Active', tenant: 'Lordes Sta.Ana', contact: '09369223915' },
-  { id: 30, name: 'Unit 101',  propertype:'Apartment', startoccupancy: '01-23-2023', location: 'Building A', status: 'Active', tenant: 'Hilda Francisco', contact: '09369223915' },
-  // Add more units as needed
-  // Add more units as needed
-  // Add more units as needed
-];
-
-export default function TenantInformationTable (){
+export default function TenantInformationTable ({setLoading, loading, handleEdit}){
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [page, setPage] = React.useState(0);
     const [selectedItem, setSelectedItem] = useState([])
-    const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
+    const [sortConfig, setSortConfig] = useState({ key: 'firstname', direction: 'asc' });
+    const [tenantInformation, setTenantInformation] = useState([]);
+
+
+    useEffect(() => {
+        const fetchedData = async () => {
+            setLoading(true);
+            const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+            const userData = JSON.parse(userDataString); // parse the datastring into json 
+            const accessToken = userData.accessToken;
+            if(accessToken){
+                try{
+                    const response = await fetch('http://127.0.0.1:8000/api/tenant_list',{
+                        method:'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${accessToken}`
+                        }
+                    })
+
+                    const data = await response.json();
+                    console.log(data);
+                    
+                    if(response.ok){
+                        setTenantInformation(data.data);
+                        setLoading(false);
+                    
+                    }else{
+                        setLoading(false);
+                        console.log('Error:', response.status);
+                    }
+
+                }catch(error){
+                    console.log(error)
+                }
+            }
+        }
+        fetchedData();
+    }, [])
+
+    // console.log()
+    const handleClick = (id) => {
+        router.push(`/Landlord/TenantInformation/${id}`);
+    }
+
+
+    // const handleClick = (unit) => {
+    //     if (unit.rented_unit.property_type === 'Apartment') {
+    //         router.push(`/Landlord/Property/${unit.rented_unit.property_id}/details/${unit.rented_unit_id}`);
+    //     } else if (unit.rented_unit.property_type === 'Boarding House') {
+    //         router.push(`/Landlord/Property/${unit.rented_unit.property_id}/boardinghouse/${unit.rented_unit_id}`);
+    //     }
+    // };
+
+
+
+
 
 
     const handleSort = (columnKey) => {
@@ -163,9 +185,8 @@ export default function TenantInformationTable (){
         }
         setSortConfig({ key: columnKey, direction });
     };
-
-    // Function to sort data, mapping the units data
-    const sortedUnits = [...unitsData].sort((a, b) => {
+    
+    const sortedUnits = [...tenantInformation].sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
         return sortConfig.direction === 'asc' ? -1 : 1;
         }
@@ -174,10 +195,31 @@ export default function TenantInformationTable (){
         }
         return 0;
     });
+    // const sortedUnits = React.useMemo(() => {
+    //     let sortableItems = [...tenantInformation];
+    //     if (sortConfig.key !== null) {
+    //       sortableItems.sort((a, b) => {
+    //         const aValue = getNestedValue(a, sortConfig.key);
+    //         const bValue = getNestedValue(b, sortConfig.key);
+    //         if (aValue < bValue) {
+    //           return sortConfig.direction === 'asc' ? -1 : 1;
+    //         }
+    //         if (aValue > bValue) {
+    //           return sortConfig.direction === 'asc' ? 1 : -1;
+    //         }
+    //         return 0;
+    //       });
+    //     }
+    //     return sortableItems;
+    // }, [tenantInformation, sortConfig]);
+
+    // const getNestedValue = (obj, key) => {
+    //     return key.split('.').reduce((acc, part) => acc && acc[part], obj);
+    // };
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-        const newSelected = unitsData.map((n) => n.id);
+        const newSelected = tenantInformation.map((n) => n.id);
         setSelectedItem(newSelected);
         return;
         }
@@ -204,7 +246,7 @@ export default function TenantInformationTable (){
     };
 
     const handleExportToExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(unitsData);
+        const ws = XLSX.utils.json_to_sheet(tenantInformation);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Units');
         XLSX.writeFile(wb, 'units_data.xlsx');
@@ -227,14 +269,20 @@ export default function TenantInformationTable (){
 
 
     const filteredUnits = sortedUnits.filter((unit) =>
-        unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        unit.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        unit.propertype.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        unit.startoccupancy.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (unit.status && unit.status.toLowerCase().includes(searchTerm.toLowerCase()))||
-        (unit.tenant && unit.tenant.toLowerCase().includes(searchTerm.toLowerCase()))||
-        (unit.contact && unit.contact.toString().includes(searchTerm))
-    );
+        (unit.tenant.firstname && unit.tenant.firstname.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.tenant.middlename && unit.tenant.middlename.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.tenant.lastname && unit.tenant.lastname.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.tenant.street && unit.tenant.street.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.tenant.barangay && unit.tenant.barangay.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.tenant.municipality && unit.tenant.municipality.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.rented_unit.property_type && unit.rented_unit.property_type.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.lease_start_date && unit.lease_start_date.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.rented_unit.status && unit.rented_unit.status.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.rented_unit.apartment_name && unit.rented_unit.apartment_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.rented_unit.boarding_house_name && unit.rented_unit.boarding_house_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.tenant.contact && unit.tenant.contact.toString().includes(searchTerm))
+      );
+    
 
     const paginatedUnits = filteredUnits.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
@@ -353,16 +401,16 @@ export default function TenantInformationTable (){
                                     <Checkbox
                                         color="primary"
                                         onChange={handleSelectAllClick}
-                                        indeterminate={selectedItem.length > 0 && selectedItem.length < unitsData.length}
+                                        indeterminate={selectedItem.length > 0 && selectedItem.length < tenantInformation.length}
                                         inputProps={{
                                             'aria-label': 'select all desserts',
                                         }}
                                     />
                                 </StyledTableCell>
-                                <StyledTableCell  onClick={() => handleSort('name')}>
-                                    Tenant {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                <StyledTableCell  onClick={() => handleSort('tenant.firstname')}>
+                                    Tenant {sortConfig.key === 'tenant.firstname' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell  onClick={() => handleSort('contact')}>
+                                <StyledTableCell  onClick={() => handleSort('tenant.contact')}>
                                     Contact No. {sortConfig.key === 'contact' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
                                 <StyledTableCell  onClick={() => handleSort('unitname')}>
@@ -377,9 +425,9 @@ export default function TenantInformationTable (){
                                 <StyledTableCell  onClick={() => handleSort('startoccupancy')}>
                                     Start Occupancy {sortConfig.key === 'startoccupancy' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('status')}>
+                                {/* <StyledTableCell onClick={() => handleSort('status')}>
                                     status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
-                                </StyledTableCell>
+                                </StyledTableCell> */}
                                 <StyledTableCell align="center">Action</StyledTableCell>
                                 </TableRow>
                             </TableHead>
@@ -404,13 +452,16 @@ export default function TenantInformationTable (){
                                                         }}
                                                 />
                                             </TableCell>
-                                            <TableCell>{unit.tenant || 'N/A'}</TableCell>
-                                            <TableCell>{unit.contact || 'N/A'}</TableCell>
-                                            <TableCell>{unit.name}</TableCell>
-                                            <TableCell>{unit.location}</TableCell>
-                                            <TableCell>{unit.propertype}</TableCell>
-                                            <TableCell>{unit.startoccupancy}</TableCell>
-                                            <TableCell>
+                                            <TableCell>{`${unit.tenant.firstname || ''} ${unit.tenant.middlename || ''} ${unit.tenant.lastname || ''}`}</TableCell>
+                                            <TableCell>{unit.tenant.contact || ''}
+                                            </TableCell>
+                                            <TableCell>{unit.rented_unit.apartment_name}</TableCell>
+                                            <TableCell>{`${unit.tenant.street}, ${unit.tenant.barangay}, ${unit.tenant.municipality}`}</TableCell>
+                                            <TableCell>{unit.rented_unit.property_type}</TableCell>
+                                            <TableCell>{unit.lease_start_date}</TableCell>
+                                            
+
+                                            {/* <TableCell>
                                                 <Chip
                                                     label={unit.status}
                                                     variant="contained"
@@ -427,15 +478,19 @@ export default function TenantInformationTable (){
                                                         }
                                                     }}
                                                 />
-                                            </TableCell>
+                                            </TableCell> */}
                                             
                                             <TableCell align="center">
-                                            <IconButton onClick={() =>  router.push('/Landlord/Apartment/[id]/RegisterTenant')}>
-                                                <EditOutlinedIcon color='success'/>
-                                            </IconButton>
+                                            <AcceptToolTip title='Edit'>
+                                                <IconButton onClick={() => handleEdit(unit.tenant.id)}>
+                                                    <EditOutlinedIcon color='success'/>
+                                                </IconButton>
+                                            </AcceptToolTip>
+                                           <DeleteTooltip title='Edit'>
                                             <IconButton>
-                                                <DeleteForeverOutlinedIcon color='warning'/>    
-                                            </IconButton>                                     
+                                                    <DeleteForeverOutlinedIcon color='warning'/>    
+                                                </IconButton>                                     
+                                           </DeleteTooltip>
                                             </TableCell>
                                         </StyledTableRow>
                                     )

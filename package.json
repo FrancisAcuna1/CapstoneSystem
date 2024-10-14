@@ -23,11 +23,10 @@
     "@mui/material": "^5.16.4",
     "@mui/styled-engine-sc": "^6.0.0-alpha.18",
     "@mui/x-data-grid": "^7.12.1",
-    "@mui/x-date-pickers": "^7.15.0",
-    "@mui/x-date-pickers-pro": "^7.15.0",
+    "@mui/x-date-pickers": "^7.20.0",
     "axios": "^1.7.7",
-    "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
+    "framer-motion": "^11.11.2",
     "mui-file-input": "^6.0.0",
     "next": "14.2.5",
     "next-auth": "^4.24.7",
@@ -38,6 +37,7 @@
     "react-dom": "^18",
     "react-router-dom": "^6.25.1",
     "styled-components": "^6.1.12",
+    "sweetalert2": "^11.14.3",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

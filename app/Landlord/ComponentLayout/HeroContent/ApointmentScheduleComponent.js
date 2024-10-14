@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { Grid, Box, Paper, Typography, Button, Fade,   Link, Breadcrumbs, TextField, FormControl, InputLabel, Select, MenuItem, } from '@mui/material';
-import ModalComponent from '../ModalComponent/page';
+import ModalComponent from '../ModalComponent/AddMaintenanceSchedule';
 import dynamic from 'next/dynamic';
 const Fullcalendar = dynamic(() => import('../Labraries/CalendarComponent'), {
     ssr: false

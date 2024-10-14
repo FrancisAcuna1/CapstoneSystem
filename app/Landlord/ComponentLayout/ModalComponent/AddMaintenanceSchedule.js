@@ -148,7 +148,7 @@ export default function ModalComponent({open, handleOpen, handleClose}){
         <Box sx={{ display: 'flex', justifySelf: 'end', mt:1.5, }}>
             <Button variant="contained"  onClick={handleOpen} sx={{background: '#f78028','&:hover': {backgroundColor: '#ffab40',}, borderRadius: '15px', p:1.1, mb: 2 }}>
                 <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
-                New Schedule
+                Add New Schedule
             </Button>
             <Modal
                 aria-labelledby="transition-modal-title"
@@ -160,7 +160,7 @@ export default function ModalComponent({open, handleOpen, handleClose}){
             >
                 <Fade in={open}>
                 <ModalContent sx={style}>
-                    <Typography variant='h1' letterSpacing={3} sx={{ fontSize: '20px' }}>New Maintenace Schedule</Typography>
+                    <Typography variant='h1' letterSpacing={3} sx={{ fontSize: '20px' }}>Add New Schedule</Typography>
                     <FormControl fullWidth margin="normal" sx={{mt:3}}>
                         <InputLabel required>Select Apartment</InputLabel>
                         <Select>
@@ -199,8 +199,9 @@ export default function ModalComponent({open, handleOpen, handleClose}){
                     </FormControl>
                     <TextField id="description" label="Task Description" variant="outlined" multiline maxRows={5} fullWidth margin="normal" sx={{mt:-0.1}}/>
                     <LocalizationProvider dateAdapter={AdapterDayjs} sx={{mt:-0.1}}>
-                        <DemoContainer components={['DatePicker', 'DatePicker']}>
+                        <DemoContainer components={['DatePicker']}>
                             <DateRangePicker localeText={{ start: 'Start-Date', end: 'End-Date' }} />
+                           
                         </DemoContainer>
                     </LocalizationProvider>
                     

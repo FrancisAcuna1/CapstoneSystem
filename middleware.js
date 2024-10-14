@@ -26,7 +26,7 @@ export async function middleware(request) {
   });
 
   if (token) {
-    if (request.nextUrl.pathname === "/") {
+    if (token && request.nextUrl.pathname === "/") {
       return NextResponse.redirect(
         new URL(`/${token.role}/Home`, request.url)
       );
@@ -34,7 +34,7 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
-  if (request.nextUrl.pathname !== "/") {
+  if (!token && request.nextUrl.pathname !== "/") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

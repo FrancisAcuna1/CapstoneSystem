@@ -1,16 +1,13 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper, TextField, IconButton, InputAdornment, Avatar, Toolbar, Typography, Box, Tooltip, InputBase, inputProps, Breadcrumbs, Link, Grid, Chip, Fab, Button, Fade, FormControl, InputLabel, Select, MenuItem, AppBar} from '@mui/material';
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper, IconButton, InputAdornment, Avatar, Toolbar, Typography, Box, Tooltip, InputBase, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Backdrop, CircularProgress} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import EditIcon from '@mui/icons-material/Edit';
 import { styled, alpha, useTheme, css } from '@mui/system';
 import { Modal as BaseModal } from '@mui/base/Modal';
 import TuneIcon from '@mui/icons-material/Tune';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
-import CheckCircleOutlineSharpIcon from '@mui/icons-material/CheckCircleOutlineSharp';
 import Checkbox from '@mui/material/Checkbox';
 import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
@@ -127,7 +124,7 @@ const unitsData = [
   { id: 15, name: 'Unit 101', }
 ];
 
-export default function EquipmentTable (){
+export default function EquipmentTable ({handleEdit, setSuccessful, setError, error, setLoading, loading}){
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -135,6 +132,137 @@ export default function EquipmentTable (){
     const [page, setPage] = React.useState(0);
     const [selectedItem, setSelectedItem] = useState([])
     const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
+    const [inclusionList, setInclusionList] = useState([]);
+    const [deleting, setDeleting] = useState(false); //for backdrop
+    const [deleteEquipment, setDeleteEquipment] = useState({})
+    console.log(inclusionList)
+
+    useEffect(() => {
+        const fetchedData =  async () => {
+            const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+            const userData = JSON.parse(userDataString); // parse the datastring into json 
+            const accessToken = userData.accessToken;
+
+           
+            if(accessToken){
+                console.log(accessToken)
+                try{
+                    setLoading(true);
+                    const response = await fetch('http://127.0.0.1:8000/api/inclusion_list', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json',
+                            "Accept": "application/json",
+    
+                        }
+                    })
+    
+                    const data = await response.json();
+                    console.log('Data fetched:', data);
+
+                    if(response.ok){
+                        if(data && Array.isArray(data.data)){
+                            setInclusionList(data.data);
+                            setLoading(false)
+                        }else{
+                            throw new Error('Unexpected data format. Data is not an array.');S
+                            setLoading(false)
+                        }
+                    }else{
+                        console.log('Error:', response.status)
+                        setLoading(false)
+                    }
+                }catch(error){
+                    setError(error.message);
+                    setLoading(false);
+                }finally{
+                    setLoading(false)
+                }
+            }
+            
+
+        }
+        fetchedData()
+
+    }, [])
+
+
+     // for Dialog alert for delete 
+    const handleClickOpen = (id) => {
+        setDeleteEquipment({id});
+        setOpen(true);
+
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleDelete = async() => {
+        const {id} = deleteEquipment;
+        const userDataString = localStorage.getItem('userDetails'); // get the 
+        const userData = JSON.parse(userDataString); // parse the datastring into 
+        const accessToken = userData.accessToken;
+
+        if(accessToken){
+            try{
+                setDeleting(true);
+                const response = await fetch(`http://127.0.0.1:8000/api/delete_inclusion/${id}`,{
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
+                    }
+                })
+
+                const data = await response.json();
+                if(response.ok){
+                    setOpen(false); 
+                    localStorage.setItem('successMessage', data.message || 'Operation Sucess!');
+                    window.location.reload();
+
+                }else{
+                    if(data.error){
+                        console.log(data.error)
+                        localStorage.setItem('errorMessage', data.message || 'Operation Error!');
+                        window.location.reload();
+                        setOpen(false); // Close dialog after delete
+                      }else{
+                        console.log(data.message);
+                        localStorage.setItem('errorMessage', data.message || 'Operation Error!');
+                        window.location.reload();
+                       
+                    }                
+                }
+
+            }catch(error){
+                console.error('An error occurred:', error);
+            }finally{
+                console.log('Error Response')
+                setDeleting(false);
+            }
+        }
+    }
+    
+    useEffect(() => {
+    const successMessage = localStorage.getItem('successMessage');
+    const errorMessage = localStorage.getItem('errorMessage')
+    if (successMessage) {
+      setSuccessful(successMessage);
+      setTimeout(() => {
+        localStorage.removeItem('successMessage');
+      }, 3000);
+    }
+
+    if(errorMessage){
+      setError(errorMessage);
+      setTimeout(() => {
+        localStorage.removeItem('errorMessage');
+      }, 3000);
+    }
+
+  
+  }, []);
 
     const handleSort = (columnKey) => {
         let direction = 'asc';
@@ -145,19 +273,23 @@ export default function EquipmentTable (){
     };
     
       // Function to sort data
-    const sortedUnits = [...unitsData].sort((a, b) => {
+    // Handle sorting
+    const sortedUnits = inclusionList && Array.isArray(inclusionList)
+    ? [...inclusionList].sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
+        return sortConfig.direction === 'asc' ? -1 : 1;
         }
         if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
+        return sortConfig.direction === 'asc' ? 1 : -1;
         }
         return 0;
-    });
+    })
+    : [];
+ 
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-          const newSelected = unitsData.map((n) => n.id);
+          const newSelected = inclusionList.map((n) => n.id);
           setSelectedItem(newSelected);
           return;
         }
@@ -184,7 +316,7 @@ export default function EquipmentTable (){
     };
 
     const handleExportToExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(unitsData);
+        const ws = XLSX.utils.json_to_sheet(inclusionList);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Units');
         XLSX.writeFile(wb, 'units_data.xlsx');
@@ -214,194 +346,220 @@ export default function EquipmentTable (){
     const paginatedUnits = filteredUnits.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     return (
-    <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
-        <Grid  container spacing={1} sx={{ mt: '-0.9rem', display:'flex', justifyContent:' center',  }}>
-            <Grid item xs={12}>
-                <Box elevation={3} sx={{maxWidth: { xs: 312, sm: 767,  md: 1000, lg: 1400, borderRadius: '12px'  }}}>
-                    {/* <Box sx={{maxWidth: { xs: 312, sm: 767,  md: 1000, lg: 1400}}}> */}
-                        <TableContainer >
-                            <Toolbar
-                            sx={[
-                                {
-                                pl: { sm: 2 },
-                                pr: { xs: 1, sm: 1 },
-                                },
-                                // numSelected > 0 && {
-                                //   bgcolor: (theme) =>
-                                //     alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                                // },
-                            ]}
-                            >  
-                                {/* {numSelected > 0 ? (
-                                    <Typography
-                                        sx={{ flex: '1 1 100%' }}
-                                        color="inherit"
-                                        variant="subtitle1"
-                                        component="div"
-                                    >
-                                        {numSelected} selected
-                                    </Typography>
-                                    ) :(
-                                        <Typography
-                                            sx={{ flex: '1 1 100%', mt:'0.4rem',  mb: '0.4rem' }}
-                                            variant="h6"
-                                            id="tableTitle"
-                                            component="div"
-                                            letterSpacing={2}
-                                        >
-                                        List of Units
-                                        </Typography>
-                                    )}
-
-                                
-
-                                {numSelected > 0 ? (
-                                    <Tooltip title="Delete" sx={{mt:'0.5rem', mb: '0.5rem'}}>
-                                    <IconButton>
-                                        <DeleteIcon color='warning' fontSize='medium'/>
-                                    </IconButton>
-                                    </Tooltip>
-                                ) : (
-                                
-                                    <Box sx={{ display: 'flex',   alignItems: 'center',justifyContent: 'flex-end', mt:'1rem',  mb: '0.5rem'}}>
-                                        <Search>
-                                            <SearchIconWrapper>
-                                            <SearchIcon fontSize='small' />
-                                            </SearchIconWrapper>
-                                            <StyledInputBase
-                                            placeholder="Search…"
-                                            inputProps={{ 'aria-label': 'search' }}
-                                            />
-                                        </Search>
-                                        <Tooltip title="Filter Table" >
-                                            <IconButton sx={{ml: '-0.5rem', mr: '0.6rem'}}>
-                                                <TuneIcon fontSize='medium' color='primary'/>
-                                            </IconButton>   
-                                        </Tooltip>
-                                        
-                                    </Box>
-                                
-                                )} */}
-                                <Typography
-                                    sx={{ flex: '1 1 100%', mt:'0.4rem',  mb: '0.4rem', fontSize: {xs: '18px', sm: '18px', md:'18px', lg:'22px'} }}
-                                    variant="h6"
-                                    id="tableTitle"
-                                    component="div"
-                                    letterSpacing={2}
-                                >
-                                    List of Equipment
-                                </Typography>
-                                <Box sx={{ display: 'flex',   alignItems: 'center', justifyContent: 'end', mt:'1rem',  mb: '0.5rem'}}>
-                                    <Search
-                                    value={searchTerm}
-                                    onChange={handleSearchChange}
-                                    >
-                                        
-                                        <SearchIconWrapper>
-                                        <SearchIcon fontSize='small' />
-                                        </SearchIconWrapper>
-                                        <StyledInputBase
-                                        placeholder="Search…"
-                                        inputProps={{ 'aria-label': 'search' }}
-                                        />
-                                    </Search>
-                                    <GeneralTooltip title="Filter Table" >
-                                        <IconButton sx={{ml: '-0.5rem', mr: '0.6rem'}}>
-                                            <TuneIcon fontSize='medium'/>
-                                        </IconButton>   
-                                    </GeneralTooltip>
-                                    <GeneralTooltip title="Download file">
-                                        <IconButton sx={{ml: '-0.5rem', mr: '0.6rem'}} onClick={handleExportToExcel}>
-                                            <CloudDownloadOutlinedIcon fontSize='medium'/>
-                                        </IconButton>
-                                    </GeneralTooltip>
-                                   
-                                    
-                                </Box>
-                        
-                        
-
-                            </Toolbar>
-                            <Table size='small' sx={{mt:2}}>
-                            <TableHead sx={{backgroundColor: 'whitesmoke', p:2}}>
-                                <TableRow>
-                                    
-                                <StyledTableCell> 
-                                    <Checkbox
-                                        color="primary"
-                                        onChange={handleSelectAllClick}
-                                        indeterminate={selectedItem.length > 0 && selectedItem.length < unitsData.length}
-                                        inputProps={{
-                                            'aria-label': 'select all desserts',
-                                        }}
-                                        // checked={isSelected}
-                                        // inputProps={{
-                                        // 'aria-labelledby': labelId,
-                                        // }}
-                                    />
-                                </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('name')}>
-                                    Equipment Name {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">Action</StyledTableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {paginatedUnits.map((unit, index) => {
-                                    const isSelected = selectedItem.includes(unit.id);
-                                    const labelId = `enhanced-table-checkbox-${index}`;
-                                    return (
-                                    <StyledTableRow
-                                        key={unit.id}  
-                                        tabIndex={-1}
-                                        selected={isSelected} 
-                                        aria-checked={isSelected} 
-                                        onChange={(event) => handleCheckBoxChange(event, unit.id)}
-                                    >
-                                        <TableCell>
-                                            <Checkbox
-                                                color="primary"
-                                                checked={isSelected}
-                                                inputProps={{
-                                                    'aria-labelledby': labelId,
-                                                  }}
-                                            />
-                                        </TableCell>
-                                        <TableCell>{unit.name}</TableCell>
-                                        <TableCell align="center">
-                                        <AcceptToolTip title="Edit">
-                                            <IconButton>
-                                                <DriveFileRenameOutlineOutlinedIcon color='success'/>
-                                            </IconButton>
-                                        </AcceptToolTip>
-                                        <CustomTooltip title="Delete">
-                                            <IconButton>
-                                                <DeleteForeverOutlinedIcon color='warning' />
-                                            </IconButton>
-                                        </CustomTooltip>
-                                                                           
-                                        </TableCell>
-                                    </StyledTableRow>
-                                    )
-                                })}
-                            </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <TablePagination
-                        rowsPerPageOptions={[5, 10, 15, 25]}
+    <Box sx={{ maxWidth: 1400,  margin: 'auto',  overflowX: 'auto',}}>
+        <Paper elevation={2} sx={{maxWidth: { xs: 312, sm: 767,  md: 1000, lg: 1490, borderRadius: '12px'}}}>
+            <TableContainer >
+                <Toolbar
+                sx={[
+                    {
+                    pl: { sm: 2 },
+                    pr: { xs: 1, sm: 1 },
+                    },
+                    // numSelected > 0 && {
+                    //   bgcolor: (theme) =>
+                    //     alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                    // },
+                ]}
+                >  
+                {/* {numSelected > 0 ? (
+                    <Typography
+                        sx={{ flex: '1 1 100%' }}
+                        color="inherit"
+                        variant="subtitle1"
                         component="div"
-                        count={filteredUnits.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    >
+                        {numSelected} selected
+                    </Typography>
+                    ) :(
+                        <Typography
+                            sx={{ flex: '1 1 100%', mt:'0.4rem',  mb: '0.4rem' }}
+                            variant="h6"
+                            id="tableTitle"
+                            component="div"
+                            letterSpacing={2}
+                        >
+                        List of Units
+                        </Typography>
+                    )}
+
+                
+
+                {numSelected > 0 ? (
+                    <Tooltip title="Delete" sx={{mt:'0.5rem', mb: '0.5rem'}}>
+                    <IconButton>
+                        <DeleteIcon color='warning' fontSize='medium'/>
+                    </IconButton>
+                    </Tooltip>
+                ) : (
+                
+                    <Box sx={{ display: 'flex',   alignItems: 'center',justifyContent: 'flex-end', mt:'1rem',  mb: '0.5rem'}}>
+                        <Search>
+                            <SearchIconWrapper>
+                            <SearchIcon fontSize='small' />
+                            </SearchIconWrapper>
+                            <StyledInputBase
+                            placeholder="Search…"
+                            inputProps={{ 'aria-label': 'search' }}
+                            />
+                        </Search>
+                        <Tooltip title="Filter Table" >
+                            <IconButton sx={{ml: '-0.5rem', mr: '0.6rem'}}>
+                                <TuneIcon fontSize='medium' color='primary'/>
+                            </IconButton>   
+                        </Tooltip>
+                        
+                    </Box>
+                
+                )} */}
+                <Typography
+                    sx={{ flex: '1 1 100%', mt:'0.4rem',  mb: '0.4rem', fontSize: {xs: '18px', sm: '18px', md:'18px', lg:'22px'} }}
+                    variant="h6"
+                    id="tableTitle"
+                    component="div"
+                    letterSpacing={2}
+                >
+                    List of Equipment
+                </Typography>
+                <Box sx={{ display: 'flex',   alignItems: 'center', justifyContent: 'end', mt:'1rem',  mb: '0.5rem'}}>
+                    <Search
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    >
+                        
+                        <SearchIconWrapper>
+                        <SearchIcon fontSize='small' />
+                        </SearchIconWrapper>
+                        <StyledInputBase
+                        placeholder="Search…"
+                        inputProps={{ 'aria-label': 'search' }}
                         />
-                    {/* </Box> */}
+                    </Search>
+                    <GeneralTooltip title="Filter Table" >
+                        <IconButton sx={{ml: '-0.5rem', mr: '0.6rem'}}>
+                            <TuneIcon fontSize='medium'/>
+                        </IconButton>   
+                    </GeneralTooltip>
+                    <GeneralTooltip title="Download file">
+                        <IconButton sx={{ml: '-0.5rem', mr: '0.6rem'}} onClick={handleExportToExcel}>
+                            <CloudDownloadOutlinedIcon fontSize='medium'/>
+                        </IconButton>
+                    </GeneralTooltip>
+                    
                     
                 </Box>
-            </Grid>
+        
+        
 
-        </Grid>
+                </Toolbar>
+                <Table size='small' sx={{mt:2}}>
+                <TableHead sx={{backgroundColor: 'whitesmoke', p:2}}>
+                    <TableRow>
+                        
+                    <StyledTableCell> 
+                        <Checkbox
+                            color="primary"
+                            onChange={handleSelectAllClick}
+                            indeterminate={selectedItem.length > 0 && selectedItem.length < unitsData.length}
+                            inputProps={{
+                                'aria-label': 'select all desserts',
+                            }}
+                            // checked={isSelected}
+                            // inputProps={{
+                            // 'aria-labelledby': labelId,
+                            // }}
+                        />
+                    </StyledTableCell>
+                    <StyledTableCell onClick={() => handleSort('name')}>
+                        Equipment Name {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">Action</StyledTableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {paginatedUnits && paginatedUnits.map((item, index) => {
+                        const isSelected = selectedItem.includes(item.id);
+                        const labelId = `enhanced-table-checkbox-${index}`;
+                        return (
+                        <StyledTableRow
+                            key={item.id}  
+                            tabIndex={-1}
+                            selected={isSelected} 
+                            aria-checked={isSelected} 
+                            onChange={(event) => handleCheckBoxChange(event, item.id)}
+                        >
+                            <TableCell>
+                                <Checkbox
+                                    color="primary"
+                                    checked={isSelected}
+                                    inputProps={{
+                                        'aria-labelledby': labelId,
+                                        }}
+                                />
+                            </TableCell>
+                            <TableCell>{item.name}</TableCell>
+                            <TableCell align="center">
+                            <AcceptToolTip title="Edit">
+                                <IconButton onClick={() => handleEdit(item.id)}>
+                                    <DriveFileRenameOutlineOutlinedIcon color='success'/>
+                                </IconButton>
+                            </AcceptToolTip>
+                            <CustomTooltip title="Delete">
+                                <IconButton onClick={() => handleClickOpen(item.id)}>
+                                    <DeleteForeverOutlinedIcon color='warning' />
+                                </IconButton>
+                            </CustomTooltip>
+                                                                
+                            </TableCell>
+                        </StyledTableRow>
+                        )
+                    })}
+                </TableBody>
+                </Table>
+            </TableContainer>
+            <TablePagination
+            rowsPerPageOptions={[5, 10, 15, 25]}
+            component="div"
+            count={filteredUnits.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+        </Paper>
+        <React.Fragment>
+            <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="delete-dialog-title"
+            aria-describedby="delete-dialog-description"
+            >
+            <DialogTitle id="delete-dialog-title">
+                Confirm Deletion
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText id="delete-dialog-description">
+                Are you sure you want to delete this item? This action cannot be undone.
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose} color="primary">
+                Cancel
+                </Button>
+                <Button onClick={handleDelete} color="error" variant="contained">
+                Delete
+                </Button>
+            </DialogActions>
+            </Dialog>
+
+            <Backdrop
+            sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+            open={deleting}
+            >
+            <CircularProgress color="inherit" />
+            </Backdrop>
+        </React.Fragment>
+
+        
     </Box>
 
     );

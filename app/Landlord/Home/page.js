@@ -211,7 +211,7 @@ export default function HomePage (){
   useEffect(() => {
     if (status === "unauthenticated") {
       console.log('anauthenticated')
-      router.push('/'); // Redirect to login if not authenticated
+      router.replace('/'); // Redirect to login if not authenticated
     }
   }, [status, router]);
 

@@ -1,12 +1,12 @@
 "use client"
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
-import {Box} from '@mui/material';
+import {Box, LinearProgress} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Navigator from '../DashboardLayout/navigator';
@@ -191,6 +191,7 @@ const drawerWidth = 256;
 
 export default function PropertyPage (){
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
   console.log("Session: ", session);
   console.log("Status: ", status);
@@ -213,7 +214,7 @@ export default function PropertyPage (){
     // return <>
     //   <LoadingState/>
     // </>
-    return <p>Loading...</p>; // You can add a loading spinner here if needed
+    // You can add a loading spinner here if needed
   }
 
   if (status == "authenticated"){
@@ -243,9 +244,13 @@ export default function PropertyPage (){
             </Box>
             <Divider />
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            {loading && <LinearProgress sx={{ color:"#673ab7", position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
             <Header onDrawerToggle={handleDrawerToggle} />
             <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-                <PropertyContent/>
+                <PropertyContent
+                  loading={loading}
+                  setLoading={setLoading}
+                />
                 {/* <Content/> */}
             </Box>
             <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>

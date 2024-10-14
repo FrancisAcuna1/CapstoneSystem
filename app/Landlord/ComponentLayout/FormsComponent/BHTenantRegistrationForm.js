@@ -1,23 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {Box, Stepper, Step, StepLabel, Button, Typography, TextField, Grid, FormHelperText, FormControl, InputLabel, Select, FormControlLabel, Checkbox, MenuItem} from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 const steps = ['Tenant Information', 'Account Creation', 'Unit Details'];
 
-const rooms = [
-    { id: 1, name: "Room 101", totalBeds: 3, occupiedBeds: 0 },
-    { id: 2, name: "Room 102", totalBeds: 2, occupiedBeds: 1 },
-]
+// const rooms = [
+//     { id: 1, name: "Room 101", totalBeds: 3, occupiedBeds: 0 },
+//     { id: 2, name: "Room 102", totalBeds: 2, occupiedBeds: 1 },
+// ]
 
-
-
-
-const MultiStepForm = () => {
+const MultiStepForm = ({details, setDetails}) => {
     const [contact, setContact] = useState('');
     const [activeStep, setActiveStep] = useState(0);
-    const [room, setRoom] = useState("");
-    const [bedsAvailable, setBedsAvailable] = useState(3); // Example: 3 beds in each room initially
-    const [numOfBeds, setNumOfBeds] = useState(1); // Default is 1 bed
+    const [rooms, setRooms] = useState([]);
+    const [totalBeds, setTotalBeds] = useState();
+    const [selectedRoom, setSelectedRoom] = useState("");
+    const [bedsAvailable, setBedsAvailable] = useState(0);
+    const [numOfBeds, setNumOfBeds] = useState(1);
     const [wantPrivacy, setWantPrivacy] = useState(false);
+    const propsDetails = details;
+    const BoardinghouseDetails = propsDetails?.boardinghouse?.boarding_house_name;
+    const propertyDetails = propsDetails?.boardinghouse?.property?.propertyname;
+
+
+    console.log(BoardinghouseDetails);
+    console.log(propertyDetails);
+    console.log(rooms)
+
     const [formData, setFormData] = useState({
     firstName: '',
     middleName: '',
@@ -27,22 +36,45 @@ const MultiStepForm = () => {
     username: '',
     password: '',
     confirmPassword: '',
+    boardinghouse: BoardinghouseDetails,
+    property: propertyDetails,
+    rentalFee: '',
     });
 
+    useEffect(() => {
+        if (propsDetails && propsDetails.boardinghouse) {
+            setRooms(propsDetails.boardinghouse.rooms || []);
+            const totalBedsCount = propsDetails.boardinghouse.rooms.reduce((sum, room) => sum + room.number_of_beds, 0);
+            setTotalBeds(totalBedsCount);
+            setFormData(prevFormData => ({
+                ...prevFormData,
+                boardinghouse:BoardinghouseDetails,
+                property: propertyDetails,
+                numberOfRooms: propsDetails.boardinghouse.number_of_rooms,
+                totalBeds: totalBedsCount
+            }));
+        }
+    }, [propsDetails]);
+
     const handleRoomChange = (e) => {
-        const selectedRoom = rooms.find((r) => r.id === e.target.value);
-        setRoom(selectedRoom);
-        setBedsAvailable(selectedRoom.totalBeds - selectedRoom.occupiedBeds);
+        const roomId = e.target.value;
+        const selectedRoom = rooms.find((r) => r.id === roomId);
+        setSelectedRoom(selectedRoom);
+        setBedsAvailable(selectedRoom ? selectedRoom.number_of_beds : 0);
+        setNumOfBeds(1); // Reset selected beds when room changes
     };
+
     const handleNumOfBedsChange = (e) => {
         const selectedBeds = parseInt(e.target.value);
         setNumOfBeds(selectedBeds);
     };
-    
+
     const handlePrivacyChange = (e) => {
         setWantPrivacy(e.target.checked);
         if (e.target.checked) {
-          setNumOfBeds(bedsAvailable); // Set all beds if privacy is selected
+            setNumOfBeds(bedsAvailable);
+        } else {
+            setNumOfBeds(1);
         }
     };
    
@@ -348,41 +380,72 @@ const MultiStepForm = () => {
             <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
                 <TextField
-                name="unitNumber"
+                name="boardinghouse"
                 label="Boarding House Name"
-                value={formData.unitNumber}
+                value={formData.boardinghouse}
                 onChange={handleChange}
                 fullWidth
                 required
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
-                <FormControl fullWidth margin="normal" required sx={{mt:'0rem'}}>
-                    <InputLabel>Room</InputLabel>
-                    <Select value={room.id || ""} onChange={handleRoomChange}>
+                <TextField
+                name="boardinghouse"
+                label="Property Name"
+                value={formData.property}
+                onChange={handleChange}
+                fullWidth
+                required
+                />
+            </Grid>
+            <Grid item xs={12} sm={4} sx={{mt:'-1rem'}}>
+                <FormControl fullWidth margin="normal" required>
+                    <InputLabel id="demo-simple-select-label">Room</InputLabel>
+                    <Select
+                        required
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        name='roomnumber'
+                        label="Status"
+                        value={selectedRoom ? selectedRoom.id : ""}
+                        onChange={handleRoomChange}
+                        displayEmpty
+                    >
+                        <MenuItem value="" disabled>Select a room</MenuItem>
                         {rooms.map((room) => (
-                        <MenuItem key={room.id} value={room.id}>
-                            {room.name} - {room.totalBeds - room.occupiedBeds} beds available
-                        </MenuItem>
+                            <MenuItem key={room.id} value={room.id}>
+                                Room {room.room_number} - {room.number_of_beds} beds available
+                            </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
+
+
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={4} sx={{mt:'-1rem'}}>
                 {/* Number of Beds Selection */}
                 {!wantPrivacy && (
-                <FormControl fullWidth margin="normal" required  sx={{mt:'0rem'}}>
-                    <InputLabel>Number of Beds</InputLabel>
-                    <Select value={numOfBeds} onChange={handleNumOfBedsChange}>
-                    {[...Array(bedsAvailable)].map((_, index) => (
-                        <MenuItem key={index + 1} value={index + 1}>
-                        {index + 1} bed{index + 1 > 1 ? "s" : ""}
-                        </MenuItem>
-                    ))}
-                    </Select>
-                </FormControl>
+                    <FormControl fullWidth margin="normal" required>
+                        <InputLabel id="demo-simple-select-label">Number of Beds</InputLabel>
+                        <Select
+                            required
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            name='bed'
+                            label="Number of Beds"
+                            value={numOfBeds} 
+                            onChange={handleNumOfBedsChange}>
+                            {[...Array(bedsAvailable)].map((_, index) => (
+                                <MenuItem key={index + 1} value={index + 1}>
+                                    {/* {index + 1} bed{index + 1 > 1 ? "s" : ""} */}
+                                    bed {index + 1}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                 )}
             </Grid>
+            
             <Grid item xs={12} sx={{mt: '-0.8rem'}}>
                 <FormControlLabel
                     control={<Checkbox sx={{color:'gray'}} checked={wantPrivacy} onChange={handlePrivacyChange} />}
@@ -396,6 +459,13 @@ const MultiStepForm = () => {
                     }}
                    
                 />
+            </Grid>
+            <Grid item xs={12}>
+                {/* Information message */}
+                <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', mt:'-1rem', fontSize: '12px', color: 'gray'}}>
+                    <InfoOutlinedIcon fontSize="small" sx={{ mr: 1,}} />
+                    Please check this if necessary
+                </Typography>
             </Grid>
 
             </Grid>

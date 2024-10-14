@@ -5,7 +5,7 @@ import Fullcalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import ModalComponent from '../ModalComponent/page';
+import ModalComponent from '../ModalComponent/AddMaintenanceSchedule';
 import '/app/style.css';
 // import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 // import enUS from 'date-fns/locale/en-US';

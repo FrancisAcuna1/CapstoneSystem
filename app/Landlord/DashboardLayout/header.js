@@ -1,5 +1,6 @@
 'use client'
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import PropTypes from 'prop-types';
 import { AppBar, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Typography, Avatar, StyledBadge, Tooltip, Breadcrumbs } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
@@ -16,7 +17,8 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import { UserProfile } from '@clerk/clerk-react';
 import { UserButton } from '@clerk/nextjs'
 import { signOut } from "next-auth/react";
-
+import { fetchData } from 'next-auth/client/_utils';
+import useLogout from '@/app/Authentication/Logout/page';
 
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
@@ -65,17 +67,18 @@ const Search = styled('div')(({ theme }) => ({
     },
   }));
 
-  const CustomPage = () => {
-    return (
-      <div>
-        <h1>Custom Profile Page</h1>
-        <p>This is the custom profile page</p>
-      </div>
-    )
-  }
+//   const CustomPage = () => {
+//     return (
+//       <div>
+//         <h1>Custom Profile Page</h1>
+//         <p>This is the custom profile page</p>
+//       </div>
+//     )
+//   }
 
 
 function Header(props) {
+    const router = useRouter();
     const { onDrawerToggle } = props;
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -100,6 +103,56 @@ function Header(props) {
         setMobileMoreAnchorEl(event.currentTarget);
     };
 
+    // const handleLogout = useLogout();
+
+    // const handleLogout = async () => {
+    //     const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+    //     const userData = JSON.parse(userDataString); // parse the datastring into json 
+    //     const accessToken = userData.accessToken;
+    //     console.log(accessToken)
+    //     if(accessToken){
+    //         try {
+    //             // Call the backend logout endpoint
+    //             const response = await fetch('http://127.0.0.1:8000/api/logout', {
+    //               method: 'POST',
+    //               headers:{
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': `Bearer ${accessToken}`
+
+    //               }
+    //             //   credentials: 'include', // Include cookies
+    //             });
+                
+    //             if (response.ok) {
+    //                 // Use NextAuth's signOut
+    //                 await signOut({ redirect: false });
+
+    //                 // Clear local storage and sign out
+    //                 localStorage.removeItem('userDetails');
+    //                 sessionStorage.clear();
+
+    //                 window.location.href = '/';
+
+    //             } else {
+    //               console.error('Logout failed:', await response.json());
+    //             }
+    //           } catch (error) {
+    //             console.error('An error occurred during logout:', error);
+    //           }
+    //     }else{
+    //         console.log('No access token found')
+    //     }
+        
+    // };
+    const handleLogout = async () => {
+        await signOut({ redirect: false });
+        localStorage.removeItem('userDetails'); // Clear user data
+        sessionStorage.clear(); // Clear token
+        // Redirect to login page
+        window.location.href = '/';
+    };
+      
+
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
         <Menu
@@ -118,7 +171,7 @@ function Header(props) {
         onClose={handleMenuClose}
         >
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={() => signOut({ callbackUrl: '/' })}>Log out</MenuItem>
+        <MenuItem onClick={handleLogout}>Log out</MenuItem>
         </Menu>
     );
 

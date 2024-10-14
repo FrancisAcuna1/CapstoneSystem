@@ -6,6 +6,7 @@ import Paperbase from './Dashboard/paperbased';
 import HomePage from './Landlord/Home/page';
 import LoginPage from './Authentication/Login/page';
 import '/app/style.css';
+import LandingPage from './Proptrack/LandingPage/page';
 
 
 export default function App() {
@@ -16,15 +17,19 @@ export default function App() {
   };
 
   return (
-   
-    <Box  className={'body'}>
+    <>
+      <LandingPage/>
+    </>
     
-      <LoginPage/>
+   
+    // <Box  className={'body'}>
+    
+    //   <LoginPage/>
     
 
-      {/* <HomePage/> */}
-      {/* <Paperbase/> */}
-    </Box>
+    //   {/* <HomePage/> */}
+    //   {/* <Paperbase/> */}
+    // </Box>
   );
 }
 

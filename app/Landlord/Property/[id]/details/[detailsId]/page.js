@@ -1,10 +1,11 @@
 "use client"
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter, useParams} from 'next/navigation';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
+import {Box, LinearProgress} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Navigator from '../../../../DashboardLayout/navigator';
@@ -189,6 +190,17 @@ let theme = createTheme({
 const drawerWidth = 256;
 
 export default function DetailsPage (){
+  const params = useParams();
+  const apartmentId = params?.detailsId;
+  const propsId = params.id;
+  const [loading, setLoading] = useState(false)
+
+  console.log('Apartment ID:', apartmentId );
+  console.log('property ID:', propsId );
+  
+
+
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
    // this code 'isSmUp is Enable the Burger Icon for mobile view
    const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
@@ -225,10 +237,15 @@ export default function DetailsPage (){
           </Box>
           <Divider />
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          {loading && <LinearProgress sx={{ color:"#673ab7", position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
           <Header onDrawerToggle={handleDrawerToggle} />
           <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-              <h1>Id page</h1>
-              <TenantRegistration/>
+              <TenantRegistration
+                apartmentId={apartmentId}
+                propsId={propsId}
+                loading={loading}
+                setLoading={setLoading}
+              />
               {/* <Content/> */}
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>

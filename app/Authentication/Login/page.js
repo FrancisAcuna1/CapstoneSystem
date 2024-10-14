@@ -1,8 +1,8 @@
 'use client'
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession, signIn } from 'next-auth/react'
+import { useSession, getSession, signIn } from 'next-auth/react'
 import { Box, Grid, Button, TextField, Typography, Link, IconButton, InputAdornment, Container, CssBaseline, Avatar, LinearProgress, Alert} from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import GoogleIcon from '@mui/icons-material/Google';
@@ -11,6 +11,9 @@ import TwitterIcon from '@mui/icons-material/Twitter';;
 import { createTheme, } from '@mui/material';
 import { ThemeProvider } from 'styled-components';
 import LockPersonIcon from "@mui/icons-material/LockPerson";
+import { resolve } from 'styled-jsx/css';
+import '/app/style.css';
+
 
 const theme = createTheme({
    
@@ -85,6 +88,7 @@ export default function LoginPage() {
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [login, setLogin] = useState({
     username: '',
     password: '',
@@ -98,6 +102,8 @@ export default function LoginPage() {
       });
   }
 
+ 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -107,37 +113,49 @@ export default function LoginPage() {
     
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify(login),
-      });
-    //   const response = signIn("credentials", { 
-    //   redirect: false,
-    //   username: login.username,
-    //   password: login.password,
-    // });
+      // const response = await fetch(`http://127.0.0.1:8000/api/login`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Accept': 'application/json',
+      //   },
+      //   body: JSON.stringify(login),
+      // });
+      const response = await signIn("credentials", { 
+      redirect: false,
+      username: login.username,
+      password: login.password,
+    });
 
-      const data = await response.json();
-      console.log("Response data:", data);
-      console.log("Response status:", response.status);
+      // const data = await response.json();
+      // console.log("Response data:", data);
+      // console.log("Response status:", response.status);
+      
 
       if (response.ok) {
-        if (data.token && data.user_type) {
-          localStorage.setItem('userDetails', JSON.stringify(data));
-          console.log('Login successful:', data);
-          // Assuming that the name is present in the response, otherwise handle accordingly
-          console.log('role:', data.user_type)
-          router.push(`/${data.user_type}/Home`);
-        } else {
-          console.error('Missing token or name in response:', data);
-          setError(true);
+        const updatedSession = await getSession();
+        localStorage.setItem('userDetails', JSON.stringify(updatedSession))
+        if (updatedSession && updatedSession.user) {
+          console.log('Login successful:', updatedSession.user);
+          console.log('Login successful:', updatedSession.user.role);
+          router.push(`/${updatedSession.user.role}/Home`);
+        }else{
+          console.log('Login failed');
         }
+
+
+        // if (data.token && data.user_type) {
+        //   localStorage.setItem('userDetails', JSON.stringify(data));
+        //   console.log('Login successful:', data);
+        //   // Assuming that the name is present in the response, otherwise handle accordingly
+        //   console.log('role:', data.user_type)
+        //   router.push(`/${data.user_type}/Home`);
+        // } else {
+        //   console.error('Missing token or name in response:', data);
+        //   setError(true);
+        // }
       } else {
-        console.error('Login failed:', data);
+        console.error('Login failed:', response.status);
         setError(true);
         setLoading(false);
         // Handle login failure, e.g., display an error message
@@ -148,6 +166,7 @@ export default function LoginPage() {
     }
   };
 
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -157,6 +176,7 @@ export default function LoginPage() {
   };
 
   return (
+    <Box className={'body'}>
     <ThemeProvider theme={theme}>
         <Container component="main" >
         <CssBaseline />
@@ -164,7 +184,6 @@ export default function LoginPage() {
             maxWidth={430}
             sx={{
             margin: 'auto',
-           
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -289,6 +308,7 @@ export default function LoginPage() {
         </Box>
         </Container>
     </ThemeProvider>
+    </Box>
   );
 }
 

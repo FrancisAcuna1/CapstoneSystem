@@ -1,7 +1,7 @@
 'use client'; // Add this at the top for Next.js client-side rendering
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { TextField, Typography, Box, Fab, Button, Fade, IconButton } from '@mui/material';
 import { styled, css } from '@mui/system';
@@ -86,19 +86,20 @@ const AddButton = styled(Fab)(({ theme }) => ({
   },
 }));
 
-export default function AddApartmentModal({ open, handleOpen, handleClose, successful, setSuccessful}) {
+export default function AddApartmentModal({open, handleOpen, handleClose, error, setError, successful, setSuccessful, editproperty, setEditProperty}) {
   const { data: session, status } = useSession();
   const [selectedImage, setSelectedImage] = useState();
   const [isLoading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  // const [successful, setSeccessful] = useState(false);
   const router = useRouter();
+  const editItem = editproperty;
   const [newProperty, setNewProperty] = useState({
     propertyname: '',
     street: '',
     barangay: '',
     municipality: 'Sorsogon City'
   });
+
+  console.log('id:', editItem)
 
   
   const handleChange = (e) => {
@@ -116,6 +117,60 @@ export default function AddApartmentModal({ open, handleOpen, handleClose, succe
     }
   }, [status, router]);
 
+  // useEffect(() => {
+  //   if (editItem) {
+  //     console.log('id:', editItem)
+  //   }
+  // }, [editItem]) // for edit property
+
+  useEffect(() => {
+    const fetchDataEdit =  async () => {
+      const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+      const userData = JSON.parse(userDataString); // parse the datastring into json 
+      const accessToken = userData.accessToken;
+      if(accessToken){
+        try{
+          const response = await fetch(`http://127.0.0.1:8000/api/edit_property/${editItem}}`,{
+            method: 'GET',
+            headers: {
+              "Authorization": `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+              "Accept": "application/json",
+            }
+          })
+          const data = await response.json();
+          console.log(data)
+          console.log('Response:', response.status)
+
+          if(response.ok){
+            setNewProperty({
+              propertyname: data?.editProperty?.propertyname,
+              street: data?.editProperty?.street,
+              barangay: data?.editProperty?.barangay,
+              municipality: data?.editProperty?.municipality,
+            })
+            setSelectedImage(data?.editProperty?.image )
+            console.log('Edit:', newProperty);
+            console.log('Edit:', selectedImage)
+            setSuccessful(successMessage);
+          }else{
+            setError(data.message || 'Failed to save property data.');
+            handleClose();
+          }
+         
+
+        }catch (error){
+          setLoading(false); // Set loading to false regardless of success or failure
+        }finally{
+          setLoading(false); // Set loading to false regardless of success or failure
+        }
+      }
+
+    }
+    fetchDataEdit()
+
+  }, [editItem])
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -124,13 +179,15 @@ export default function AddApartmentModal({ open, handleOpen, handleClose, succe
     const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
     const userData = JSON.parse(userDataString); // parse the datastring into json 
 
-    const accessToken = userData.token;
+    const accessToken = userData.accessToken;
 
     if (accessToken){
       console.log('authenticated', status)
       console.log("Value:", newProperty)
       console.log('Token:', accessToken); 
       console.log({selectedImage});
+
+      const method = editItem ? 'POST' : 'POST';
 
       try {
         const formData = new FormData()
@@ -139,17 +196,26 @@ export default function AddApartmentModal({ open, handleOpen, handleClose, succe
         formData.append('barangay', newProperty.barangay);
         formData.append('municipality', newProperty.municipality);
 
-        if(selectedImage){
+        if(selectedImage && selectedImage instanceof File){
           formData.append('image', selectedImage)
         }
 
+        if (editItem) {
+          formData.append('_method', 'PUT'); // Indicate to Laravel that this is an update
+        }
+
+        const url = editItem 
+          ? `http://127.0.0.1:8000/api/update_property/${editItem}`
+          : 'http://127.0.0.1:8000/api/create'
+        
+        // const method = editItem ? 'PUT' : 'POST';
+
       
-        const response = await fetch('http://127.0.0.1:8000/api/create', {
-          method: 'POST',
+        const response = await fetch(url, {
+          method,
           headers:{
               'Authorization': `Bearer ${accessToken}`, 
               'Accept': 'application/json',
-
           },
           body: formData
         });
@@ -160,9 +226,6 @@ export default function AddApartmentModal({ open, handleOpen, handleClose, succe
         console.log("Response status:", response.status);
 
         if (response.ok) {
-          window.location.reload();
-          // router.push('/Landlord/Property')
-         
           handleClose();
           setNewProperty({
             propertyname: '',
@@ -171,15 +234,29 @@ export default function AddApartmentModal({ open, handleOpen, handleClose, succe
             municipality: 'Sorsogon City'
           });
           setSelectedImage(null);
-          setSuccessful(true);
+          localStorage.setItem('successMessage', data.message || 'Operation successful!');
+          window.location.reload();
+          // const successMessage = data.message || 'Success!'; 
+          // setSuccessful(successMessage);
+          
         } else {
-          console.error('Failed in Creating New Apartment', data);
-          setError(true);
-          setLoading(false);
-          setSuccessful(false)
+         if(data.error)
+         {
+          console.log(data.error) // for empty field
+          setError(data.error)
+          handleClose();
+         }else{
+          localStorage.setItem('errorMessage', data.message || 'Operation Error!');
+          window.location.reload();
+          // console.log(data.message); // for duplicate entry
+          // setError(data.message);
+          handleClose();
+         }
+        
         }
       } catch (error) {
-        console.error('An error occurred:', error);
+        console.error("Error fetching data:", error);
+        setError(error.message || 'An unexpected error occurred');
         setLoading(false);
         setSuccessful(false)
       }
@@ -190,14 +267,37 @@ export default function AddApartmentModal({ open, handleOpen, handleClose, succe
     
   };
 
+  useEffect(() => {
+    const successMessage = localStorage.getItem('successMessage');
+    const errorMessage = localStorage.getItem('errorMessage');
+    if (successMessage) {
+      setSuccessful(successMessage);
+      setTimeout(() => {
+        localStorage.removeItem('successMessage');
+      }, 3000);
+    }
+
+    if(errorMessage){
+      setError(errorMessage);
+      setTimeout(() => {
+        localStorage.removeItem('errorMessage');
+      }, 3000);
+    }
 
 
+
+  
+  }, []);
 
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedImage(e.target.files[0]);
     }
   };
+
+
+
+
 
 
   
@@ -215,14 +315,24 @@ export default function AddApartmentModal({ open, handleOpen, handleClose, succe
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={open}
-        onClose={handleClose}
+        onClose={() => {
+          handleClose();
+          setEditProperty(null);
+          setNewProperty({
+            propertyname: '',
+            street: '',
+            barangay: '',
+            municipality: 'Sorsogon City',
+          });
+          setSelectedImage(null);
+        }}
         closeAfterTransition
         slots={{ backdrop: StyledBackdrop }}
       >
         <Fade in={open}>
           <ModalContent> 
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 550, letterSpacing: 1, textTransform: 'uppercase' }}>
-              Add New Estate
+              {editItem ? 'Edit Estate' : 'Add New Estate'}
             </Typography>
             <Box onSubmit={handleSubmit} component="form"  noValidate>
               <TextField 
@@ -280,7 +390,8 @@ export default function AddApartmentModal({ open, handleOpen, handleClose, succe
                 <Box sx={{ marginBottom: '-10px' }}>
                   {selectedImage ? (
                     <Typography variant="body1" gutterBottom sx={{ color: 'gray', fontSize: '18px' }}>
-                    {selectedImage.name} <IconButton>
+                    {typeof selectedImage === 'string' ? selectedImage : selectedImage.name} 
+                    <IconButton>
                       <HighlightOffOutlinedIcon color='warning' onClick={() => setSelectedImage(null)} />
                     </IconButton>
                     </Typography>
@@ -328,7 +439,17 @@ export default function AddApartmentModal({ open, handleOpen, handleClose, succe
                     borderColor: '#000',
                   },
                 }}
-                onClick={handleClose}
+                onClick={() => {
+                  handleClose();
+                  setEditProperty(null);
+                  setNewProperty({
+                    propertyname: '',
+                    street: '',
+                    barangay: '',
+                    municipality: 'Sorsogon City',
+                  });
+                  setSelectedImage(null);
+                }}
               >
                 Cancel
               </Button>

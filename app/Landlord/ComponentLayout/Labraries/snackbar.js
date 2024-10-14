@@ -10,7 +10,7 @@ const SuccessSnackbar = ({successful, setSuccessful}) => {
 
     useEffect(() => {
         if (successful) {
-          enqueueSnackbar('Created Successfully!', {
+          enqueueSnackbar(successful, {
             variant: 'success',
             autoHideDuration: 3000, // Snackbar disappears after 6 seconds
             anchorOrigin: {

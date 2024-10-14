@@ -1,12 +1,15 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Typography, Box,  Breadcrumbs, Link, Grid, Fab,} from '@mui/material';
+import { Typography, Box,  Breadcrumbs, Link, Grid, Fab, LinearProgress} from '@mui/material';
 import ListofPropertyTable from '../TableComponent/ListofPropertyTable';
 import AddPropertyModal from '../ModalComponent/AddPropertyModal';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { styled, useTheme, css } from '@mui/system';
-
+import SuccessSnackbar from '../Labraries/snackbar';
+import { SnackbarProvider } from 'notistack';
+import ErrorSnackbar from '../Labraries/ErrorSnackbar'
+import zIndex from '@mui/material/styles/zIndex';
 
 
 const AddButton = styled(Fab)(({ theme }) => ({
@@ -18,17 +21,26 @@ const AddButton = styled(Fab)(({ theme }) => ({
 }));
 
 
-export default function PropertyTypeComponent({propsId}){
-  const router = useRouter();
-  const id = propsId;
+export default function PropertyTypeComponent({propertyId, loading, setLoading}){
+  const [successful, setSuccessful] = useState(null);
+  const [error, setError] = useState(null);
+  const [editItem, setEditItem] = useState(null);
+  const [selectedProperty, setSelectedProperty] = useState('');
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const id = propertyId;
+  console.log('id:', id);
+  console.log('Error:', error)
+
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleCreate = () => {
-    router.push('/FormsComponent/createpropertyform');
-    console.log('Success', router);
+  const handleEdit = (id, propertyType) => {
+    console.log('Edit Property:', id)
+    setSelectedProperty(propertyType);
+    setEditItem(id);
+    setOpen(true);
   }
   
 
@@ -36,7 +48,19 @@ export default function PropertyTypeComponent({propsId}){
 
 
   return (
+    
     <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
+      
+      <SnackbarProvider maxSnack={3}>
+        <SuccessSnackbar
+          setSuccessful={setSuccessful}
+          successful={successful}          
+        />
+         <ErrorSnackbar
+          error={error}
+          setError={setError}          
+        />
+      </SnackbarProvider>
         <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '5px', fontSize: '24px', fontWeight: 'bold',  mt:5}}>
             List of Propreties - id Acuna
         </Typography>
@@ -47,6 +71,7 @@ export default function PropertyTypeComponent({propsId}){
                     Home
                 </Link>
                 <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Property">
+             
                     Property
                 </Link>
                 <Typography letterSpacing={2} color="text.primary"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '15px' } }}>List of property</Typography>
@@ -57,23 +82,36 @@ export default function PropertyTypeComponent({propsId}){
         <Grid  container spacing={1} sx={{ mt: '-0.9rem', display:'flex', justifyContent:' center',  }}>
             <Grid item xs={12}>
                 <Grid item>
-                  {/* <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5, mb: 3 }}>
-                    <AddButton variant="extended" aria-label="add" onClick={() =>  router.push('/Landlord/Apartment/[id]/CreateProperty')}>
-                      <AddCircleOutlineIcon sx={{ mr: 1 }} />
-                      Add Property
-                    </AddButton>
-                  </Box> */}
-
                   <AddPropertyModal
                     open={open}
                     handleOpen={handleOpen}
                     handleClose={handleClose}
-                    propsId={propsId}
+                    propertyId={propertyId}
+                    successful={successful}
+                    setSuccessful={setSuccessful}
+                    error={error}
+                    setError={setError} 
+                    editItem={editItem}
+                    setEditItem={setEditItem}
+                    setSelectedProperty={setSelectedProperty}
+                    selectedProperty={selectedProperty}
+                    
                   />
                 </Grid>
                 
                 <Grid Item>
-                  <ListofPropertyTable/> 
+                  <ListofPropertyTable  
+                    propertyId={propertyId}
+                    error={error}
+                    setError={setError} 
+                    loading={loading}
+                    setLoading={setLoading}
+                    handleEdit={handleEdit}
+                    setSuccessful={setSuccessful}
+                    open={open}
+                    handleOpen={handleOpen}
+                    handleClose={handleClose}
+                  /> 
                 </Grid>
                     
                 

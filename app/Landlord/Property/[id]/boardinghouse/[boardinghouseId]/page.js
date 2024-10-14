@@ -1,17 +1,20 @@
 "use client"
-import * as React from 'react';
+import * as React  from 'react';
+import useClient from 'next/client';
+import { useEffect, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
+import {Box, LinearProgress} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Navigator from '../../../../DashboardLayout/navigator';
 import Header from '../../../../DashboardLayout/header';
 import { Divider } from '@mui/material';
 import dynamic from 'next/dynamic';
-import OccupiedTenantInformation from '../../../../ComponentLayout/HeroContent/OccupiedUnitInfoComponent';
-
+import PropertyTypeComponent from '../../../../ComponentLayout/HeroContent/PropertyTypeComponent';
+import BoardingHouseDetailsComponent from '../../../../ComponentLayout/HeroContent/boardinghouseComponent';
 // const CardContentHeader = dynamic(() => import('../ComponentLayout/cards'), {
 //   ssr: false
 //   }) 
@@ -183,9 +186,19 @@ let theme = createTheme({
       },
     },
   };
+
+  
 const drawerWidth = 256;
 
-export default function OccupiedTenantPage (){
+export default function BoardingHouseDetailsPage (){
+  const router = useRouter();
+  const params = useParams();
+  const [loading, setLoading] = useState(false)
+  const boardinghouseId = params?.boardinghouseId;
+  const propsId = params.id;
+  console.log('Boarding House ID:', boardinghouseId);
+  console.log('PropertyID:', propsId);
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
    // this code 'isSmUp is Enable the Burger Icon for mobile view
    const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
@@ -193,6 +206,8 @@ export default function OccupiedTenantPage (){
   const handleDrawerToggle = () => {
   setMobileOpen(!mobileOpen);
   };
+
+  
 
   return (
     <>
@@ -220,10 +235,17 @@ export default function OccupiedTenantPage (){
           </Box>
           <Divider />
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          {loading && <LinearProgress sx={{ color:"#673ab7", position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
           <Header onDrawerToggle={handleDrawerToggle} />
           <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-             <OccupiedTenantInformation/>
-              {/* <Content/> */}
+              {/* <h1>Boarding House Details page</h1> */}
+              <BoardingHouseDetailsComponent 
+                boardinghouseId={boardinghouseId} 
+                propsId={propsId}
+                loading={loading}
+                setLoading={setLoading}
+              />
+              
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
               {/* <Copyright/> */}

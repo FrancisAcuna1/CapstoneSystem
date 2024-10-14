@@ -1,14 +1,43 @@
 'use client'
-
 import * as React from 'react';
 import { useState } from 'react';
 import { Grid, Box, Paper, Typography, Button, Divider, Link, Fade, Breadcrumbs, TextField, FormControl, InputLabel, Select, MenuItem, Menu} from '@mui/material';
 import EquipmentTable from '../TableComponent/EquipmentTable';
+import AddEquipmentModal from '../ModalComponent/AddEquipmentModal';
+import SuccessSnackbar from '../Labraries/snackbar';
+import { SnackbarProvider } from 'notistack';
+import ErrorSnackbar from '../Labraries/ErrorSnackbar'
 
 
-export default function MaintenaceRequestComponent(){
+export default function EquipmentComponent({loading, setLoading}){
+    const [successful, setSuccessful] = useState(null);
+    const [error, setError] = useState(null);
+    const [open, setOpen] = useState(false);
+    const [editItem, setEditItem] = useState();
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
+    const handleEdit = (id) => {
+        setEditItem(id);
+        setOpen(true);
+    }
+
+
+
+
     return(
         <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
+             <SnackbarProvider maxSnack={3}>
+                <SuccessSnackbar
+                    setSuccessful={setSuccessful}
+                    successful={successful}          
+                />
+                    <ErrorSnackbar
+                    error={error}
+                    setError={setError}          
+                />
+            </SnackbarProvider>
             <Typography variant="h5" letterSpacing={3} sx={{color: '#263238', marginLeft: '5px', fontSize: '24px', fontWeight: 'bold',  mt:5}}>
                 Amenities & Equipment
             </Typography>
@@ -25,34 +54,35 @@ export default function MaintenaceRequestComponent(){
             </Box>
 
             <Grid  container spacing={1} sx={{ mt: '-0.9rem', display:'flex', justifyContent:' center',  }}>
-                <Grid item xs={12} >
-                        <Paper
-                            elevation={2}
-                            sx={{
-                                maxWidth: { xs: 312, sm: 741,  md: 940, lg: 1400 }, 
-                                padding: "1rem 0rem 0rem 0rem",
-                                borderRadius: '8px',
-                                marginTop: '2rem',
-                                height: 'auto'
-                            }}
-                        >
-                            {/* <Typography variant="h5" color={'black'} sx={{ fontSize: '20px', marginTop: '0.6rem', ml: '1.2rem' }} letterSpacing={2} gutterBottom>
-                                List of Maintenance Request
-                            </Typography> */}
 
-                            <EquipmentTable/> 
-                        </Paper>
-                    {/* <Paper elevation={3} style={{ maxWidth: { xs: 300, sm: 740,  md: 940, lg: 1400 }, padding: '0px', marginTop: '15px', borderRadius: '15px'}}>  
-                        <Grid container alignItems="center" justifyContent="space-between">
-                            <Grid item>
-                                <Typography variant="h6" letterSpacing={2} sx={{marginLeft: '20px', mt:2}} >
-                                    List of Maintenance Request
-                                </Typography>
-                            </Grid>
+                <Grid item xs={12}>
+                    <Grid item>
+                        <AddEquipmentModal
+                            open={open}
+                            handleClose={handleClose}
+                            handleOpen={handleOpen}
+                            setSuccessful={setSuccessful}
+                            setError={setError}
+                            error={error}
+                            setLoading={setLoading}
+                            loading={loading}
+                            setEditItem={setEditItem}
+                            editItem={editItem}
+                      
                         
-                        </Grid>
-                        <RequestMaintenanceTable/>
-                    </Paper> */}
+                        />
+                    </Grid>
+                    <Grid item>
+                        <EquipmentTable
+                            setSuccessful={setSuccessful}
+                            setError={setError}
+                            error={error}
+                            setLoading={setLoading}
+                            loading={loading}
+                            handleEdit={handleEdit}
+                            
+                        /> 
+                    </Grid> 
                 </Grid>
                 
 
