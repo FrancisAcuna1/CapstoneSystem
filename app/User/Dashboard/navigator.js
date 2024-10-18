@@ -35,12 +35,14 @@ export default function Navigator(props) {
 
 
   const menuItems = [
-    { text: 'Dashboard', Icon: <DashboardCustomizeOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/Overview', category: 'Menu' },
+    { text: 'Dashboard', Icon: <DashboardCustomizeOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/Home', category: 'Menu' },
     { text: 'Maintenance Request', Icon: <ConstructionOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/RequestMaintenance', category: 'Menu' },
-    { text: 'Account Balance', Icon: <AccountBalanceWalletOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/', category: 'Menu' },
-    { text: 'Chatbot', Icon: <SmartToyOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/Landlord/ExpensesTracking', category: 'Menu' },
-    { text: 'My Account', Icon: <AccountCircleOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/Landlord/TenantInformation', category: 'User' }
+    { text: 'Account Balance', Icon: <AccountBalanceWalletOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/AssessmentFee', category: 'Menu' },
+    { text: 'My Account', Icon: <AccountCircleOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/Landlord/TenantInformation', category: 'Menu' }
   ];
+
+  const chatbotMenuItem = { text: 'Chatbot', Icon: <SmartToyOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/Landlord/ExpensesTracking', category: 'Menu' };
+
 
   const categories = [...new Set(menuItems.map(item => item.category))];
   const isSelected = (itemHref) => {
@@ -122,6 +124,35 @@ export default function Navigator(props) {
             </Box>
           </React.Fragment>
         ))}
+
+        <Box sx={{ position: 'absolute', bottom: 20, width: '100%',}}>
+          <Link
+            href={chatbotMenuItem.href}
+            passHref
+            style={{ textDecoration: 'none' }} // Remove underline from links
+          >
+            <MenuItem
+              sx={{
+                mx: '0.7rem',
+                my: '0.5rem',
+                backgroundColor: isSelected(chatbotMenuItem.href) ? '#9aa3ee' : 'transparent',
+                color: isSelected(chatbotMenuItem.href) ? '#ffffff' : 'text.primary',
+                borderRadius: '8px',
+                '& .MuiSvgIcon-root': {
+                  color: isSelected(chatbotMenuItem.href) ? '#ffffff' : 'text.primary',
+                },
+                '&:hover': {
+                  backgroundColor: isSelected(chatbotMenuItem.href) ? '#9aa3ee' : 'rgba(0, 0, 0, 0.08)',
+                },
+              }}
+            >
+              {chatbotMenuItem.Icon}
+              <Typography variant="body2" sx={{ ml: '0.4rem', color:'primary', fontFamily: 'Poppins, Arial, sans-serif', fontWeight: 300, fontSize: '0.9rem', letterSpacing: '1px', textAlign: 'center' }}>
+                {chatbotMenuItem.text}
+              </Typography>
+            </MenuItem>
+          </Link>
+        </Box>
       </Box>
     </Drawer>
   );

@@ -1,7 +1,8 @@
 'use client'
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { AppBar, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Typography, Avatar, StyledBadge, Tooltip, Breadcrumbs } from '@mui/material';
+import { AppBar, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Avatar,} from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -64,12 +65,61 @@ const Search = styled('div')(({ theme }) => ({
   }));
 
 
-
+  
 
 function Header(props) {
     const { onDrawerToggle } = props;
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+    const [tenantInformation, setTenantInformation] = useState([]);
+
+    useEffect(() => {
+        const fetchedData = async () => {
+        //   setLoading(true); // Start loading
+          const userDataString = localStorage.getItem('userDetails');
+    
+          if (userDataString) {
+            try {
+              const userData = JSON.parse(userDataString); // Parse JSON
+              const accessToken = userData.accessToken; // Access token
+              const userId = userData.user.id; // User ID
+              
+              if (accessToken) {
+                console.log('User ID:', userId); // Debugging line
+                const response = await fetch(`http://127.0.0.1:8000/api/tenant_information/${userId}`, {
+                  method: 'GET',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                  }
+                });
+    
+                const data = await response.json();
+    
+                console.log('API Response:', data); // Debugging line
+    
+                if(response.ok){
+                    console.log(data)
+                    setTenantInformation(data.data)
+                    // setLoading(false)
+                }else{
+                    console.log('Error:', response.status)
+                    // setLoading(false)
+                }
+              }
+            } catch (error) {
+              console.error('Error fetching payment details:', error); // Error logging
+            }
+          } else {
+            console.error('No user data found in local storage.'); // Handling missing user data
+          }
+        //   setLoading(false); // Stop loading
+        };
+        
+        fetchedData();
+      }, []);
+
+      console.log(tenantInformation)
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -93,11 +143,37 @@ function Header(props) {
 
     const handleLogout = async () => {
         await signOut({ redirect: false });
+        localStorage.removeItem('avatarColor')
         localStorage.removeItem('userDetails'); // Clear user data
         sessionStorage.clear(); // Clear token
         // Redirect to login page
         window.location.href = '/';
     };
+
+        
+    const avatarColors = ['#1976d2', '#f44336', '#4caf50', '#ff9800', '#9c27b0', '#3f51b5', '#00bcd4', '#8bc34a', '#8785d0', '#a55555',];
+
+    const getRandomColor = () => {
+        return avatarColors[Math.floor(Math.random() * avatarColors.length)]
+    }
+    // Function to get or set the avatar color
+    const getAvatarColor = () => {
+        // Check if a color is already stored in localStorage
+        const storedColor = localStorage.getItem('avatarColor');
+        
+        if (storedColor) {
+            // Return the stored color if it exists
+            return storedColor;
+        } else {
+            // Generate a new random color, store it, and return it
+            const newColor = getRandomColor();
+            localStorage.setItem('avatarColor', newColor);
+            return newColor;
+        }
+    }
+
+    // Use the getAvatarColor function to set the background color
+    const avatarBackgroundColor = getAvatarColor();
 
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
@@ -180,10 +256,9 @@ function Header(props) {
                 color="primary"
                 position="sticky"
                 elevation={1}
-                sx={ { zIndex: 1, py: 1.3,  backgroundColor: '#ebf2f0', backgroundImage: 'none',
+                sx={ { zIndex: 1, py: 1.3,  backgroundColor: '#ffffff', backgroundImage: 'none',
                    
                 }}
-                
             >
 
             <Toolbar>
@@ -233,10 +308,11 @@ function Header(props) {
                         aria-haspopup="true"
                         onClick={handleProfileMenuOpen}
                         color="inherit"
-                        sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px' }}
-                        src="/user.png"
-                    >
+                        sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px', backgroundColor: avatarBackgroundColor, }}
                         
+                        // src="/user.png"
+                    >
+                         {tenantInformation?.firstname?.charAt(0)}{tenantInformation?.lastname?.charAt(0)}
                     </Avatar>
                 </Box>
                 <Box sx={{ display: { xs: 'flex', md: 'flex', lg: 'none'} }}>

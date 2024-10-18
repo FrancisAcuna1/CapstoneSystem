@@ -30,161 +30,159 @@ import dynamic from 'next/dynamic';
 // }
 
 let theme = createTheme({
-    palette: {
-      primary: {
-        light: '#b6bdf1',  // Accent Color
-        main: '#8785d0',    // Primary Color
-        dark: '#6f6ab2',    // Darker Shade of Primary Color
-      },
-      secondary: {
-        main: '#f78028',    // Secondary Color
-      },
-      warning: {
-        main: '#a55555',    // Alert/Warn Color
-      },
-      background: {
-        default: '#eaeff1', // Neutral Color for backgrounds
+  palette: {
+    primary: {
+      light: '#b6bdf1',  // Accent Color
+      main: '#8785d0',    // Primary Color
+      dark: '#6f6ab2',    // Darker Shade of Primary Color
+    },
+    secondary: {
+      main: '#f78028',    // Secondary Color
+    },
+    warning: {
+      main: '#a55555',    // Alert/Warn Color
+    },
+    background: {
+      default: '#eaeff1', // Neutral Color for backgrounds
+    },
+  },
+  typography: {
+    h5: {
+      fontWeight: 500,
+      fontSize: 26,
+      letterSpacing: 0.5,
+    },
+  },
+  shape: {
+    borderRadius: 8,
+  },
+  components: {
+    MuiTab: {
+      defaultProps: {
+        disableRipple: true,
       },
     },
-    typography: {
-      h5: {
-        fontWeight: 500,
-        fontSize: 26,
-        letterSpacing: 0.5,
-      },
+  },
+  mixins: {
+    toolbar: {
+      minHeight: 48,
     },
-    shape: {
-      borderRadius: 8,
-    },
-    components: {
-      MuiTab: {
-        defaultProps: {
-          disableRipple: true,
+  },
+});
+
+theme = {
+  ...theme,
+  components: {
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: '#ffffff', // Neutral Color
         },
       },
     },
-    mixins: {
-      toolbar: {
-        minHeight: 48,
-      },
-    },
-  });
-  
-  theme = {
-    ...theme,
-    components: {
-      MuiDrawer: {
-        styleOverrides: {
-          paper: {
-            backgroundColor: '#ebf2f0', // Neutral Color
-          },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
         },
-      },
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            textTransform: 'none',
-          },
-          contained: {
+        contained: {
+          boxShadow: 'none',
+          '&:active': {
             boxShadow: 'none',
-            '&:active': {
-              boxShadow: 'none',
-            },
-          },
-        },
-      },
-      MuiTabs: {
-        styleOverrides: {
-          root: {
-            marginLeft: theme.spacing(1),
-          },
-          indicator: {
-            height: 3,
-            borderTopLeftRadius: 3,
-            borderTopRightRadius: 3,
-            backgroundColor: theme.palette.common.white,
-          },
-        },
-      },
-      MuiTab: {
-        styleOverrides: {
-          root: {
-            textTransform: 'none',
-            margin: '0 16px',
-            minWidth: 0,
-            padding: 0,
-            [theme.breakpoints.up('md')]: {
-              padding: 0,
-              minWidth: 0,
-            },
-          },
-        },
-      },
-      MuiIconButton: {
-        styleOverrides: {
-          root: {
-            padding: theme.spacing(1),
-          },
-        },
-      },
-      MuiTooltip: {
-        styleOverrides: {
-          tooltip: {
-            borderRadius: 4,
-          },
-        },
-      },
-      MuiDivider: {
-        styleOverrides: {
-          root: {
-            backgroundColor: 'rgb(255,255,255,0.15)',
-          },
-        },
-      },
-      MuiListItemButton: {
-        styleOverrides: {
-          root: {
-            '&.Mui-selected': {
-              color: '#f78028',  // Secondary Color for selected items
-            },
-            '&:hover': {
-              backgroundColor: '#b6bdf1',  // Accent Color on hover
-            },
-          },
-        },
-      },
-      MuiListItemText: {
-        styleOverrides: {
-          primary: {
-            fontSize: 14,
-            fontWeight: theme.typography.fontWeightMedium,
-          },
-        },
-      },
-      MuiListItemIcon: {
-        styleOverrides: {
-          root: {
-            color: 'inherit',
-            minWidth: 'auto',
-            marginRight: theme.spacing(2),
-            '& svg': {
-              fontSize: 20,
-            },
-          },
-        },
-      },
-      MuiAvatar: {
-        styleOverrides: {
-          root: {
-            width: 32,
-            height: 32,
           },
         },
       },
     },
-  };
-
-
+    MuiTabs: {
+      styleOverrides: {
+        root: {
+          marginLeft: theme.spacing(1),
+        },
+        indicator: {
+          height: 3,
+          borderTopLeftRadius: 3,
+          borderTopRightRadius: 3,
+          backgroundColor: theme.palette.common.white,
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          margin: '0 16px',
+          minWidth: 0,
+          padding: 0,
+          [theme.breakpoints.up('md')]: {
+            padding: 0,
+            minWidth: 0,
+          },
+        },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          padding: theme.spacing(1),
+        },
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          borderRadius: 4,
+        },
+      },
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'rgb(255,255,255,0.15)',
+        },
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          '&.Mui-selected': {
+            color: '#f78028',  // Secondary Color for selected items
+          },
+          '&:hover': {
+            backgroundColor: '#b6bdf1',  // Accent Color on hover
+          },
+        },
+      },
+    },
+    MuiListItemText: {
+      styleOverrides: {
+        primary: {
+          fontSize: 14,
+          fontWeight: theme.typography.fontWeightMedium,
+        },
+      },
+    },
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: {
+          color: 'inherit',
+          minWidth: 'auto',
+          marginRight: theme.spacing(2),
+          '& svg': {
+            fontSize: 20,
+          },
+        },
+      },
+    },
+    MuiAvatar: {
+      styleOverrides: {
+        root: {
+          width: 32,
+          height: 32,
+        },
+      },
+    },
+  },
+};
   
 
   

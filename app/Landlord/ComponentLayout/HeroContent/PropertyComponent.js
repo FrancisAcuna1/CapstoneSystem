@@ -217,12 +217,12 @@ export default function PropertyComponent ({loading, setLoading}){
                             </Grid>
                             </Box>
                             <Box height={95} sx={{mt:2, }}>
-                                <Typography variant="h5" component="div" sx={{fontSize: {xs: '22px', sm: '24px', md: '22px', lg: '24px'}, fontWeight: 540,}} letterSpacing={2}>
+                                <Typography gutterBottom variant="h5" component="div" sx={{fontSize: {xs: '22px', sm: '24px', md: '22px', lg: '24px'}, fontWeight: 540,}} letterSpacing={2}>
                                     {item.propertyname}
                                 </Typography>
-                                <Typography variant="body1" color={'gray'} sx={{fontSize: {xs: '13px', sm: '14px', md: '13px' ,lg:'14px'}}} letterSpacing={1} gutterBottom>
+                                <Typography variant="body1" color={'#424242'} sx={{fontSize: {xs: '13px', sm: '14px', md: '13px' ,lg:'14px'}}} letterSpacing={1} gutterBottom>
                                     {/* Magsaysay st. Brgy Cogon, Sorsogon City */}
-                                    {item.street}. Brgy {item.barangay}, {item.municipality}
+                                    Brgy {item.barangay}, {item.municipality}
                                 </Typography>
                               
 

@@ -122,7 +122,8 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
     });
 
   console.log('ID:', editItem)
-  console.log('EditItem:'. addEquipment)
+  console.log('EditItem:'. formData)
+  console.log('contact:', contact)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -141,7 +142,7 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
         console.log('Token:', accessToken)
         try{
 
-          const response = await fetch(`http://127.0.0.1:8000/api/edit_inclusion/${editItem}`,{
+          const response = await fetch(`http://127.0.0.1:8000/api/edit_tenant/${editItem}`,{
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',  
@@ -150,12 +151,11 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
           })
 
           const data = await response.json();
+          console.log(data)
 
           if(response.ok){
-            setAddEquipment({
-              name: data?.data?.name,
-            });
-            console.log( data?.data?.name)
+            setFormData(data.data || formData)
+            setContact(data.data.contact || '')
             // setAddEquipment(data)
           }else{
             console.log(data.message); // for duplicate entry
@@ -170,7 +170,7 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
       }
     }
     fetchDataEdit();
-  }, [editItem])
+  }, [editItem, setFormData])
 
 
   const handleSubmit = async(e) => {
@@ -180,23 +180,22 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
     const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
     const userData = JSON.parse(userDataString); // parse the datastring into json 
     const accessToken = userData.accessToken;
-   
-
+  
     if(accessToken){
       try{
-        const method = editItem ? 'PUT' : 'POST';
-        const endpoint = editItem 
-        ? `http://127.0.0.1:8000/api/update_inclusion/${editItem}`  
-        : 'http://127.0.0.1:8000/api/store_inclusion' 
+        // const method = editItem ? 'PUT' : 'POST';
+        // const endpoint = editItem 
+        // ? `http://127.0.0.1:8000/api/update_tenant/${editItem}`  
+        // : 'http://127.0.0.1:8000/api/store_inclusion' 
             
-        const response = await fetch(endpoint,{
-          method,
+        const response = await fetch(`http://127.0.0.1:8000/api/update_tenant/${editItem}`,{
+          method: 'PUT',
           headers:{
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`, 
             'Accept': 'application/json',
           },
-          body: JSON.stringify(addEquipment)
+          body: JSON.stringify(formData)
         })
 
         const data = await response.json();
@@ -204,13 +203,8 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
         if(response.ok){
           // setLoading(false);
           handleClose()
-          setAddEquipment({
-            name: ''
-          })
           localStorage.setItem('successMessage', data.message || 'Operation Sucess!');
           window.location.reload();
-          // const successMessage = data.message || 'Success!'; 
-          // setSuccessful(successMessage);
         }else{
           setLoading(false);
           if(data.error)
@@ -478,7 +472,7 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
                     />
                 </Grid>
             </Grid>
-            <Button variant='contained' type='submit' sx={{width: '100%',background: 'primary','&:hover': {backgroundColor: '#b6bdf1',}, padding: '8px', fontSize: '16px', mt:4 }}>Add </Button>
+            <Button variant='contained' type='submit' sx={{width: '100%',background: 'primary','&:hover': {backgroundColor: '#b6bdf1',}, padding: '8px', fontSize: '16px', mt:4 }}>Submit </Button>
             <Button
             variant="outlined"
             fullWidth

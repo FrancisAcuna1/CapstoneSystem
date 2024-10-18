@@ -136,7 +136,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
   const [selectedDeleteProperty, setSelectedDeleteProperty] = useState({ id: null, type: '' });
   const [deleting, setDeleting] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
-  const [propertyData, setPropertyData] = useState({ apartments: [], boarding_houses: [] });
+  const [propertyData, setPropertyData] = useState({address: [], apartments: [], boarding_houses: [] });
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   console.log('ID:', propsid)
@@ -177,7 +177,14 @@ export default function UnitListTable({propertyId, error, setError, loading, set
               if(response.ok){
                   console.log('Data:', data)
                   if(selectedCategory === "All"){
-                    setPropertyData({apartments: data['0']?.apartments || [], boarding_houses: data['1'] || []});
+                    setPropertyData({address: {
+                      street: data['0']?.street || '',
+                      barangay: data['0']?.barangay || '',
+                      municipality: data['0']?.municipality || ''
+                  },
+                   apartments: data['0']?.apartments || [], 
+                   boarding_houses: data['1'] || []});
+                    
                   }else if (selectedCategory === "Available" || selectedCategory === "Occupied"){
                     setPropertyData({apartments: data?.status || [], boarding_houses: data?.[0] || []});
                   }else if (selectedCategory === "Apartment"){
@@ -305,7 +312,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
   };
 
 
-  const handleClick = (status, boardinghouseId, detailsId, occupiedid, property_type) => {
+  const handleClick = (status, occupiedboardinghouseId, boardinghouseId, detailsId, occupiedid, property_type) => {
     if (status === 'Available') {
       // Navigate to the available property details page
       if (property_type === 'Apartment') {
@@ -320,7 +327,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
       if (property_type === 'Apartment') {
         router.push(`/Landlord/Property/${propsid}/occupiedapartment/${occupiedid}`);
       }else if (property_type === 'Boarding House'){
-        router.push(`/Landlord/Property/${propsid}/boardinghouse/${boardinghouseId}`)
+        router.push(`/Landlord/Property/${propsid}/occupiedboardinghouse/${occupiedboardinghouseId}`)
       }
     }
   };
@@ -456,7 +463,9 @@ export default function UnitListTable({propertyId, error, setError, loading, set
 
   console.log("Category:", selectedCategory);
 
-
+  console.log(displayedData);
+  
+  
   
   
   return (
@@ -613,7 +622,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                         </Typography>
                     </TableCell>
                     {/* <TableCell>{property.inclusion}</TableCell> */}
-                    <TableCell> {`${property.street}, ${property.street}st., ${property.barangay}, ${property.municipality}`}</TableCell>
+                    <TableCell> {`${property.street}st. ${property.barangay}, ${property.municipality}`}</TableCell>
                     <TableCell>{property.property_type}</TableCell>
                     <TableCell>{property.number_of_rooms}</TableCell>
                     <TableCell>
@@ -659,7 +668,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                       {/* <IconButton onClick={() =>  router.push('/Landlord/property/[id]/Occupiedpropertys')}>
                           <VisibilityOutlinedIcon color='info'/>
                       </IconButton> */}
-                      <IconButton onClick={() =>  handleClick(property.status, property.id, property.id, property.id, property.property_type)}>
+                      <IconButton onClick={() =>  handleClick(property.status, property.id, property.id, property.id, property.id, property.property_type)}>
                           <VisibilityOutlinedIcon fontSize='medium' color='info'/>
                       </IconButton>
                     

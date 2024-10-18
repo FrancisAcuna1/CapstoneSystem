@@ -1,8 +1,6 @@
+'use client'
 import React, { useEffect, useState } from "react";
-import {
-  Box, Paper, Table, TableBody, TableHead, TableContainer, TableRow, Toolbar,
-  TableCell, TablePagination, Tooltip, Typography, IconButton,
-} from "@mui/material";
+import { Box, Grid, Paper, Table, TableBody, TableHead, TableContainer, TableRow, Toolbar,TableCell, TablePagination, Tooltip, Typography, IconButton, Skeleton, Divider} from "@mui/material";
 import { styled, alpha } from '@mui/system';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import NorthIcon from '@mui/icons-material/North';
@@ -34,7 +32,7 @@ const GeneralTooltip = styled(({ className, ...props }) => (
   },
 });
 
-export default function PaymentHistoryTable({ tenantId, setLoading, loading }) {
+export default function AssesmentFeeTable({ tenantId, setLoading, loading }) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [paymentDetails, setPaymentDetails] = useState([]);
@@ -43,56 +41,54 @@ export default function PaymentHistoryTable({ tenantId, setLoading, loading }) {
 
   useEffect(() => {
     const fetchedData = async () => {
-      setLoading(true);
+      setLoading(true); // Start loading
       const userDataString = localStorage.getItem('userDetails');
-      const userData = JSON.parse(userDataString);
-      const accessToken = userData.accessToken;
-      if (accessToken) {
+
+      if (userDataString) {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/show_payment/${tenantId}`, {
-                method: 'GET',
-                headers: {
+          const userData = JSON.parse(userDataString); // Parse JSON
+          const accessToken = userData.accessToken; // Access token
+          const userId = userData.user.id; // User ID
+          
+          if (accessToken) {
+            console.log('User ID:', userId); // Debugging line
+            const response = await fetch(`http://127.0.0.1:8000/api/show_payment/${userId}`, {
+              method: 'GET',
+              headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`
-                }
+              }
             });
 
             const result = await response.json();
-        
-            console.log('API Response:', result);
+
+            console.log('API Response:', result); // Debugging line
 
             if (response.ok) {
-            if (result.data) {
-                console.log('Data type:', typeof result.data);
-                console.log('Is array:', Array.isArray(result.data));
-                
-                if (typeof result.data === 'object' && !Array.isArray(result.data)) {
-                // Single object
-                setPaymentDetails([result.data]);
-                } else if (Array.isArray(result.data)) {
-                // Array of objects
-                setPaymentDetails(result.data);
+              if (result.data) {
+                if (Array.isArray(result.data)) {
+                  setPaymentDetails(result.data); // Array of objects
                 } else {
-                console.error('Unexpected data format:', result.data);
-                setError('Received unexpected data format from server');
+                  setPaymentDetails([result.data]); // Single object
                 }
-            } else {
+              } else {
                 console.error('No data in response:', result);
-                setError('No data received from server');
-            }
+              }
             } else {
-            console.error('Error:', response.status, result);
-            setError(`Error ${response.status}: ${result.message || 'Unknown error'}`);
+              console.error('Error:', response.status, result);
             }
+          }
         } catch (error) {
-          console.log(error);
-        } finally {
-          setLoading(false);
+          console.error('Error fetching payment details:', error); // Error logging
         }
+      } else {
+        console.error('No user data found in local storage.'); // Handling missing user data
       }
+      setLoading(false); // Stop loading
     };
+    
     fetchedData();
-  }, [tenantId, setLoading]);
+  }, [tenantId]);
 
   const handleSort = (columnKey) => {
     let direction = 'asc';
@@ -145,11 +141,11 @@ export default function PaymentHistoryTable({ tenantId, setLoading, loading }) {
 
   return (
     <Box sx={{ maxWidth: 1400, margin: 'auto', overflowX: 'auto' }}>
-      <Paper elevation={2} sx={{ maxWidth: { xs: 312, sm: 767, md: 1000, lg: 1490 }, borderRadius: '12px' }}>
+      {/* <Paper elevation={2} sx={{ maxWidth: { xs: 312, sm: 767, md: 1000, lg: 1490 }, borderRadius: '12px' }}> */}
         <TableContainer>
-          <Toolbar sx={{ pl: { sm: 2 }, pr: { xs: 1, sm: 1 } }}>
+          <Toolbar sx={{ pl: { sm: 2 }, pr: { xs: 1, sm: 1 }, bgcolor: '#f5f5f5'}}>
             <Typography
-              sx={{ flex: '1 1 100%', mt: '0.4rem', mb: '0.4rem', fontSize: { xs: '18px', sm: '18px', md: '18px', lg: '22px' } }}
+              sx={{ flex: '1 1 100%', ml:'-0.7rem', fontSize: { xs: '18px', sm: '18px', md: '18px', lg: '18px' } }}
               variant="h6"
               id="tableTitle"
               component="div"
@@ -157,7 +153,7 @@ export default function PaymentHistoryTable({ tenantId, setLoading, loading }) {
             >
               Payment History
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end', mt: '1rem', mb: '0.5rem' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end', }}>
               <GeneralTooltip title="Download file">
                 <IconButton sx={{ ml: '-0.5rem', mr: '0.6rem' }} onClick={handleExportToExcel}>
                   <CloudDownloadOutlinedIcon fontSize='medium' />
@@ -165,8 +161,9 @@ export default function PaymentHistoryTable({ tenantId, setLoading, loading }) {
               </GeneralTooltip>
             </Box>
           </Toolbar>
-          <Table size='small' sx={{ mt: 2 }}>
-            <TableHead sx={{ backgroundColor: 'whitesmoke', p: 2 }}>
+          <Divider/>
+          <Table size='small'>
+            <TableHead sx={{ p: 2, bgcolor:'#e0e0e0'}}>
               <TableRow>
                 <StyledTableCell onClick={() => handleSort('tenant.firstname')}>
                   Tenant Name {sortConfig.key === 'tenant.firstname' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' /> : <SouthIcon fontSize='extrasmall' />)}
@@ -179,7 +176,18 @@ export default function PaymentHistoryTable({ tenantId, setLoading, loading }) {
                 </StyledTableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
+            {loading ? (
+              <>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Skeleton width="215%" height={30}/>
+                  <Skeleton width="215%" height={30}/>
+                  <Skeleton width="215%" height={30}/>
+                </Grid>
+              </Grid> 
+              </>
+            ):(
+              <TableBody>
               {paginatedPayments.map((item) => (
                 <StyledTableRow key={item.id}>
                   <TableCell>{item.tenant?.firstname || 'N/A'}</TableCell>
@@ -187,7 +195,9 @@ export default function PaymentHistoryTable({ tenantId, setLoading, loading }) {
                   <TableCell>{item.deposit || 'N/A'}</TableCell>
                 </StyledTableRow>
               ))}
-            </TableBody>
+              </TableBody>
+            )}
+            
           </Table>
         </TableContainer>
         <TablePagination
@@ -199,7 +209,7 @@ export default function PaymentHistoryTable({ tenantId, setLoading, loading }) {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </Paper>
+      {/* </Paper> */}
     </Box>
   );
 }

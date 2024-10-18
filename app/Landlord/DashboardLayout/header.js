@@ -75,6 +75,11 @@ const Search = styled('div')(({ theme }) => ({
 //       </div>
 //     )
 //   }
+const avatarColors = ['#1976d2', '#f44336', '#4caf50', '#ff9800', '#9c27b0', '#3f51b5', '#00bcd4', '#8bc34a'];
+
+const getRandomColor = () => {
+    return avatarColors[Math.floor(Math.random() * avatarColors.length)]
+}
 
 
 function Header(props) {
@@ -103,47 +108,7 @@ function Header(props) {
         setMobileMoreAnchorEl(event.currentTarget);
     };
 
-    // const handleLogout = useLogout();
-
-    // const handleLogout = async () => {
-    //     const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-    //     const userData = JSON.parse(userDataString); // parse the datastring into json 
-    //     const accessToken = userData.accessToken;
-    //     console.log(accessToken)
-    //     if(accessToken){
-    //         try {
-    //             // Call the backend logout endpoint
-    //             const response = await fetch('http://127.0.0.1:8000/api/logout', {
-    //               method: 'POST',
-    //               headers:{
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': `Bearer ${accessToken}`
-
-    //               }
-    //             //   credentials: 'include', // Include cookies
-    //             });
-                
-    //             if (response.ok) {
-    //                 // Use NextAuth's signOut
-    //                 await signOut({ redirect: false });
-
-    //                 // Clear local storage and sign out
-    //                 localStorage.removeItem('userDetails');
-    //                 sessionStorage.clear();
-
-    //                 window.location.href = '/';
-
-    //             } else {
-    //               console.error('Logout failed:', await response.json());
-    //             }
-    //           } catch (error) {
-    //             console.error('An error occurred during logout:', error);
-    //           }
-    //     }else{
-    //         console.log('No access token found')
-    //     }
-        
-    // };
+   
     const handleLogout = async () => {
         await signOut({ redirect: false });
         localStorage.removeItem('userDetails'); // Clear user data
@@ -287,7 +252,7 @@ function Header(props) {
                         aria-haspopup="true"
                         onClick={handleProfileMenuOpen}
                         color="inherit"
-                        sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px' }}
+                        sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px', }}
                         src="/user.png"
                     >
                         

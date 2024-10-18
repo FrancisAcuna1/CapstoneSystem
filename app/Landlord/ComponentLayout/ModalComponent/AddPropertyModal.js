@@ -2,7 +2,7 @@
 import React, { useState, useEffect} from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { TextField, Typography, Box, Fab, Button, Fade, FormControl, InputLabel, Select, MenuItem, Grid, Autocomplete, Checkbox, IconButton} from '@mui/material';
+import { TextField, Typography, Box, Fab, Button, Fade, FormControl, InputLabel, Select, MenuItem, Grid, Autocomplete, Checkbox, IconButton, Divider} from '@mui/material';
 import { styled, useTheme, css } from '@mui/system';
 import { Modal as BaseModal } from '@mui/base/Modal';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -122,15 +122,16 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 export default function AddPropertyType({ open, handleOpen, handleClose, propertyId, setSuccessful, setError, editItem, setEditItem, setSelectedProperty, selectedProperty}) {
   const { data: session, status } = useSession();
   const [isLoading, setLoading] = useState(false);
-  // const [error, setError] = useState(null);
-  // const [selectedProperty, setSelectedProperty] = useState('');
   const [numRooms, setNumRooms] = useState(1);  // Default to 1 room
-  const [rooms, setRooms] = useState([{ beds: 1 }]); // Default to 1 bed in the first room
+  const [rooms, setRooms] = useState([{ beds: [
+    { type: '', status: '' }
+  ]}]); // Default to 1 bed in the first room
   // const [rooms, setRooms] = useState([{ room_number: 1, number_of_beds: 1 }]);
   const [selectedImage, setSelectedImage] = useState();
   const [selectedInclusions, setSelectedInclusions] = useState([]);
   const [inclusion, setInclusion] = useState([])
   const propsid = propertyId;
+  const [propAddress, setPropAddress] = useState([]); 
   const [newApartment, setNewApartment] = useState({
     propertyid: propsid,
     apartmentname: '',
@@ -141,21 +142,19 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
     apartmentstatus:'',
     buildingno: '' ,
     street: '',
-    barangay: '' ,
+    barangay: propAddress.barangay,
     municipality: 'Sorsogon City' ,
   })
 
   const [newboardinghouse, setNewBoardinghouse] = useState({
     propertyid: propsid,
     boardinghousename: '',
-    // numberofrooms: '',
-    // capacity: '',
     rentalfee: '',
     payorname:'none',
     boardinghousestatus:'',
     buildingno: '' ,
     street: '',
-    barangay: '' ,
+    barangay: propAddress.barangay,
     municipality: 'Sorsogon City' ,
   })
 
@@ -183,6 +182,47 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
         [name]: value || ''
     });
   }
+
+  useEffect(() => {
+    const fetchDataAddress = async() => {
+      const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+      const userData = JSON.parse(userDataString); // parse the datastring into json 
+      const accessToken = userData.accessToken;
+
+      if(accessToken){
+        try{
+          const response = await fetch(`http://127.0.0.1:8000/api/property_address/${propsid}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+            }
+          })
+
+          const data = await response.json();
+          console.log(data)
+
+          if(response.ok){
+            setPropAddress(data.data)
+            console.log(data)
+          }else{
+            console.log('Error fetching data')
+
+          }
+
+        }catch(error){
+          console.log(error)
+        }
+      }
+
+
+    }
+    fetchDataAddress();
+  }, [])
+
+  console.log('address:', propAddress);
+  console.log('barangay:', propAddress.barangay);
+  
 
   useEffect(() =>{
     const fetchDataEdit = async() => {
@@ -311,7 +351,7 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
           formData.append('property_type', selectedProperty); 
           formData.append('buildingno', newApartment.buildingno);
           formData.append('street', newApartment.street);
-          formData.append('barangay', newApartment.barangay);
+          formData.append('barangay', propAddress.barangay); //get the state value of barangay
           formData.append('municipality', newApartment.municipality);
           if(selectedImage && selectedImage instanceof File){
             formData.append('image', selectedImage)
@@ -334,7 +374,7 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
           formData.append('property_type', selectedProperty); 
           formData.append('buildingno', newboardinghouse.buildingno);
           formData.append('street', newboardinghouse.street);
-          formData.append('barangay', newboardinghouse.barangay);
+          formData.append('barangay', propAddress.barangay);
           formData.append('municipality', newboardinghouse.municipality);
 
           if(selectedImage && selectedImage instanceof File){
@@ -344,12 +384,35 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
           if(numRooms){
             formData.append('numberofrooms', numRooms);
           }
-          if (rooms && rooms.length > 0) {
-            rooms.forEach((room, index) => {
-              formData.append(`rooms[${index}][room_number]`, parseInt(room.room_number || index + 1, 10));
-              formData.append(`rooms[${index}][number_of_beds]`, parseInt(room.beds, 10));
+          // if (rooms && rooms.length > 0) {
+          //   rooms.forEach((room, index) => {
+          //     formData.append(`rooms[${index}][room_number]`, parseInt(room.room_number || index + 1, 10));
+          //     formData.append(`rooms[${index}][number_of_beds]`, parseInt(room.beds, 10));
+          //   });
+          // }    
+          // if (rooms && rooms.length > 0) {
+          //   rooms.forEach((room, roomIndex) => {
+          //     formData.append(`rooms[${roomIndex}][room_number]`, roomIndex + 1);
+          //     formData.append(`rooms[${roomIndex}][number_of_beds]`, room.beds.length);
+              
+          //     room.beds.forEach((bed, bedIndex) => {
+          //       formData.append(`rooms[${roomIndex}][beds][${bedIndex}][type]`, bed.type);
+          //       formData.append(`rooms[${roomIndex}][beds][${bedIndex}][status]`, bed.status);
+          //     });
+          //   });
+          // }    
+          rooms.forEach((room, roomIndex) => {
+            formData.append(`rooms[${roomIndex}][room_number]`, roomIndex + 1);
+            formData.append(`rooms[${roomIndex}][number_of_beds]`, room.beds.length);
+        
+            room.beds.forEach((bed, bedIndex) => {
+              formData.append(`rooms[${roomIndex}][beds][${bedIndex}][bed_number]`, bedIndex + 1);
+              formData.append(`rooms[${roomIndex}][beds][${bedIndex}][bed_type]`, bed.type || '');
+              formData.append(`rooms[${roomIndex}][beds][${bedIndex}][status]`, bed.status || '');
             });
-          }        
+          });
+  
+          
           if (selectedInclusions.length > 0) {
             const inclusionsJson = JSON.stringify(selectedInclusions.map(inclusion => ({
               id: inclusion.id,
@@ -405,6 +468,7 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
             handleClose();
             localStorage.setItem('errorMessage', data.error || 'Operation Error!');
             window.location.reload();
+            
           }else{
             // console.log(data.message);
             // setError(data.message);
@@ -554,31 +618,66 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
       )
     );
   };
-
-
+  
   const handleNumRoomsChange = (e) => {
     // const newNumRooms = Math.max(parseInt(e.target.value, 10));
-    const newNumRooms = parseInt(e.target.value, 10);
+    const newNumRooms = Math.min(parseInt(e.target.value, 0), 10);
     setNumRooms(newNumRooms);
 
     // Adjust the number of room objects with room_number and default number_of_beds
     const newRooms = Array.from({ length: newNumRooms }, (_, index) => ({
         room_number: index + 1,
-        // beds: (rooms[index] && rooms[index].beds) || 1,
-        beds: 1, // Default value
+        beds: [{ bed_number: 1, type: '', status: '' }] 
+        // beds: 1  // Default value
     }));
     setRooms(newRooms);
   };
 
   
-  const handleBedChange = (index, e) => {
-      const newRooms = [...rooms];
-      newRooms[index].beds = parseInt(e.target.value,);
-      setRooms(newRooms);
-  }
+  // const handleBedChange = (index, e) => {
+  //     const newRooms = [...rooms];
+  //     newRooms[index].beds = parseInt(e.target.value,);
+  //     setRooms(newRooms);
+  // }
+
+  // Handle change for the number of beds
+  const handleBedCountChange = (roomIndex, count) => {
+    const updatedRooms = [...rooms];
+    // const bedCount = parseInt(count, 10);
+    const bedCount = Math.min(parseInt(count, 10), 5)
+    updatedRooms[roomIndex].beds = Array.from({ length: bedCount }, (_, index) => ({
+      bed_number: index + 1,
+      type: '',
+      status: '',
+    }));
+    setRooms(updatedRooms);
+  };
+
+  const handleBedTypeChange = (roomIndex, bedIndex, bedType) => {
+    const updatedRooms = [...rooms];
+    if (Array.isArray(updatedRooms[roomIndex].beds)) {
+      updatedRooms[roomIndex].beds[bedIndex].type = bedType;
+      setRooms(updatedRooms);
+    }
+  };
+
+  const handleBedStatusChange = (roomIndex, bedIndex, bedStatus) => {
+    const updatedRooms = [...rooms];
+    if (Array.isArray(updatedRooms[roomIndex].beds)) {
+      updatedRooms[roomIndex].beds[bedIndex].status = bedStatus;
+      setRooms(updatedRooms);
+    }
+  };
+
 
   // const totalcapacity = rooms.reduce((acc, room) => acc + room.beds, 0);
-  const totalcapacity = rooms.reduce((acc, room) => acc + (room.beds || 0), 0);
+  const totalcapacity = rooms.reduce((acc, room) => {
+    if(Array.isArray(room.beds)){
+      return acc + room.beds.length
+    }
+    return acc;
+  }, 0)
+    // acc + (room.beds.bed_number || 0), 0);
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5, mb: 3 }}> 
@@ -806,9 +905,11 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
                     id="barangay"
                     label="Barangay"
                     name="barangay"
+                    defaultValue={propAddress.barangay}
                     value={newApartment.barangay}
-                      onChange={handleChangeApartment}
+                    onChange={handleChangeApartment}
                     margin="normal"
+                    InputProps={{ readOnly: true }}
                     fullWidth
                   />
                   </Grid>
@@ -1142,9 +1243,11 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
                       id="barangay"
                       label="Barangay"
                       name="barangay"
+                      defaultValue={propAddress.barangay}
                       value={newboardinghouse.barangay}
                       onChange={handleChangeBoardinghouse}
                       margin="normal"
+                      InputProps={{readOnly: true}}
                       fullWidth
                     />
                     </Grid>
@@ -1223,7 +1326,7 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
                         value={item.quantity}
                         onChange={(e) => handleQuantityChange(item.id, e.target.value)}
                         InputProps={{
-                          inputProps: { min: 1 },
+                          inputProps: {min: 1 },
                           readOnly: true,
                           sx: { textAlign: 'center', fontWeight: 'bold' },
                         }}
@@ -1260,10 +1363,8 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
                   </Grid>
 
                   <Grid item xs={12}>
-                    {/* Information message */}
-                    <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', mt:'0.2rem', fontSize: '12px', color: 'gray'}}>
-                      <InfoOutlinedIcon fontSize="small" sx={{ mr: 1,}} />
-                      Please specify the number of beds for each room.
+                    <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', mt: '0.2rem', fontSize: '12px', color: 'gray' }}>
+                      ----- Room and Bed Information ------
                     </Typography>
                   </Grid>
 
@@ -1281,36 +1382,105 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
                   </Grid>
                   <Grid item xs={12}>
                       {/* Dynamically render room inputs */}
-                    {rooms.map((room, index) => (
+                    {rooms.map((room, roomIndex) => (
                       <Grid item xs={12}> 
-                      <Box key={index} sx={{ display: 'flex', flexDirection: 'column', gap: 2}}>
-                        <TextField
-                          sx={{mt:'0.4rem', }}
-                          label={`Room ${index + 1} - Number of Beds`}
-                          type="number"
-                          name="room_number"
-                          value={room.room_number || index + 1} 
-                          // onChange={(e) => handleBedChange(index, e)}
-                          inputProps={{ min: 1 }}
-                          variant="outlined"
-                          fullWidth
-                          required
-                        />
-                        <TextField
-                          sx={{mt:'0.4rem'}}
-                          label={`Room ${index + 1} - Number of Beds`}
-                          type="number"
-                          name="number_of_beds"
-                          value={room.beds}
-                          onChange={(e) => handleBedChange(index, e)}
-                          inputProps={{ min: 1 }}
-                          variant="outlined"
-                          fullWidth
-                          required
-                        />
-                      </Box>
+                      <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', mt: '0.2rem', fontSize: '12px', color: 'gray' }}>
+                      ----- Room {roomIndex + 1} and Bed Information ------
+                      </Typography>
+                      {/* <Divider/> */}
+                      <Box key={roomIndex} sx={{ display: 'flex', flexDirection: 'column',  mt:2.5}}>
+                        <Box sx={{display: 'flex', gap: 2}}>
+                        <Grid xs={4}>
+                          <TextField
+                            sx={{mt:'0.4rem', }}
+                            label={`Room ${roomIndex + 1}`}
+                            type="number"
+                            name="room_number"
+                            value={room.room_number || roomIndex + 1} 
+                            // onChange={(e) => handleBedChange(index, e)}
+                            inputProps={{ min: 1 }}
+                            variant="outlined"
+                            fullWidth
+                            required
+                          />
+                        </Grid>
+                        <Grid xs={8}>
+                          <TextField
+                            sx={{mt:'0.4rem'}}
+                            label={`Room ${roomIndex + 1} - Number of Beds`}
+                            type="number"
+                            name="number_of_beds"
+                            value={room.beds.length}
+                            // value={room.beds} 
+                            // onChange={(e) => handleBedChange(index, e)}
+                            onChange={(e) => handleBedCountChange(roomIndex, e.target.value)}
+                            inputProps={{ min: 1, max: 8 }}
+                            variant="outlined"
+                              helperText="Please specify the number of bed"
+                            fullWidth
+                            required
+                          />
+                        </Grid>
+
+                        </Box>
+                        
+                        
+
+                        {/* Bed Type Input */}
+                        <Grid container spacing={2} sx={{ mt: 0, mb:1 }}>
+                          {Array.isArray && room.beds.map((bed, bedIndex) => (
+                            <Grid item xs={12} key={bedIndex}>
+                              <Box sx={{display: 'flex', gap: 2, borderRadius: '4px',  mb:1 }}>
+                                <Grid item xs={4}>
+                                  <TextField
+                                    fullWidth
+                                    label="Bed Number"
+                                    type="number"
+                                    defaultValue={bed.bed_number || bedIndex + 1}
+                                    value={bed.bed_number || bedIndex + 1}
+                                    InputProps={{ readOnly: true }}
+                                    sx={{ mb: 1 }}
+                                  />
+                                </Grid>
+                                <Grid item xs={4}>
+                                  <FormControl fullWidth sx={{ mb: 1 }}>
+                                    <InputLabel>Bed Type</InputLabel>
+                                    <Select
+                                      value={bed.type}
+                                      onChange={(e) => handleBedTypeChange(roomIndex, bedIndex, e.target.value)}
+                                      label="Bed Type"
+                                    >
+                                      <MenuItem value="single">Single</MenuItem>
+                                      {/* <MenuItem value="double">Double</MenuItem> */}
+                                      <MenuItem value="bunk">Bunk</MenuItem>
+                                    </Select>
+                                  </FormControl>
+                                </Grid>
+                                <Grid item xs={4}>
+                                  <FormControl fullWidth>
+                                    <InputLabel>Bed Status</InputLabel>
+                                    <Select
+                                      value={bed.status}
+                                      onChange={(e) => handleBedStatusChange(roomIndex, bedIndex, e.target.value)}
+                                      label="Bed Status"
+                                    >
+                                      <MenuItem value="available">Available</MenuItem>
+                                      <MenuItem value="occupied">Occupied</MenuItem>
+                                      <MenuItem value="reserved">Reserved</MenuItem>
+                                    </Select>
+                                  </FormControl>
+                                </Grid>
+                                
+                              </Box>
+                            </Grid>
+                            
+                          ))}
+                         
+                        </Grid>
+                      </Box> 
                       </Grid>
                     ))}  
+                     
                   </Grid>
                   <Grid item xs={12}>
                     {/* Information message */}
@@ -1416,6 +1586,11 @@ export default function AddPropertyType({ open, handleOpen, handleClose, propert
                   setSelectedImage(null);
                   setSelectedProperty('')
                   setSelectedInclusions([''])
+                  setNumRooms(1)
+                  setRooms([{ beds: [
+                    { type: '', status: '' }
+                  ]}]); 
+                 
                 }}
               >
                   Cancel

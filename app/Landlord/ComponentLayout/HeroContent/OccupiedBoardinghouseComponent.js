@@ -34,13 +34,11 @@ const AcceptToolTip = styled(({ className, ...props }) => (
 // }));
 
 
-export default function BoardingHouseDetailsComponent({boardinghouseId, propsId, loading, setLoading}){
+export default function OccupiedBoardinghouse({boardinghouseId, propsId, loading, setLoading}){
   const router = useRouter();
   const boardinghouseID = boardinghouseId; // boardinghouse ID
   const propsID = propsId // property ID
   const [details, setDetails] = useState([]);
-  const [successful, setSuccessful] = useState(null);
-  const [error, setError] = useState(null);
   console.log('baordinghouse ID:', boardinghouseID )
   console.log('property ID:', propsID )
   console.log('Details:', details);
@@ -72,8 +70,6 @@ export default function BoardingHouseDetailsComponent({boardinghouseId, propsId,
                 if(response.ok){ 
                     console.log('Data:', data)
                     setDetails(data);
-                    console.log(data);
-                    
                 
                     // setInclusions(data);
                 }
@@ -102,16 +98,6 @@ export default function BoardingHouseDetailsComponent({boardinghouseId, propsId,
 
   return (
     <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
-       <SnackbarProvider maxSnack={3}>
-          <SuccessSnackbar
-              setSuccessful={setSuccessful}
-              successful={successful}          
-          />
-          <ErrorSnackbar
-              error={error}
-              setError={setError}          
-          />
-      </SnackbarProvider>
         {loading ? (
           <>
             <Box>
@@ -123,7 +109,7 @@ export default function BoardingHouseDetailsComponent({boardinghouseId, propsId,
          
           {details.boardinghouse && details.boardinghouse.boarding_house_name ? (
           <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '5px', fontSize: '24px', fontWeight: 'bold',  mt:5 }}>
-            Details - {details.boardinghouse.boarding_house_name}        
+            Occupied - {details.boardinghouse.boarding_house_name}        
           </Typography>
           ) : null }
           </>
@@ -185,7 +171,6 @@ export default function BoardingHouseDetailsComponent({boardinghouseId, propsId,
                         <Typography variant='body2' letterSpacing={1.2} gutterBottom sx={{ fontWeight: 500, }}>
                           Inclusion -
                         </Typography>
-                       
                         {details.boardinghouse.inclusions && details.boardinghouse.inclusions.length > 0 ? (
                           details.boardinghouse.inclusions.map((item, index) => (
                             <Typography key={item.index} variant='body2' letterSpacing={2} gutterBottom sx={{ fontWeight: 500, }}>
@@ -231,7 +216,7 @@ export default function BoardingHouseDetailsComponent({boardinghouseId, propsId,
                     details.boardinghouse.rooms.map((room, index) => {
                       return (
                         <>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sm={12} lg={6}>
                           <Paper elevation={2} sx={{ borderRadius: '8px', padding: '24px', marginTop: '15px',}}>
                             <Grid container sx={{justifyContent: 'space-between'}}>
                               <Grid item>
@@ -249,29 +234,9 @@ export default function BoardingHouseDetailsComponent({boardinghouseId, propsId,
                                 </Box>
                               </Grid>
                             </Grid>
+                          
                             
-                            {room.beds && room.beds.map((bed, bedIndex) => (
-                              // <Typography key={bedIndex} variant='body2' sx={{ fontWeight: 500 }}>
-                              //   Bed {bed.bed_number} - Type: {bed.bed_type}, Status: {bed.status}
-                              // </Typography>
-                              <Box key={bedIndex}>
-                                <Typography  variant='body1' gutterBottom>
-                                <strong>Bed {bed.bed_number} </strong> | <strong>type:</strong> {bed.bed_type} | {bed.status} 
-                                <AcceptToolTip title="Add Tenant">
-                                  <IconButton>
-                                    <AddCircleOutlineOutlinedIcon color='success'/>
-                                  </IconButton>
-                                </AcceptToolTip>
-                                </Typography>
-                               
-                              </Box>
-                              
-                             
-                            
-                            ))}
-                           
-                            
-                            {/* {Array.from({ length: room.beds }, (_, index) => index + 1).map((bedNumber) => (
+                            {Array.from({ length: room.number_of_beds }, (_, index) => index + 1).map((bedNumber) => (
                               <>
                                 <Typography variant='body1' gutterBottom>
                                   <strong>Bed {bedNumber}:</strong> Available
@@ -283,7 +248,7 @@ export default function BoardingHouseDetailsComponent({boardinghouseId, propsId,
                                 </Typography>
                                 <Divider/>
                               </>
-                            ))} */}
+                            ))}
                             {/* This Comment code is display when the bed is occupied */}
                             {/* {Array.from({ length: room.number_of_beds }, (_, index) => index + 1).map((bedNumber) => (
                               <>
@@ -351,17 +316,6 @@ export default function BoardingHouseDetailsComponent({boardinghouseId, propsId,
 
 
             
-          </Grid>
-          <Grid item xs={12} lg={7}>
-              <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '8px'}}>  
-                  <TenantRegistrationForm
-                    details={details}
-                    setDetails={setDetails}
-                    setSuccessful={setSuccessful}
-                    setError={setError}
-                    setLoading={setLoading}
-                  />
-              </Paper>
           </Grid>
         </Grid>
     </Box>

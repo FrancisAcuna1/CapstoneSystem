@@ -2,10 +2,12 @@
 
 import * as React from 'react';
 import { useState } from 'react';
-import { Grid, Box, Paper, Typography, Button, Divider, Link, Fade, Breadcrumbs, TextField, FormControl, InputLabel, Select, MenuItem, Menu} from '@mui/material';
-// import RequestMaintenanceTable from '../TableComponent/RequestMaintenanceTable';
+import { Grid, Box, Paper, Typography,  Link, Breadcrumbs} from '@mui/material';
 import TenantInformationTable from '../TableComponent/TenantInformationTable';
 import EditTenantModal from '../ModalComponent/EditTenantModal';
+import SuccessSnackbar from '../Labraries/snackbar';
+import { SnackbarProvider } from 'notistack';
+import ErrorSnackbar from '../Labraries/ErrorSnackbar'
 
 export default function TenantInformationComponent({loading, setLoading}){
     const [successful, setSuccessful] = useState(null);
@@ -25,6 +27,16 @@ export default function TenantInformationComponent({loading, setLoading}){
 
     return(
         <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
+            <SnackbarProvider maxSnack={3}>
+                <SuccessSnackbar
+                setSuccessful={setSuccessful}
+                successful={successful}          
+                />
+                <ErrorSnackbar
+                error={error}
+                setError={setError}          
+                />
+            </SnackbarProvider>
             <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '1px', fontSize: '24px', fontWeight: 'bold',  mt:5}}>
               Tenant Information
             </Typography>

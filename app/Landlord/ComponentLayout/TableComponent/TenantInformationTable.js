@@ -413,11 +413,11 @@ export default function TenantInformationTable ({setLoading, loading, handleEdit
                                 <StyledTableCell  onClick={() => handleSort('tenant.contact')}>
                                     Contact No. {sortConfig.key === 'contact' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell  onClick={() => handleSort('unitname')}>
-                                    Unit Name {sortConfig.key === 'unitname' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
-                                </StyledTableCell>
                                 <StyledTableCell  onClick={() => handleSort('location')}>
                                     Location {sortConfig.key === 'location' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                </StyledTableCell>
+                                <StyledTableCell  onClick={() => handleSort('unitname')}>
+                                    Unit Name {sortConfig.key === 'unitname' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
                                 <StyledTableCell  onClick={() => handleSort('propertype')}>
                                     Property Type {sortConfig.key === 'propertype' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
@@ -453,10 +453,10 @@ export default function TenantInformationTable ({setLoading, loading, handleEdit
                                                 />
                                             </TableCell>
                                             <TableCell>{`${unit.tenant.firstname || ''} ${unit.tenant.middlename || ''} ${unit.tenant.lastname || ''}`}</TableCell>
-                                            <TableCell>{unit.tenant.contact || ''}
-                                            </TableCell>
-                                            <TableCell>{unit.rented_unit.apartment_name}</TableCell>
+                                            <TableCell>{unit.tenant.contact || ''}</TableCell>
                                             <TableCell>{`${unit.tenant.street}, ${unit.tenant.barangay}, ${unit.tenant.municipality}`}</TableCell>
+                                            <TableCell>{unit.rented_unit.apartment_name}</TableCell>
+                                            
                                             <TableCell>{unit.rented_unit.property_type}</TableCell>
                                             <TableCell>{unit.lease_start_date}</TableCell>
                                             
@@ -486,7 +486,7 @@ export default function TenantInformationTable ({setLoading, loading, handleEdit
                                                     <EditOutlinedIcon color='success'/>
                                                 </IconButton>
                                             </AcceptToolTip>
-                                           <DeleteTooltip title='Edit'>
+                                           <DeleteTooltip title='Delete'>
                                             <IconButton>
                                                     <DeleteForeverOutlinedIcon color='warning'/>    
                                                 </IconButton>                                     

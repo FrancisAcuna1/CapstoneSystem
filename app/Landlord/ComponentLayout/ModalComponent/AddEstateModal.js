@@ -94,7 +94,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
   const editItem = editproperty;
   const [newProperty, setNewProperty] = useState({
     propertyname: '',
-    street: '',
+    // street: '',
     barangay: '',
     municipality: 'Sorsogon City'
   });
@@ -145,7 +145,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
           if(response.ok){
             setNewProperty({
               propertyname: data?.editProperty?.propertyname,
-              street: data?.editProperty?.street,
+              // street: data?.editProperty?.street,
               barangay: data?.editProperty?.barangay,
               municipality: data?.editProperty?.municipality,
             })
@@ -187,12 +187,19 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
       console.log('Token:', accessToken); 
       console.log({selectedImage});
 
+      if (!newProperty.propertyname || !newProperty.barangay || !selectedImage){
+        localStorage.setItem('errorMessage', 'Please fill all required field' || 'Operation successful!');
+        window.location.reload();
+        setLoading(false);
+        handleClose();
+      }
+
       const method = editItem ? 'POST' : 'POST';
 
       try {
         const formData = new FormData()
         formData.append('propertyname', newProperty.propertyname);
-        formData.append('street', newProperty.street);
+        // formData.append('street', newProperty.street);
         formData.append('barangay', newProperty.barangay);
         formData.append('municipality', newProperty.municipality);
 
@@ -229,7 +236,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
           handleClose();
           setNewProperty({
             propertyname: '',
-            street: '',
+            // street: '',
             barangay: '',
             municipality: 'Sorsogon City'
           });
@@ -320,7 +327,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
           setEditProperty(null);
           setNewProperty({
             propertyname: '',
-            street: '',
+            // street: '',
             barangay: '',
             municipality: 'Sorsogon City',
           });
@@ -346,7 +353,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
                 onChange={handleChange}
               
               />
-              <TextField 
+              {/* <TextField 
                 required 
                 id="street"
                 label="Street" 
@@ -355,7 +362,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
                 name="street"
                 value={newProperty.street}
                 onChange={handleChange}
-              />
+              /> */}
               <TextField 
                 required 
                 id="barangay"
@@ -375,7 +382,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
                 fullWidth
                 margin="normal"
                 name="municipality"
-                value={newProperty.municipality}
+                value={newProperty.municipality} // Ensure this is bound to state
                 onChange={handleChange}
               />
               <Box

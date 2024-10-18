@@ -59,7 +59,7 @@ export default function OccupiedTenantInformation({apartmentId, propsId, loading
         fetchedData();
     }, [])
 
-    const totalBalanced = (tenantInformation.rental_fee - tenantInformation.deposit);
+    const totalBalanced = (tenantInformation.rental_fee - tenantInformation.deposit).toFixed(2) || '';
     console.log(tenantInformation?.tenant?.id);
     const tenantId = tenantInformation?.tenant?.id;
     
@@ -161,9 +161,6 @@ export default function OccupiedTenantInformation({apartmentId, propsId, loading
             <Grid  container spacing={2} >
                 <Grid item xs={12} md={5} lg={7}>
                     <Paper elevation={2} style={{height: {xs:'20vh', lg:'20vh'}, marginTop: '15px',  borderRadius: '8px' ,  padding: "1rem 0rem 0rem 0rem",  }}>  
-                        <Typography variant="h5" color={'black'} sx={{ fontSize: '20px', marginTop: '0.6rem', ml: '1.2rem', mb: 2 }} letterSpacing={2} gutterBottom>
-                           Payment History
-                        </Typography>
                         <Grid >
                             <PaymentHistory 
                                 tenantId={tenantId}

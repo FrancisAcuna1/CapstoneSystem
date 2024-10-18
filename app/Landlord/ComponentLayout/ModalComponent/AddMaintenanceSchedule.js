@@ -7,11 +7,10 @@ import { Modal as BaseModal } from '@mui/base/Modal';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import PropTypes from 'prop-types';
 import { styled, css, } from '@mui/system'
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 
 
@@ -198,12 +197,32 @@ export default function ModalComponent({open, handleOpen, handleClose}){
                         </Select>
                     </FormControl>
                     <TextField id="description" label="Task Description" variant="outlined" multiline maxRows={5} fullWidth margin="normal" sx={{mt:-0.1}}/>
-                    <LocalizationProvider dateAdapter={AdapterDayjs} sx={{mt:-0.1}}>
-                        <DemoContainer components={['DatePicker']}>
-                            <DateRangePicker localeText={{ start: 'Start-Date', end: 'End-Date' }} />
-                           
-                        </DemoContainer>
-                    </LocalizationProvider>
+                    <Grid item xs={12} sm={6}>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          label="Start Date"
+                          name="startDate"
+                          sx={{width: '100%'}}
+                          value={formData.startDate}
+                          onChange={(newValue) => handleDateChange('startDate', newValue)}
+                          fullWidth
+                          renderInput={(params) => <TextField {...params} fullWidth />}
+                        />
+                      </LocalizationProvider>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label="End Date"
+                                name="endDate"
+                                sx={{width: '100%'}}
+                                value={formData.endDate}
+                                onChange={(newValue) => handleDateChange('endDate', newValue)}
+                                fullWidth
+                                renderInput={(params) => <TextField {...params} fullWidth />}
+                            />
+                        </LocalizationProvider>
+                    </Grid>
                     
                     <Button variant='contained' sx={{background: 'primary','&:hover': {backgroundColor: '#b6bdf1',}, padding: '8px', fontSize: '16px', mt:4 }}>Add </Button>
                 </ModalContent>

@@ -416,7 +416,7 @@ export default function TenantInformationTable (){
                                     </StyledTableRow>
                                     )
                                 })}
-                                {/* {paginatedUnits.map((unit) => (
+                                {paginatedUnits.map((unit) => (
                                 <TableRow key={unit.id}>
                                     <TableCell>
                                         <Checkbox
@@ -443,7 +443,7 @@ export default function TenantInformationTable (){
                                     </IconButton>                                     
                                     </TableCell>
                                 </TableRow>
-                                ))} */}
+                                ))}
                             </TableBody>
                             </Table>
                         </TableContainer>
