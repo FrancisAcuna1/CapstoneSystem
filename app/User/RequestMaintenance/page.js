@@ -1,5 +1,8 @@
 "use client"
 import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,8 +12,9 @@ import Link from '@mui/material/Link';
 import Navigator from '../Dashboard/navigator';
 import Header from '../Dashboard/header';
 import { Divider } from '@mui/material';
-// import Content from '../ComponentLayout/content';
+import RequestMaintenanceComponent from '../Component/HeroContent/RequestMaintenanceComponent';
 import dynamic from 'next/dynamic';
+
 
 // const CardContentHeader = dynamic(() => import('../ComponentLayout/HeroContent/HomeContent'), {
 //   ssr: false
@@ -189,9 +193,9 @@ theme = {
 const drawerWidth = 256;
 
 export default function OverviewPage (){
-
-  // const router = useRouter();
-  // const [activeTab, setActiveTab] = useState('');
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const [loading, setLoading] = useState(false);
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
   // this code 'isSmUp is Enable the Burger Icon for mobile view
@@ -201,8 +205,19 @@ export default function OverviewPage (){
   setMobileOpen(!mobileOpen);
   };
 
-  return (
-    <>
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.replace('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if(status === "loading"){
+    return <p>Loading...</p>;
+  }
+
+  if(status === "authenticated"){
+    return (
       <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
           <CssBaseline />
@@ -230,9 +245,11 @@ export default function OverviewPage (){
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
           <Box component="main" sx={{ flex: 1, py: 2, px: 4, bgcolor: '#eaeff1' }}>
-              <h5>This is Request Maintenance Page</h5>
-              {/* <CardContentHeader/> */}
-              {/* <Content/> */}
+              {/* <h5>This is Request Maintenance Page</h5> */}
+              <RequestMaintenanceComponent
+                setLoading={setLoading}
+                loading={loading}
+              />
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
               {/* <Copyright/> */}
@@ -240,7 +257,6 @@ export default function OverviewPage (){
           </Box>
       </Box>
       </ThemeProvider>
-    
-    </>
-  )
+    )
+  }
 }

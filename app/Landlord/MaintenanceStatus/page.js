@@ -1,9 +1,12 @@
 "use client"
 import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
+import {Box, LinearProgress} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Navigator from '../DashboardLayout/navigator';
@@ -185,9 +188,15 @@ let theme = createTheme({
     },
   };
   
-const drawerWidth = 256;
+const drawerWidth = 278
 
 export default function MaintenaceStatusPage (){
+  const router = useRouter();
+  const [loading, setLoading]= useState(false)
+  const { data: session, status } = useSession();
+  // console.log("Session: ", session);
+  // console.log("Status: ", status);  
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
    // this code 'isSmUp is Enable the Burger Icon for mobile view
    const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
@@ -196,8 +205,19 @@ export default function MaintenaceStatusPage (){
   setMobileOpen(!mobileOpen);
   };
 
-  return (
-    <>
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.replace('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if(status === "loading"){
+    return <p>Loading...</p>;
+  }
+
+  if(status === 'authenticated'){
+    return (
       <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
           <CssBaseline />
@@ -223,8 +243,12 @@ export default function MaintenaceStatusPage (){
           <Divider />
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
+          {loading && <LinearProgress sx={{ color:"#673ab7", position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
           <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-              <StatusComponent/>
+              <StatusComponent
+                setLoading={setLoading}
+                loading={loading}
+              />
               {/* <Content/> */}
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
@@ -233,7 +257,6 @@ export default function MaintenaceStatusPage (){
           </Box>
       </Box>
       </ThemeProvider>
-    
-    </>
-  )
+    )
+  }
 }

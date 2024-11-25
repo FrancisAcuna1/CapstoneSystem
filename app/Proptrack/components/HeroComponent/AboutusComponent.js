@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -22,7 +23,7 @@ export default function FAQSection() {
             <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold' }}>
               Questions?
               <br />
-              We've got answers.
+              We&apos;ve got answers.
             </Typography>
             <Typography
               variant="body1"
@@ -72,7 +73,7 @@ export default function FAQSection() {
               How do you make sure listings are legitimate?
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-              We take your security seriously. All listings go through a rigorous verification process to ensure that they are genuine. Our team reviews every listing for authenticity to protect you from scams. Look for the "Verified" badge on trusted properties.
+              We take your security seriously. All listings go through a rigorous verification process to ensure that they are genuine. Our team reviews every listing for authenticity to protect you from scams. Look for the &quot;Verified&quot; badge on trusted properties.
             </Typography>
           </Box>
         </Stack>

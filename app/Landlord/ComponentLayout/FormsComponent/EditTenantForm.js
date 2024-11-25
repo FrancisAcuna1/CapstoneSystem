@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect} from 'react';
 import { Box, Stepper, Step, StepLabel, Button, Typography, TextField, Grid, FormHelperText} from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -121,7 +122,7 @@ const MultiStepForm = ({details, setSuccessful, setError , setLoading}) => {
                 
             }))
         }
-    },[propDetails])
+    },[propDetails, Property_Type, ApartmentID])
     
 
 

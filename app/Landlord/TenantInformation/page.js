@@ -1,6 +1,8 @@
 "use client"
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -184,10 +186,13 @@ let theme = createTheme({
     },
   };
   
-const drawerWidth = 256;
+const drawerWidth = 278
 
 export default function TenantInformationPage (){
   const [loading, setLoading]= useState(false)
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
    // this code 'isSmUp is Enable the Burger Icon for mobile view
@@ -196,6 +201,19 @@ export default function TenantInformationPage (){
   const handleDrawerToggle = () => {
   setMobileOpen(!mobileOpen);
   };
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.replace('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if(status === "loading"){
+    return <p>Loading...</p>;
+  }
+
+  if(status === 'authenticated'){
 
   return (
     <>
@@ -241,4 +259,5 @@ export default function TenantInformationPage (){
     
     </>
   )
+  }
 }

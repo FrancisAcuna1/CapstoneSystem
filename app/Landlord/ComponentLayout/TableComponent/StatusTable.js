@@ -1,7 +1,7 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper, TextField, IconButton, InputAdornment, Avatar, Toolbar, Typography, Box, Tooltip, InputBase, inputProps, Breadcrumbs, Link, Grid, Chip, Fab, Button, Fade, FormControl, InputLabel, Select, MenuItem} from '@mui/material';
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper, TextField, IconButton, InputAdornment, Avatar, Toolbar, Typography, Box, Tooltip, InputBase, inputProps, Breadcrumbs, Link, Grid, Chip, Fab, Button, Fade, FormControl, InputLabel, Select, MenuItem, Menu} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
@@ -16,6 +16,7 @@ import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import * as XLSX from 'xlsx';
+import { format, parseISO } from 'date-fns';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -110,34 +111,79 @@ const GeneralTooltip = styled(({ className, ...props }) => (
 
   
 
-
-const unitsData = [
-  { id: 1, name: 'Unit 101',  propertype:'Apartment', datestarted: '01-23-2023', enddate: '01-24-2023', issuestype:'Plumbing', status: 'Done',location: 'Building A', tenant: 'John Doe', contact: '09369223915' },
-  { id: 2, name: 'Unit 102',  propertype:'Apartment', datestarted: '05-29-2024', enddate: '05-31-2024', issuestype:'Elictrical', status: 'Done',location: 'Building A', tenant: 'Mark Villiar', contact: '09769243995'  },
-  { id: 3, name: 'Unit 104',  propertype:'Apartment', datestarted: '08-23-2023', enddate: '08-24-2023', issuestype:'Bulbs Replacement', status: 'Ongoing',location: 'Building B', tenant: 'Mark Doe', contact: '09369223915' },
-  { id: 4, name: 'Unit 103',  propertype:'Bedspacer', datestarted: '01-03-2023', enddate: '01-10-2023', issuestype:'Sira ang Kisame', status: 'Done',location: 'Building B', tenant: 'Jane Smith', contact: '09369223915' },
-  { id: 5, name: 'Unit 105',  propertype:'Bedspacer', datestarted: '02-03-2024', enddate: '02-05-2024', issuestype:'Electrical', status: 'Done',location: 'Building B', tenant: 'Izer Alindogan', contact: '09397865491'},
-  { id: 6, name: 'Unit 106',  propertype:'Bedspacer', datestarted: '09-07-2023', enddate: '09-07-2023', issuestype:'Sira ang pinto', status: 'Ongoing',location: 'Building B', tenant: 'John Domasig', contact: '09369223915' },
-  { id: 7, name: 'Unit 112',  propertype:'Apartment', datestarted: '09-12-2023', enddate: '09-20-2023', issuestype:'Repaint', status: 'Todo',location: 'Building A', tenant: 'Ericson Hugo', contact: '09369223915' },
-  { id: 8, name: 'Unit 107',  propertype:'Apartment', datestarted: '04-16-2024', enddate: '04-17-2024', issuestype:'Water leaks', status: 'Ongoing',location: 'Building B', tenant: 'Kim Denso', contact: '09097865491' },
-  { id: 9, name: 'Unit 108',  propertype:'Apartment', datestarted: '07-23-2024', enddate: '07-23-2024', issuestype:'Water leaks', status: 'Ongoing',location: 'Building B', tenant: 'Anne Jebulan', contact: '09887765149' },
-  { id: 10, name: 'Unit 109',  propertype:'BedSpacer', datestarted: '08-23-2023', enddate: '08-23-2023', issuestype:'Electrical', status: 'Todo',location: 'Building B', tenant: 'Maria Jalmasco', contact: '09369223915'},
-  { id: 11, name: 'Unit 110', propertype:'Apartment', datestarted: '09-10-2024', enddate: '09-10-2024', issuestype:'Bulbs Replacement', status: 'Todo',location: 'Building B', tenant: 'Jake Pure', contact: '09234189123' },
-  { id: 12, name: 'Unit 111',  propertype:'Apartment', datestarted: '09-05-2023', enddate: '09-07-2023', issuestype:'Barado ang CR', status: 'Ongoing',location: 'Building A', tenant: 'John Mark Erlano', contact: '09369223915' },
-
-  // Add more units as needed
-  // Add more units as needed
-  // Add more units as needed
-];
-
-export default function TenantInformationTable (){
+export default function TenantInformationTable ({setLoading, loading}){
     const router = useRouter();
+    const [anchorEl, setAnchorEl] = useState(null);
+    const isMenuOpen = Boolean(anchorEl);
     const [open, setOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [page, setPage] = React.useState(0);
     const [selectedItem, setSelectedItem] = useState([])
     const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
+    const [statusData, setStatuData] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('All');
+
+    const categories = ['All', 'To do', 'Completed', 'In Progress'];
+    
+    console.log('data:', statusData)
+    console.log('category:', selectedCategory)
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const userDataString = localStorage.getItem('userDetails');
+            const userData = JSON.parse(userDataString);
+            const accessToken = userData?.accessToken;
+            setLoading(true);
+
+            if(accessToken){
+                try{
+                    const url = selectedCategory === 'All'
+                    ? `http://127.0.0.1:8000/api/get_status`
+                    : `http://127.0.0.1:8000/api/filter_status/${selectedCategory}`;
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers:{
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json',
+                        }
+                    })
+
+                    const data = await response.json();
+                    if(response.ok){
+                        setStatuData(data.data);
+                        setLoading(false);
+                    }else{
+                        console.log('Error', data.error)
+                        setLoading(false);
+                    }
+                }catch(error){
+                    console.log('Error', error)
+                }
+            }else{
+                console.log('No access token found!')
+            }
+        
+        }
+        fetchData();
+    }, [selectedCategory, setLoading])
+
+
+    // filter
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleCategoryChange = (category) => {
+        // const category = event.target.value;
+        setSelectedCategory(category);
+        setAnchorEl(null);
+    };
 
     const handleSort = (columnKey) => {
     let direction = 'asc';
@@ -148,15 +194,15 @@ export default function TenantInformationTable (){
     };
 
     // Function to sort data
-    const sortedUnits = [...unitsData].sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-        }
-        return 0;
-    });
+    // const sortedUnits = [...unitsData].sort((a, b) => {
+    //     if (a[sortConfig.key] < b[sortConfig.key]) {
+    //     return sortConfig.direction === 'asc' ? -1 : 1;
+    //     }
+    //     if (a[sortConfig.key] > b[sortConfig.key]) {
+    //     return sortConfig.direction === 'asc' ? 1 : -1;
+    //     }
+    //     return 0;
+    // });
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
@@ -186,12 +232,29 @@ export default function TenantInformationTable (){
         setSelectedItem(newSelected);
     };
 
+    // const handleExportToExcel = () => {
+    //     const ws = XLSX.utils.json_to_sheet(unitsData);
+    //     const wb = XLSX.utils.book_new();
+    //     XLSX.utils.book_append_sheet(wb, ws, 'Units');
+    //     XLSX.writeFile(wb, 'units_data.xlsx');
+    // };
+
     const handleExportToExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(unitsData);
+        const exportData = statusData.map(request => ({
+            'Unit Name': request.tenant?.rental_agreement[0]?.rented_unit?.apartment_name || request.tenant?.rental_agreement[0]?.rented_unit?.boarding_house_name,
+            'Location': `${request?.maintenance_request?.tenant?.rental_agreement[0]?.rented_unit?.building_no|| ''}. ${request?.maintenance_request?.tenant?.rental_agreement[0]?.rented_unit?.street|| ''} st. ${request?.maintenance_request?.tenant?.rental_agreement[0]?.rented_unit?.barangay|| ''}, ${request?.maintenance_request?.tenant?.rental_agreement[0]?.rented_unit?.municipality|| ''}  `, 
+            'Property Type': request.maintenance_request?.unit_type,
+            'Reported Issue': request?.maintenance_request?.reported_issue,
+            'Issue Description': request?.maintenance_request?.issue_description,
+            'Start Date': formatDate(request?.start_date),
+            'End Date': formatDate(request?.end_date),
+            'Status': request.status
+        }));
+        const ws = XLSX.utils.json_to_sheet(exportData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Units');
-        XLSX.writeFile(wb, 'units_data.xlsx');
-    };
+        XLSX.utils.book_append_sheet(wb, ws, 'Maintenances Status');
+        XLSX.writeFile(wb, 'maintenance_status.xlsx');
+    }
 
 
     const handleChangeRowsPerPage = (event) => {
@@ -208,17 +271,130 @@ export default function TenantInformationTable (){
     setSearchTerm(event.target.value);
     };
 
+    const formatDate = (dateString) => {
+        if(!dateString){
+            return null;
+        }
+    
+        try{
+            const parseDate = parseISO(dateString);
+            return format(parseDate, 'MMM d, yyyy');
+        }catch(error){
+            console.log('Error formating Date:', error);
+            return dateString;
+        }
+    }
 
-    const filteredUnits = sortedUnits.filter((unit) =>
-    unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    unit.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    unit.propertype.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    unit.startoccupancy.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (unit.tenant && unit.tenant.toLowerCase().includes(searchTerm.toLowerCase()))||
-    (unit.contact && unit.contact.toString().includes(searchTerm))
-    );
 
-    const paginatedUnits = filteredUnits.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    const sortedStatus = React.useMemo(() => {
+        if (!sortConfig.key) return statusData;
+    
+        return [...statusData].sort((a, b) => {
+            // Helper function to get nested property value safely
+            const getNestedValue = (obj, key) => {
+                const keys = key.split('.');
+                return keys.reduce((acc, k) => (acc && acc[k] !== undefined) ? acc[k] : undefined, obj);
+            };
+    
+            let aValue, bValue;
+    
+            switch (sortConfig.key) {
+                case 'unit_name':
+                    aValue = `${a.maintenance_request?.tenant?.rental_agreement?.rented_unit?.boarding_house_name || a.maintenance_request?.tenant?.rental_agreement?.rented_unit?.apartment_name}`.trim();
+                    bValue = `${b.maintenance_request?.tenant?.rental_agreement?.rented_unit?.boarding_house_name || b.maintenance_request?.tenant?.rental_agreement?.rented_unit?.apartment_name}`.trim();
+                    break;
+                case 'location':
+                    aValue = a.maintenance_request?.tenant?.rental_agreement?.[0]?.rented_unit 
+                        ? `${a.maintenance_request.tenant.rental_agreement[0].rented_unit.building_no || ''} ${a.maintenance_request.tenant.rental_agreement[0].rented_unit.street || ''}`.trim()
+                        : '';
+                    bValue = b.maintenance_request?.tenant?.rental_agreement?.[0]?.rented_unit 
+                        ? `${b.maintenance_request.tenant.rental_agreement[0].rented_unit.building_no || ''} ${b.maintenance_request.tenant.rental_agreement[0].rented_unit.street || ''}`.trim()
+                        : '';
+                    break;
+                case 'startDate':
+                    aValue = new Date(a.start_date || 0);
+                    bValue = new Date(b.start_date || 0);
+                    break;
+                case 'endDate':
+                    aValue = new Date(a.end_date || 0);
+                    bValue = new Date(b.end_date || 0);
+                    break;
+                case 'property_type':
+                    aValue = `${a.maintenance_request?.tenant.rental_agreement[0].rented_unit_type || ''} ${a.maintenance_request?.tenant.rental_agreement[0].rented_unit_type || ''}`.trim();
+                    bValue = `${b.maintenance_request?.tenant.rental_agreement[0].rented_unit_type || ''} ${b.maintenance_request?.tenant.rental_agreement[0].rented_unit_type || ''}`.trim();
+                    break;
+                case 'reported_issue':
+                    aValue = `${a.maintenance_request?.reported_issue || ''} ${a.maintenance_request?.reported_issue || ''}`.trim();
+                    bValue = `${b.maintenance_request?.reported_issue || ''} ${b.maintenance_request?.reported_issue || ''}`.trim();
+                    break;
+                case 'status':
+                    const statusOrder = {
+                        'To do': 1,
+                        'In Progress': 2,
+                        'Completed': 3
+                    };
+                    
+                    aValue = statusOrder[a.status] || 0;
+                    bValue = statusOrder[b.status] || 0;
+                    break;
+                default:
+                    aValue = getNestedValue(a, sortConfig.key) || '';
+                    bValue = getNestedValue(b, sortConfig.key) || '';
+            }
+    
+            // Handle string comparisons
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return sortConfig.direction === 'asc'
+                    ? aValue.localeCompare(bValue)
+                    : bValue.localeCompare(aValue);
+            }
+    
+            // Handle numeric and date comparisons
+            if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, [statusData, sortConfig]);
+    
+    console.log('data:', sortedStatus);
+    const filteredStatus = sortedStatus.filter((status) => {
+        const searchStr = searchTerm.toLowerCase();
+        const tenantName = `${status.maintenance_request?.tenant?.firstname} ${status.maintenance_request?.tenant?.lastname}`.toLowerCase();
+    
+        // Get unit info from rental agreement
+        const unitInfo = status.maintenance_request.tenant?.rental_agreement?.[0]?.rented_unit;
+        
+        const otherissue = status?.maintenance_request?.other_issue?.toLowerCase();
+        const description = status?.maintenance_request?.issue_description?.toLowerCase();
+        const reportedIssue = status?.maintenance_request?.reported_issue?.toLowerCase();
+        const currentStatus = status?.status?.toLowerCase();;
+        const startDate = status?.start_date;
+        const endDate = status?.end_date;
+        const formatedstartDate = formatDate(startDate);
+        const formatedendDate = formatDate(endDate);
+        const property_Type =  status?.maintenance_request?.tenant?.rental_agreement[0]?.rented_unit_type.toLowerCase();
+    
+        return (
+            currentStatus?.includes(searchStr) ||
+            otherissue?.includes(searchStr) ||
+            formatedstartDate?.toLowerCase().includes(searchStr) ||
+            formatedendDate?.toLowerCase().includes(searchStr) ||
+            property_Type?.includes(searchStr) ||
+            description.includes(searchStr) ||
+            tenantName.includes(searchStr) ||
+            reportedIssue.includes(searchStr) ||
+            status.tenant?.contact?.includes(searchStr) ||
+
+            // Rented Unit details
+            unitInfo?.boarding_house_name?.toLowerCase().includes(searchStr) ||
+            unitInfo?.apartment_name?.toLowerCase().includes(searchStr) ||
+            unitInfo?.building_no?.toLowerCase().includes(searchStr) ||
+            unitInfo?.street?.toLowerCase().includes(searchStr) ||
+            unitInfo?.barangay?.toLowerCase().includes(searchStr) ||
+            unitInfo?.municipality?.toLowerCase().includes(searchStr)
+        );
+    });
+    const paginatedUnits = filteredStatus.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     return (
     <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
@@ -313,10 +489,33 @@ export default function TenantInformationTable (){
                                         />
                                     </Search>
                                     <GeneralTooltip title="Filter Table" >
-                                        <IconButton sx={{ml: '-0.5rem', mr: '0.6rem'}}>
+                                        <IconButton onClick={handleMenuOpen} sx={{ml: '-0.5rem', mr: '0.6rem'}}>
                                             <TuneIcon fontSize='medium'/>
                                         </IconButton>   
                                     </GeneralTooltip>
+                                    <Menu
+                                        anchorEl={anchorEl}
+                                        open={isMenuOpen}
+                                        onClose={handleMenuClose}
+                                        anchorOrigin={{
+                                            vertical: 'bottom',
+                                            horizontal: 'left',
+                                        }}
+                                        transformOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'left',
+                                        }}
+                                        >
+                                        {categories.map((category) => (
+                                            <MenuItem  
+                                            key={category} 
+                                            selected={category === selectedCategory}
+                                            onClick={() => handleCategoryChange(category)}
+                                            >
+                                            {category}
+                                            </MenuItem>
+                                        ))}
+                                    </Menu>
                                     <GeneralTooltip title="Download file">
                                         <IconButton sx={{ml: '-0.5rem', mr: '0.6rem'}} onClick={handleExportToExcel}>
                                             <CloudDownloadOutlinedIcon fontSize='medium'/>
@@ -345,20 +544,20 @@ export default function TenantInformationTable (){
                                         // }}
                                     />
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('name')}>
-                                    Unit Name {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                <StyledTableCell onClick={() => handleSort('unit_name')}>
+                                    Unit Name {sortConfig.key === 'unit_name' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
                                 <StyledTableCell onClick={() => handleSort('location')}>
                                     Location {sortConfig.key === 'location' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('propertype')}>
-                                    Property Type {sortConfig.key === 'propertype' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                <StyledTableCell onClick={() => handleSort('property_type')}>
+                                    Property Type {sortConfig.key === 'property_type' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('datestarted')}>
-                                    Date Started {sortConfig.key === 'datestarted' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                <StyledTableCell onClick={() => handleSort('startDate')}>
+                                    Date Started {sortConfig.key === 'startDate' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('enddate')}>
-                                    End Date {sortConfig.key === 'enddate' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                <StyledTableCell onClick={() => handleSort('endDate')}>
+                                    End Date {sortConfig.key === 'endDate' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
                                 <StyledTableCell onClick={() => handleSort('status')}>
                                     Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
@@ -366,24 +565,24 @@ export default function TenantInformationTable (){
                                 <StyledTableCell onClick={() => handleSort('issuestype')}>
                                     Issues Type {sortConfig.key === 'issuestype' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('tenant')}>
+                                {/* <StyledTableCell onClick={() => handleSort('tenant')}>
                                     Tenant {sortConfig.key === 'tenant' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
-                                </StyledTableCell>
+                                </StyledTableCell> */}
                             
                                 
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {paginatedUnits.map((unit, index) => {
-                                     const isSelected = selectedItem.includes(unit.id);
+                                {paginatedUnits.map((info, index) => {
+                                     const isSelected = selectedItem.includes(info.id);
                                      const labelId = `enhanced-table-checkbox-${index}`;
                                     return (
                                     <StyledTableRow 
-                                        key={unit.id}  
+                                        key={info.id}  
                                         tabIndex={-1}
                                         selected={isSelected} 
                                         aria-checked={isSelected} 
-                                        onChange={(event) => handleCheckBoxChange(event, unit.id)}
+                                        onChange={(event) => handleCheckBoxChange(event, info.id)}
                                     
                                     >
                                         <TableCell>
@@ -395,23 +594,26 @@ export default function TenantInformationTable (){
                                                   }}
                                             />
                                         </TableCell>
-                                        <TableCell>{unit.name}</TableCell>
-                                        <TableCell>{unit.location}</TableCell>
-                                        <TableCell>{unit.propertype}</TableCell>
-                                        <TableCell>{unit.datestarted}</TableCell>
-                                        <TableCell>{unit.enddate}</TableCell>
+                                        <TableCell>{info.maintenance_request.tenant.rental_agreement[0].rented_unit?.boarding_house_name || info.maintenance_request.tenant.rental_agreement[0].rented_unit?.apartment_name}</TableCell>
+                                        <TableCell>
+                                        {info.maintenance_request.tenant.rental_agreement[0].rented_unit?.building_no} {info.maintenance_request.tenant.rental_agreement[0].rented_unit?.street} st, {info.maintenance_request.tenant.rental_agreement[0].rented_unit?.barangay}, {info.maintenance_request.tenant.rental_agreement[0].rented_unit?.municipality}
+                                        </TableCell>
+                                        <TableCell>{info.maintenance_request.tenant.rental_agreement[0].rented_unit_type}</TableCell>
+                                        <TableCell>{formatDate(info.start_date)}</TableCell>
+                                        <TableCell>{formatDate(info.end_date)}</TableCell>
+                                        <TableCell>{info.maintenance_request.reported_issue}</TableCell>
                                         <TableCell>
                                             <Chip
-                                                label={unit.status}
+                                                label={info.status}
                                                 variant="contained"
-                                            // backgroundColor={unit.status === 'Available' ? '#ede7f6' : 'secondary'}
-                                                color={unit.status === 'Done' ? 'success' : unit.status === 'Ongoing' ? 'primary' : 'secondary'}
-                                                icon={unit.status === 'Done' ? <CheckCircleOutlineSharpIcon/> : unit.status === 'Ongoing' ? <AutorenewOutlinedIcon fontSize='small'/> : <PushPinOutlinedIcon fontSize='small'/>}
+                                            // backgroundColor={info.status === 'Available' ? '#ede7f6' : 'secondary'}
+                                                color={info.status === 'Completed' ? 'success' : info.status === 'In Progress' ? 'primary' : 'secondary'}
+                                                icon={info.status === 'Completed' ? <CheckCircleOutlineSharpIcon/> : info.status === 'In Progress' ? <AutorenewOutlinedIcon fontSize='small'/> : <PushPinOutlinedIcon fontSize='small'/>}
                                                 sx={{
-                                                    backgroundColor: unit.status === 'Done' ? '#e8f5e9' : unit.status === 'Ongoing' ? '#ede7f6' : '#ffe0b2',
-                                                    color: unit.status === 'Done' ? '#004d40' : unit.status === 'Ongoing' ? '#512da8' : '#e65100',
+                                                    backgroundColor: info.status === 'Completed' ? '#e8f5e9' : info.status === 'In Progress' ? '#ede7f6' : '#ffe0b2',
+                                                    color: info.status === 'Completed' ? '#004d40' : info.status === 'In Progress' ? '#512da8' : '#e65100',
                                                     '& .MuiChip-label': {
-                                                        color: unit.status === 'Done' ? '#004d40' : unit.status === 'Ongoing' ? '#512da8' : '#e65100',
+                                                        color: info.status === 'Completed' ? '#004d40' : info.status === 'In Progress' ? '#512da8' : '#e65100',
                                                         fontWeight: 560,
                                                         
                                                     }
@@ -420,9 +622,9 @@ export default function TenantInformationTable (){
                                                 
                                             </Chip>
                                         </TableCell>
-                                        <TableCell>{unit.issuestype}</TableCell>
                                         
-                                        <TableCell>{unit.tenant || 'N/A'}</TableCell>
+                                        
+                                        {/* <TableCell>{info.maintenance_request.tenant.firstname || 'N/A'}</TableCell> */}
                                         
                                     </StyledTableRow>
                                     )
@@ -433,7 +635,7 @@ export default function TenantInformationTable (){
                         <TablePagination
                         rowsPerPageOptions={[5, 10, 15, 25]}
                         component="div"
-                        count={filteredUnits.length}
+                        count={filteredStatus.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}

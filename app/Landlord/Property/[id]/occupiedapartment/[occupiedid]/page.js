@@ -1,7 +1,8 @@
 "use client"
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { useRouter, useParams} from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -185,16 +186,19 @@ let theme = createTheme({
       },
     },
   };
-const drawerWidth = 256;
+  const drawerWidth = 278
 
 export default function OccupiedTenantPage (){
+  const router = useRouter();
   const params = useParams();
   const apartmentId = params?.occupiedid;
   const propsId = params.id;  
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const { data: session, status } = useSession();
 
   console.log('Apartment ID:', apartmentId );
   console.log('property ID:', propsId );
+  
 
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -204,6 +208,22 @@ export default function OccupiedTenantPage (){
   const handleDrawerToggle = () => {
   setMobileOpen(!mobileOpen);
   };
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.push('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    // return <>
+    //   <LoadingState/>
+    // </>
+    // You can add a loading spinner here if needed
+  }
+
+  if (status == "authenticated"){
 
   return (
     <>
@@ -251,4 +271,6 @@ export default function OccupiedTenantPage (){
     
     </>
   )
+  }
+  null;
 }

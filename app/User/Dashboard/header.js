@@ -140,15 +140,48 @@ function Header(props) {
     const handleMobileMenuOpen = (event) => {
         setMobileMoreAnchorEl(event.currentTarget);
     };
-
     const handleLogout = async () => {
-        await signOut({ redirect: false });
-        localStorage.removeItem('avatarColor')
-        localStorage.removeItem('userDetails'); // Clear user data
-        sessionStorage.clear(); // Clear token
-        // Redirect to login page
-        window.location.href = '/';
+        const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+        const userData = JSON.parse(userDataString); // parse the datastring into json 
+        const accessToken = userData.accessToken;
+        if(accessToken){
+            try{
+                const response = await fetch(`http://127.0.0.1:8000/api/logout`,{
+                    method:'POST',
+                    headers:{
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                })
+        
+                const data = await response.json();
+                if(response.ok){
+                    console.log(data);
+                    
+                    await signOut({ redirect: false });
+                    localStorage.removeItem('avatarColor')
+                    localStorage.removeItem('userDetails'); 
+                    sessionStorage.clear(); // Clear token
+                    // Redirect to login page
+                    window.location.href = '/';
+                }else{
+                    console.log('error', response.status);
+                }
+            }catch(error){
+                console.error(error);
+            }
+        }else{
+            console.log('No access token found');
+        }
     };
+    // const handleLogout = async () => {
+    //     await signOut({ redirect: false });
+    //     localStorage.removeItem('avatarColor')
+    //     localStorage.removeItem('userDetails'); // Clear user data
+    //     sessionStorage.clear(); // Clear token
+    //     // Redirect to login page
+    //     window.location.href = '/';
+    // };
 
         
     const avatarColors = ['#1976d2', '#f44336', '#4caf50', '#ff9800', '#9c27b0', '#3f51b5', '#00bcd4', '#8bc34a', '#8785d0', '#a55555',];

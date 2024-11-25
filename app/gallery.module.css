@@ -1,0 +1,108 @@
+/* gallery.module.css */
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
+.gallerySlider {
+  width: 100%;
+  position: relative;
+  
+}
+
+.gallerySlider :global(.slick-slide) {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallerySlider :global(.slick-slide img) {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.gallerySlider :global(.slick-dots) {
+  bottom: -35px;
+  display: flex !important;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.gallerySlider :global(.slick-dots li button:before) {
+  font-size: 12px;
+  color: #bbb; /* Default dot color */
+  transition: color 0.3s ease;
+}
+
+/* Custom dots styles */
+.gallerySlider :global(.custom-dots) {
+  position: absolute;
+  bottom: -30px;
+  list-style: none;
+  display: flex !important;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.gallerySlider :global(.custom-dots li) {
+  margin: 0 5px;
+}
+
+.gallerySlider :global(.custom-dots li button) {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #bbb; /* Default dot color */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.gallerySlider :global(.custom-dots li.slick-active button) {
+  background-color: #9b84ee; /* Active dot color (change as needed) */
+  width: 10px;
+  height: 10px;
+}
+
+.gallerySlider :global(.custom-dots li button:hover) {
+  background-color: #9b84ee; /* Hover color (change as needed) */
+}
+
+/* Remove default Slick styles */
+.gallerySlider :global(.slick-dots li button:before) {
+  content: none;
+}
+
+.gallerySlider :global(.slick-prev:before),
+.gallerySlider :global(.slick-next:before) {
+  font-size: 30px;
+  color: #fff; /* Ensure icon is white */
+}
+
+.gallerySlider :global(.slick-prev) {
+  left: 10px;
+}
+
+.gallerySlider :global(.slick-next) {
+  right: 10px;
+}
+
+/* Ensure slides don't stack */
+.gallerySlider :global(.slick-track) {
+  display: flex !important;
+}
+
+.gallerySlider :global(.slick-slide) {
+  height: inherit !important;
+  display: flex !important;
+}
+
+.gallerySlider :global(.slick-slide > div) {
+  width: 100%;
+  flex: 1;
+}

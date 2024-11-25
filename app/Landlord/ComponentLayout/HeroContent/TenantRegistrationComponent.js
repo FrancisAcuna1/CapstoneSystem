@@ -3,11 +3,25 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Grid, Box, Paper, Typography, Button, Divider, Link, Skeleton, Breadcrumbs, CardMedia, Card, CardContent, CardActions} from '@mui/material';
-import RegisterComponent from '../FormsComponent/TenantRegistrationForm';
+import TenantRegistrationForm from '../FormsComponent/TenantRegistrationForm';
 import Image from 'next/image';
-import BedroomChildOutlinedIcon from '@mui/icons-material/BedroomChildOutlined';
+import Slider from "react-slick"; // Import the slider
+import styles from '../../../gallery.module.css';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ErrorSnackbar from '../Labraries/ErrorSnackbar'
+import { SnackbarProvider } from 'notistack';
 
-export default function TenantRegistrationForm({propsId, apartmentId, loading, setLoading}){
+
+function srcset(image, width, height, rows = 1, cols = 1) {
+    return {
+      src: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format`,
+      srcSet: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format&dpr=2 2x`,
+    };
+  }
+
+
+export default function TenantRegistrationComponent({propsId, apartmentId, loading, setLoading}){
     const apartmentID = apartmentId; // apartment ID
     const propsID = propsId; // property ID
     const [details, setDetails] = useState([]);
@@ -46,6 +60,8 @@ export default function TenantRegistrationForm({propsId, apartmentId, loading, s
 
                     if(response.ok){ 
                         console.log('Data:', data)
+                        console.log('images:', data.apartment.images);
+                        
                         setDetails(data);
                     
                         // setInclusions(data);
@@ -65,17 +81,84 @@ export default function TenantRegistrationForm({propsId, apartmentId, loading, s
             
         }
         fetchedData();
-    }, [])
-    
-    
-    
+    }, [apartmentID, propsID, setLoading])
 
+    const images = details?.apartment?.images && details?.apartment?.images || []; 
+    console.log('images:', images);
+    
+    const CustomNextArrow = ({ className, onClick }) => (
+    <div
+        className={`${className} custom-arrow next-arrow`}
+        onClick={onClick}
+        style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "absolute",
+        right: "10px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        zIndex: 1,
+        width: "35px",
+        height: "35px",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        borderRadius: "50%",
+        cursor: "pointer"
+        }}
+    >
+        <ArrowForwardIosIcon fontSize='small' style={{ color: "#fff" }} />
+    </div>
+    );
+      
+    const CustomPrevArrow = ({ className, onClick }) => (
+    <div
+        className={`${className} custom-arrow prev-arrow`}
+        onClick={onClick}
+        style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "absolute",
+        left: "10px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        zIndex: 1,
+        width: "35px",
+        height: "35px",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        borderRadius: "50%",
+        cursor: "pointer"
+        }}
+    >
+        <ArrowBackIosIcon  fontSize='small' style={{ color: "#fff", marginLeft: "8px" }} />
+    </div>
+    );
 
-
+    const sliderSettings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        adaptiveHeight: true,
+        nextArrow: <CustomNextArrow />,
+        prevArrow: <CustomPrevArrow />,
+        autoplay: true,
+        autoplaySpeed: 5000,
+        cssEase: "linear",
+        dotsClass: "slick-dots custom-dots", 
+    };
+    
 
     return(
         <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
-            <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '5px', fontSize: '24px', fontWeight: 'bold',  mt:5}}>
+            <SnackbarProvider maxSnack={3}>
+                <ErrorSnackbar
+                    error={error}
+                    setError={setError}          
+                />
+            </SnackbarProvider>
+            <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '5px', fontSize: {xs:'18px', sm:'18px', md:'24px', lg:'24px'}, fontWeight: 'bold',  mt:5}}>
                 Details -  {details.apartment && details.apartment.apartment_name}
             </Typography>
             <Grid item xs={12} sx={{marginLeft: '5px', mt:2}}>
@@ -98,7 +181,7 @@ export default function TenantRegistrationForm({propsId, apartmentId, loading, s
             </Box>
 
             <Grid  container spacing={1} sx={{maxWidth: 1400, mt: '10rem', display:'flex', justifyContent:' center',  margin: 'auto'}}>
-                <Grid item xs={12} md={5} lg={5}>
+                <Grid item xs={12} md={5} lg={5} sx={{ }}>
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '8px'}}>  
                     {loading ?
                     (
@@ -112,15 +195,50 @@ export default function TenantRegistrationForm({propsId, apartmentId, loading, s
                         </Box>   
                         ):(
                         <>
-                        <CardMedia
-                            sx={{ height: 150 }}
-                            image={details.apartment && details.apartment.image ? `http://127.0.0.1:8000/ApartmentImage/${details.apartment.image}` : ''}
-                            title={details.apartment && details.apartment.apartment_name && details.apartment.apartment_name.caption || 'Image'}
-                            // style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
-                        />
+                        <Box 
+                            className={styles.gallerySlider}
+                            sx={{
+                                position: 'relative',
+                                maxWidth:{xs:285, lg:1400},
+                                mb: 4,
+                                gap: 2,
+                                '& .slick-slider, & .slick-list, & .slick-track': {
+                                height: '100%',
+                                overflow: 'hidden',
+                                },
+                                '& .slick-slide': {
+                                '& > div': {
+                                    height: '100%',
+                                }
+                                }
+                            }}
+                            >
+                            <Slider {...sliderSettings}>
+                                {images.map((image, index) => (
+                                <div key={image.id}>
+                                    <Box
+                                    sx={{
+                                        height: { xs: '300px', sm: '300px', md: '300px' },
+                                        width: '100%',
+                                        position: 'relative',
+                                        
+                                    }}
+                                    >
+                                    <Image
+                                        src={`http://127.0.0.1:8000/ApartmentImage/${image.image_path}`}
+                                        alt={`Apartment image ${index + 1}`}
+                                        layout="fill"
+                                        objectFit="cover"
+                                        style={{ borderRadius: '10px'}}
+                                    />
+                                    </Box>
+                                </div>
+                                ))}
+                            </Slider>
+                        </Box>
                         {details && details.apartment && (
                             <>
-                            <Typography variant='h6' letterSpacing={1.2} gutterBottom sx={{textTransform: 'uppercase', fontWeight: 550, mt: 2}}>
+                            <Typography variant='h6' letterSpacing={1.2} gutterBottom sx={{textTransform: 'uppercase', fontWeight: 550, mt: 4}}>
                             {details.apartment.apartment_name}
                             </Typography>
                             <Typography variant='body2' letterSpacing={1.2} gutterBottom sx={{textTransform: 'uppercase', fontWeight: 500, }}>
@@ -138,13 +256,14 @@ export default function TenantRegistrationForm({propsId, apartmentId, loading, s
                             <Typography variant='body2' letterSpacing={1.2} gutterBottom sx={{ fontWeight: 500, }}>
                             <strong>Capacity:</strong> {details.apartment.capacity}
                             </Typography> 
-                            <Typography variant='body2' letterSpacing={1.2} gutterBottom sx={{ fontWeight: 500, }}>
-                            <strong>Inclusions -</strong>
+                            <Box sx={{display:'flex', justifyContent:'start'}}>
+                            <Typography variant='body2' letterSpacing={1.2} gutterBottom sx={{mr:'0.5rem', fontWeight: 500, }}>
+                            <strong>Inclusions:</strong>
                             </Typography>
                             {details.apartment.inclusions && details.apartment.inclusions.length > 0 ? (
                             details.apartment.inclusions.map((item, index) => (
-                                <Typography key={item.index} variant='body2' letterSpacing={2} gutterBottom sx={{ fontWeight: 500, }}>
-                                    {item.inclusion.name}: {item.quantity}
+                                <Typography key={item.index} variant='body2' letterSpacing={2} gutterBottom sx={{ display: 'inline', fontWeight: 500, mr:'0.2rem'}}>
+                                    {item.equipment.name}- {item.quantity} {index < details.apartment.inclusions.length - 1 && '|'}
                                 </Typography>
                             ))
                             ):(
@@ -154,6 +273,7 @@ export default function TenantRegistrationForm({propsId, apartmentId, loading, s
                             </Typography>
                             </>
                             )}
+                            </Box>
 
                             </>
                         )}
@@ -171,7 +291,7 @@ export default function TenantRegistrationForm({propsId, apartmentId, loading, s
                 </Grid>
                 <Grid item xs={12} md={7} lg={7}>
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '8px'}}>  
-                        <RegisterComponent
+                        <TenantRegistrationForm
                             details={details}
                             setDetails={setDetails}
                             loading={loading}

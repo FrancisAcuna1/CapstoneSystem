@@ -185,7 +185,7 @@ export default function EquipmentTable ({handleEdit, setSuccessful, setError, er
         }
         fetchedData()
 
-    }, [])
+    }, [setError, setLoading])
 
 
      // for Dialog alert for delete 
@@ -262,7 +262,7 @@ export default function EquipmentTable ({handleEdit, setSuccessful, setError, er
     }
 
   
-  }, []);
+  }, [setSuccessful, setError]);
 
     const handleSort = (columnKey) => {
         let direction = 'asc';

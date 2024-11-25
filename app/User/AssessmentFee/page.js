@@ -1,6 +1,8 @@
 "use client"
 import * as React from 'react';
-import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -192,10 +194,9 @@ let theme = createTheme({
 const drawerWidth = 256;
 
 export default function OverviewPage (){
-
-  // const router = useRouter();
+  const router = useRouter();
   // const [activeTab, setActiveTab] = useState('');
-
+  const { data: session, status } = useSession();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [loading, setLoading] = useState(false);
   // this code 'isSmUp is Enable the Burger Icon for mobile view
@@ -205,51 +206,65 @@ export default function OverviewPage (){
   setMobileOpen(!mobileOpen);
   };
 
-  return (
-    <>
-      <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-          <CssBaseline />
-          <Box
-          component="nav"
-          sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 1 } }}
-          >
-          {isSmUp ? null : (
-              <Navigator
-              PaperProps={{ style: { width: drawerWidth } }}
-              variant="temporary"
-              open={mobileOpen}
-              onClose={handleDrawerToggle}
-              
-              />
-          )}
-              {/* this code is for mobile view navigator */}
-              <Navigator
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.replace('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if(status === "loading"){
+    return <p>Loading...</p>;
+  }
+
+  if(status === "authenticated"){
+
+    return (
+      <>
+        <ThemeProvider theme={theme}>
+        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+            <CssBaseline />
+            <Box
+            component="nav"
+            sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 1 } }}
+            >
+            {isSmUp ? null : (
+                <Navigator
                 PaperProps={{ style: { width: drawerWidth } }}
-                sx={{ display: { sm: 'none', xs: 'none', lg:'block' } }} 
+                variant="temporary"
+                open={mobileOpen}
+                onClose={handleDrawerToggle}
                 
+                />
+            )}
+                {/* this code is for mobile view navigator */}
+                <Navigator
+                  PaperProps={{ style: { width: drawerWidth } }}
+                  sx={{ display: { sm: 'none', xs: 'none', lg:'block' } }} 
+                  
+                />
+            </Box>
+            <Divider />
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Header onDrawerToggle={handleDrawerToggle} />
+            {loading && <LinearProgress color='primary' sx={{ position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
+            <Box component="main" sx={{ flex: 1, py: 2, px: 4, bgcolor: '#eaeff1' }}>
+              <AssessmentFeeComponent
+                setLoading={setLoading}
+                loading={loading}
               />
-          </Box>
-          <Divider />
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Header onDrawerToggle={handleDrawerToggle} />
-          {loading && <LinearProgress color='primary' sx={{ position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
-          <Box component="main" sx={{ flex: 1, py: 2, px: 4, bgcolor: '#eaeff1' }}>
-             <AssessmentFeeComponent
-              setLoading={setLoading}
-              loading={loading}
-             />
-            {/* <HomeComponent/> */}
-              {/* <CardContentHeader/> */}
-              {/* <Content/> */}
-          </Box>
-          <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-              {/* <Copyright/> */}
-          </Box>
-          </Box>
-      </Box>
-      </ThemeProvider>
-    
-    </>
-  )
+              {/* <HomeComponent/> */}
+                {/* <CardContentHeader/> */}
+                {/* <Content/> */}
+            </Box>
+            <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
+                {/* <Copyright/> */}
+            </Box>
+            </Box>
+        </Box>
+        </ThemeProvider>
+      
+      </>
+    )
+  }
 }

@@ -12,6 +12,7 @@ import StarIcon from '@mui/icons-material/Star';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { styled, alpha, useTheme } from '@mui/system';
 import SearchIcon from '@mui/icons-material/Search';
+import SensorOccupiedIcon from '@mui/icons-material/SensorOccupied';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -74,7 +75,7 @@ export default function PropertyCard() {
           ? "http://127.0.0.1:8000/api/all_available/Available"
           : selectedCategory === "Occupied"
           ? "http://127.0.0.1:8000/api/all_occupied/Occupied"
-          : "http://127.0.0.1:8000/api/all";
+          : "http://127.0.0.1:8000/api/all_prop";
 
         const response = await fetch(url, {
           method: 'GET',
@@ -258,94 +259,163 @@ export default function PropertyCard() {
             ) : filteredProperties.length > 0 ? (
               filteredProperties.map((property) => (
                 <Grid item key={property.id} xs={12} sm={6} md={4} lg={4}>
-                  <Card sx={{ position: 'relative', borderRadius: 3, boxShadow: 3 }}>
-                    <CardMedia
-                      component="img"
-                      height="200"
-                      
-                      image={property.image ? `http://127.0.0.1:8000/ApartmentImage/${property.image}` : "/apartment2.jpeg"}
-                      alt={property.apartment_name}
-                    />
-                    <Box sx={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 1 }}>
-                      <Chip label="Featured" color="secondary" size="small" />
-                    </Box>
-                    <Box sx={{position: 'absolute', height: '24px', top: 16, left: 90, backgroundColor:'#ff9800', borderRadius:'50px', p:0.3, px:0.8}}>
-                      <Typography variant='body2' letterSpacing={1}  sx={{color: theme.palette.mode === 'light' ? 'white' :' black',  fontSize:'13px'}}>
-                        {property.property_type}
-                      </Typography>
-                    </Box>
-                    <IconButton
-                      sx={{ position: 'absolute', top: 16, right: 16 }}
-                      aria-label="bookmark"
-                    >
-                      <BookmarkTwoToneIcon sx={{ fontsize: 'large', color: '#f5f5f5' }} />
-                    </IconButton>
-                    <CardContent>
-                      <Stack direction="row" alignItems="center" spacing={1}>
+                <Card sx={{ position: 'relative', borderRadius: 3, boxShadow: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <CardMedia
+                    component="img"
+                    height="200"
+                    image={property.image ? `http://127.0.0.1:8000/ApartmentImage/${property.image}` : "/apartment2.jpeg"}
+                    alt={property.apartment_name}
+                  />
+                  <Box sx={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 1 }}>
+                    <Chip label="Featured" color="secondary" size="small" 
+                      sx={{
+                        backgroundColor: (theme) =>
+                          theme.palette.secondary.main + 'AA', // Adding alpha channel to make it semi-transparent
+                        color: (theme) =>
+                          theme.palette.getContrastText(theme.palette.secondary.main), // Ensure text remains readable
+                        opacity: 0.9, // Adjust opacity as needed for transparency
+                      }}/>
+                  </Box>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      height: '24px',
+                      top: 16,
+                      left: 90,
+                      backgroundColor: (theme) =>
+                        theme.palette.mode === 'light' ? '#eeeeeeAA' : '#e0e0e0AA', // Semi-transparent background
+                      borderRadius: '50px',
+                      p: 0.3,
+                      px: 0.8,
+                      opacity: 1, 
+                    }}
+                  >
+                    <Typography variant="body2" letterSpacing={1} sx={{ color: theme.palette.mode === 'light' ? 'black' : 'black', fontSize: '13px' }}>
+                      {property.property_type}
+                    </Typography>
+                  </Box>
+                  <IconButton
+                    sx={{ position: 'absolute', top: 16, right: 16 }}
+                    aria-label="bookmark"
+                  >
+                    <BookmarkTwoToneIcon sx={{ fontsize: 'large', color: '#f5f5f5' }} />
+                  </IconButton>
+                  <CardContent sx={{ flex: '1 1 auto' }}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      {property.status === 'Available' ? 
                         <Chip
-                          icon={<StarIcon fontSize="small" />}
-                          label={property.status}
-                          color="success"
+                        icon={<StarIcon fontSize="small" />}
+                        label={property.status}
+                        color="success"
+                        size="small"
+                      />
+                      :
+                      <Chip
+                        icon={<SensorOccupiedIcon fontSize="small" />}
+                        label={property.status}
+                        color="error"
+                        size="small"
+                      />
+                      
+                      }
+                      
+                      {/* <VerifiedIcon fontSize="small" color="#424242" />
+                      <Typography variant="body2" color="text.#424242">
+                        Verified
+                      </Typography>
+                      <Typography variant="body2" color="primary" sx={{ marginLeft: 'auto' }}>
+                        Quick look
+                      </Typography> */}
+                    </Stack>
+                    <Typography gutterBottom variant="h6" component="div" letterSpacing={1} sx={{ fontWeight: '550', mt: 1 }}>
+                      {property.apartment_name || property.boarding_house_name}
+                    </Typography>
+                    <Typography gutterBottom variant="body2" sx={{ color: 'text.#424242' }}>
+                      {`Bldg no. ${property.building_no}, ${property.street} st. ${property.barangay}, ${property.municipality}`}
+                    </Typography>
+                    <Typography gutterBottom variant="body2" sx={{ color: 'text.#424242' }}>
+                      {`${property.number_of_rooms} Rooms | Capacity: ${property.capacity}`}
+                    </Typography>
+                    {property.inclusions.map((inclusion, index) => (
+                      <Typography key={index} gutterBottom variant="body2" sx={{ display: 'inline', color: 'text.#424242', mr: '0.5rem' }}>
+                        {inclusion.equipment.name} - {inclusion.quantity} {index < property.inclusions.length - 1 && '|'}
+                      </Typography>
+                    ))}
+                    <Typography gutterBottom variant="h6" color="text.primary" sx={{ mt: 1.5 }}>
+                      {/* ₱{property.rental_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} */}
+                    </Typography>
+                  </CardContent>
+
+                  <CardActions sx={{  mt: '-0.5rem', p: 2 }}>
+                    {property.status === 'Available' ? (
+                      <>
+                        <Button
                           size="small"
-                        />
-                        <VerifiedIcon fontSize="small" color="#424242" />
-                        <Typography variant="body2" color="text.#424242">
-                          Verified
-                        </Typography>
-                        <Typography variant="body2" color="primary" sx={{ marginLeft: 'auto' }}>
-                          Quick look
-                        </Typography>
-                      </Stack>
-                      <Typography gutterBottom variant="h6" component="div" letterSpacing={1} sx={{ fontWeight: '550', mt: 1 }}>
-                        {property.apartment_name || property.boarding_house_name}
-                      </Typography>
-                      <Typography gutterBottom variant="body2" sx={{ color: "text.#424242" }}>
-                        {`${property.building_no}, ${property.street}, ${property.barangay}, ${property.municipality}`}
-                      </Typography>
-                      <Typography gutterBottom variant="body2" sx={{ color: "text.#424242" }}>
-                        {`${property.number_of_rooms} Rooms | Capacity: ${property.capacity}`}
-                      </Typography>
-                      <Typography gutterBottom variant="body2" sx={{ color: "text.#424242" }}>
-                        {property.property_type}
-                      </Typography>
-                      <Typography gutterBottom variant="h6" color="text.primary" sx={{ mt: 1 }}>
-                      ₱{property.rental_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button
-                        size="small"
-                        color="secondary"
-                        startIcon={<BookmarkBorderOutlinedIcon />}
-                        sx={{
-                          '&:hover': {
-                            bgcolor: (theme) =>
-                              theme.palette.mode === 'light' ? alpha(theme.palette.secondary.light, 0.1) : alpha(theme.palette.secondary.dark, 0.1),
-                          },
-                          mb: '1rem'
-                        }}
-                      >
-                        Tour
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        sx={{
-                          backgroundColor: (theme) =>
-                            theme.palette.mode === 'light' ? '#212121' : '#424242',
-                          color: '#fff',
-                          '&:hover': {
+                          variant="contained"
+                          sx={{
                             backgroundColor: (theme) =>
-                              theme.palette.mode === 'light' ? '#424242' : '#757575',
-                          },
-                          mb: '1rem'
-                        }}
-                      >
-                        Check availability
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
+                              theme.palette.mode === 'light' ? '#212121' : '#424242',
+                            color: '#fff',
+                            '&:hover': {
+                              backgroundColor: (theme) =>
+                                theme.palette.mode === 'light' ? '#424242' : '#757575',
+                            },
+                          }}                         
+                          onClick={() => {
+                            if (property.property_type === 'Apartment') {
+                              router.push(`/Proptrack/Properties/${property.property_id}/apartment/${property.id}`);
+                            } else if (property.property_type === 'Boarding House') {
+                              router.push(`/Proptrack/Properties/${property.property_id}/boardinghouse/${property.id}`);
+                            }
+                          }}
+                          
+                          
+                        >
+                           View Details
+                        </Button>
+                      </>
+                      ) : (
+                        <>
+                          <Button
+                            size="small"
+                            color="secondary"
+                            disabled
+                            startIcon={<BookmarkBorderOutlinedIcon />}
+                            sx={{
+                              '&:hover': {
+                                bgcolor: (theme) =>
+                                  theme.palette.mode === 'light' ? alpha(theme.palette.secondary.light, 0.1) : alpha(theme.palette.secondary.dark, 0.1),
+                              },
+                            }}
+                          >
+                            Tour
+                          </Button>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            disabled
+                            sx={{
+                              backgroundColor: (theme) =>
+                                theme.palette.mode === 'light' ? '#212121' : '#424242',
+                              color: '#fff',
+                              '&:hover': {
+                                backgroundColor: (theme) =>
+                                  theme.palette.mode === 'light' ? '#424242' : '#757575',
+                              },
+                            }}
+                            
+                          >
+                            Check availability
+                          </Button>
+                      
+                        </>
+                      )}
+          
+                    
+                  </CardActions>
+                </Card>
+              </Grid>
+              
               ))
             ) : (
               <Grid item xs={12} sx={{ textAlign: 'center' }}>

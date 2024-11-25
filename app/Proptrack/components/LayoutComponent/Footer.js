@@ -1,7 +1,8 @@
 // components/Footer.js
-
+'use client';
 import React from 'react';
 import { Box, Container, Grid, Link, Typography } from '@mui/material';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -69,13 +70,13 @@ export default function Footer() {
             </Typography>
             <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
               <Link href="#" color="inherit">
-                <img src="/twitter-icon.svg" alt="Twitter" width="24" height="24" />
+                <Image width={24} height={24} src="/twitter-icon.svg" alt="Twitter"/>
               </Link>
               <Link href="#" color="inherit">
-                <img src="/facebook-icon.svg" alt="Facebook" width="24" height="24" />
+                <Image width={24} height={24} src="/facebook-icon.svg" alt="Facebook"/>
               </Link>
               <Link href="#" color="inherit">
-                <img src="/linkedin-icon.svg" alt="LinkedIn" width="24" height="24" />
+                <Image width={24} height={24} src="/linkedin-icon.svg" alt="LinkedIn"/>
               </Link>
             </Box>
           </Grid>

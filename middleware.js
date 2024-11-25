@@ -28,6 +28,9 @@ export async function middleware(request) {
   if (token) {
     // If the user is trying to access the '/Landlord' route but has a role of 'User', redirect them to the home page or an unauthorized page
     if (token.role === "User" && request.nextUrl.pathname.startsWith("/Landlord")) {
+      return NextResponse.redirect(new URL("/User/Home", request.url)); // Redirect to the home page or any other page you want
+    }
+    if (token.role === "Landlord" && request.nextUrl.pathname.startsWith("/User")) {
       return NextResponse.redirect(new URL("/", request.url)); // Redirect to the home page or any other page you want
     }
 
@@ -47,5 +50,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/Landlord/:path*"],
+  matcher: ["/Landlord/:path*", "/User/:path*"],
 };

@@ -1,5 +1,8 @@
 "use client"
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useSession } from "next-auth/react"
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -191,10 +194,9 @@ theme = {
 const drawerWidth = 256;
 
 export default function OverviewPage (){
-
-  // const router = useRouter();
+  const router = useRouter();
   // const [activeTab, setActiveTab] = useState('');
-
+  const { data: session, status } = useSession();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   // this code 'isSmUp is Enable the Burger Icon for mobile view
   const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
@@ -203,6 +205,18 @@ export default function OverviewPage (){
   setMobileOpen(!mobileOpen);
   };
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.replace('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if(status === "loading"){
+    return <p>Loading...</p>;
+  }
+
+if(status === 'authenticated'){
   return (
     <>
       <ThemeProvider theme={theme}>
@@ -246,4 +260,5 @@ export default function OverviewPage (){
     
     </>
   )
+  }
 }

@@ -1,7 +1,8 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper, TextField, IconButton, InputAdornment, Avatar, Toolbar, Typography, Box, Tooltip, InputBase, inputProps, Breadcrumbs, Link, Grid, Chip, Fab, Button, Fade, FormControl, InputLabel, Select, MenuItem, AppBar} from '@mui/material';
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Divider, Paper, TextField, IconButton, InputAdornment, Avatar, Toolbar, Typography, Box, Tooltip, InputBase, inputProps, Breadcrumbs, Link, Grid, Chip, Fab, Button, Fade, FormControl, InputLabel, Select, Menu, MenuItem, DialogActions, DialogContent, DialogContentText, DialogTitle, Skeleton} from '@mui/material';
+import Dialog, { DialogProps } from '@mui/material/Dialog';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
@@ -9,6 +10,7 @@ import { styled, alpha, useTheme, css } from '@mui/system';
 import { Modal as BaseModal } from '@mui/base/Modal';
 import TuneIcon from '@mui/icons-material/Tune';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
+import PlagiarismOutlinedIcon from '@mui/icons-material/PlagiarismOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import CheckCircleOutlineSharpIcon from '@mui/icons-material/CheckCircleOutlineSharp';
 import Checkbox from '@mui/material/Checkbox';
@@ -16,6 +18,11 @@ import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import * as XLSX from 'xlsx';
+import { format, parseISO } from 'date-fns';
+import dynamic from 'next/dynamic';
+const MaintenanceRequestDialog = dynamic(() => import('../Labraries/ViewMaintenanceRequestDialog'), {
+  ssr: false
+}) 
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -97,6 +104,18 @@ const AcceptToolTip = styled(({ className, ...props }) => (
     },
 });
 
+
+const ViewToolTip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))({
+    '& .MuiTooltip-tooltip': {
+      backgroundColor: '#2196f3', // Background color of the tooltip
+      color: '#ffffff', // Text color
+      borderRadius: '4px',
+    },
+  });
+  
+
 const GeneralTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
   ))({
@@ -109,118 +128,320 @@ const GeneralTooltip = styled(({ className, ...props }) => (
 
 
 
-
-const unitsData = [
-  { id: 1, name: 'Unit 101',  propertype:'Apartment', datereported: '01-23-2023', issuestype:'Plumbing', location: 'Building A', tenant: 'John Doe', contact: '09369223915' },
-  { id: 2, name: 'Unit 102',  propertype:'Apartment', datereported: '05-29-2024', issuestype:'Elictrical', location: 'Building A', tenant: 'Mark Villiar', contact: '09769243995'  },
-  { id: 3, name: 'Unit 103',  propertype:'Bedspacer', datereported: '01-03-2023', issuestype:'Sira ang Kisame', location: 'Building B', tenant: 'Jane Smith', contact: '09369223915' },
-  { id: 4, name: 'Unit 104',  propertype:'Apartment', datereported: '08-23-2023', issuestype:'Bulbs Replacement', location: 'Building B', tenant: 'Mark Doe', contact: '09369223915' },
-  { id: 5, name: 'Unit 105',  propertype:'Bedspacer', datereported: '02-03-2024', issuestype:'Electrical', location: 'Building B', tenant: 'Izer Alindogan', contact: '09397865491'},
-  { id: 6, name: 'Unit 106',  propertype:'Bedspacer', datereported: '06-18-2023', issuestype:'Sira ang pinto', location: 'Building B', tenant: 'John Domasig', contact: '09369223915' },
-  { id: 7, name: 'Unit 107',  propertype:'Apartment', datereported: '04-16-2024', issuestype:'Water leaks', location: 'Building B', tenant: 'Kim Denso', contact: '09097865491' },
-  { id: 8, name: 'Unit 108',  propertype:'Apartment', datereported: '01-23-2024', issuestype:'Water leaks', location: 'Building B', tenant: 'Anne Jebulan', contact: '09887765149' },
-  { id: 9, name: 'Unit 109',  propertype:'BedSpacer', datereported: '01-23-2023', issuestype:'Electrical', location: 'Building B', tenant: 'Maria Jalmasco', contact: '09369223915'},
-  { id: 10, name: 'Unit 110', propertype:'Apartment', datereported: '03-06-2024', issuestype:'Bulbs Replacement', location: 'Building B', tenant: 'Jake Pure', contact: '09234189123' },
-  { id: 12, name: 'Unit 101',  propertype:'Apartment', datereported: '01-23-2023', issuestype:'Barado ang CR', location: 'Building A', tenant: 'John Mark Erlano', contact: '09369223915' },
-  { id: 13, name: 'Unit 101',  propertype:'Apartment', datereported: '01-23-2023', issuestype:'Sira ang Gripo', location: 'Building A', tenant: 'Ericson Hugo', contact: '09369223915' },
-  { id: 14, name: 'Unit 101',  propertype:'Apartment', datereported: '01-23-2023', issuestype:'Elictrical', location: 'Building A', tenant: 'MJ Tolintino', contact: '09369223915' },
-  { id: 15, name: 'Unit 101',  propertype:'Apartment', datereported: '01-23-2023', issuestype:'Water Leaks', location: 'Building A', tenant: 'Mark Tahimik', contact: '09369223915' }
-  // Add more units as needed
-  // Add more units as needed
-  // Add more units as needed
-];
-
-export default function TenantInformationTable (){
+export default function MaintenanceRequestTable ({loading, setLoading, setError, setSuccessful}){
     const router = useRouter();
     const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const isMenuOpen = Boolean(anchorEl);
+    const [scroll, setScroll] = useState('paper');
     const [searchTerm, setSearchTerm] = useState('');
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [page, setPage] = React.useState(0);
     const [selectedItem, setSelectedItem] = useState([])
     const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
+    const [maintenanceRequest, setMaintenanceRequest] = useState([]);
+    const [viewRequest, setViewRequest] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState('All')
+    const categories = ['All', 'Pending', 'Rejected', 'Accepted'];
+
+    console.log('data:', maintenanceRequest);
+    console.log(selectedCategory)
+    
+    useEffect(() => {
+        const fetchMaintenanceRequest = async () => {
+            setLoading(true)
+            const userDataString = localStorage.getItem('userDetails');
+            const userData = JSON.parse(userDataString); // Parse JSON
+            const accessToken = userData.accessToken; // Access token
+            // const userId = userData.user.id; // User ID 
+
+            if(accessToken){
+                try{
+                    const url = selectedCategory === 'All' 
+                    ? `http://127.0.0.1:8000/api/maintenance_request_list`
+                    : `http://127.0.0.1:8000/api/filter_maintenance/${selectedCategory}`;
+
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers:{
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json',
+                        }
+                    })
+
+                    const data = await response.json();
+                   
+                    if(response.ok){
+                        console.log(data)
+                        
+                        setLoading(false);
+                        setMaintenanceRequest(data.data);
+                    }else{
+                        console.log("Error", response.status, data)
+                    }
+                }catch(error){
+                    console.error('Error fetching user data:', error);
+                }
+            }else{
+                console.log('No user Found')
+                setLoading(false)
+            }
+        } 
+        fetchMaintenanceRequest();
+    }, [selectedCategory, setLoading])
+    
+    const fetchedViewRequest = async (id) => {
+        const userDataString = localStorage.getItem('userDetails');
+        const userData = JSON.parse(userDataString);
+        const accessToken = userData.accessToken;
+        setLoading(true)
+
+        if(accessToken){
+            try{    
+                const response = await fetch(`http://127.0.0.1:8000/api/view_request/${id}`,{
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    }
+                })
+
+                const data = await response.json();
+                if(response.ok){
+                    console.log('data:', data.data)
+                    setViewRequest(data.data)
+                    setLoading(false)
+                }else{
+                    console.log('Error fetching user data:', data.error)
+                    setLoading(false)
+                }
+            }catch(error){
+                console.error('Error fetching user data:', error);
+                setLoading(false)
+            }
+        }else{
+            console.log('No user Found')
+            setLoading(false)
+        }
+    }
+   
+
+    useEffect(() => {
+        const successMessage = localStorage.getItem('successMessage');
+        const errorMessage = localStorage.getItem('errorMessage')
+        if (successMessage) {
+          setSuccessful(successMessage);
+          setTimeout(() => {
+            localStorage.removeItem('successMessage');
+          }, 3000);
+        }
+    
+        if(errorMessage){
+          setError(errorMessage);
+          setTimeout(() => {
+            localStorage.removeItem('errorMessage');
+          }, 3000);
+        }
+    
+      
+    }, [setSuccessful, setError]);
+
+    // filter
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleCategoryChange = (category) => {
+        // const category = event.target.value;
+        setSelectedCategory(category);
+        setAnchorEl(null);
+    };
+    //end code 
+
+    //this code is for diaglog 
+    const handleClickOpen = async(id) => {
+        await fetchedViewRequest(id);
+        setOpen(true);
+        // setScroll(scrollType);
+    };
+
+    const handleClose = () => {
+    setOpen(false);
+    };
+
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const formatDate = (dateString) => {
+        if(!dateString){
+            return null;
+        }
+    
+        try{
+            const parseDate = parseISO(dateString);
+            return format(parseDate, 'MMM d, yyyy');
+        }catch(error){
+            console.log('Error formating Date:', error);
+            return dateString;
+        }
+    }
+    
 
     const handleSort = (columnKey) => {
         let direction = 'asc';
         if (sortConfig.key === columnKey && sortConfig.direction === 'asc') {
-          direction = 'desc';
+            direction = 'desc';
         }
         setSortConfig({ key: columnKey, direction });
     };
+
+    const sortedRequests = React.useMemo(() => {
+        if (!sortConfig.key) return maintenanceRequest;
     
-      // Function to sort data
-    const sortedUnits = [...unitsData].sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
-        }
-        return 0;
+        return [...maintenanceRequest].sort((a, b) => {
+            // Helper function to get nested property value safely
+            const getNestedValue = (obj, key) => {
+                const keys = key.split('.');
+                return keys.reduce((acc, k) => (acc && acc[k] !== undefined) ? acc[k] : undefined, obj);
+            };
+    
+            let aValue, bValue;
+    
+            switch (sortConfig.key) {
+                case 'tenant_name':
+                    aValue = `${a.tenant?.firstname || ''} ${a.tenant?.lastname || ''}`.trim();
+                    bValue = `${b.tenant?.firstname || ''} ${b.tenant?.lastname || ''}`.trim();
+                    break;
+                case 'location':
+                    aValue = a.tenant?.rental_agreement?.[0]?.rented_unit 
+                        ? `${a.tenant.rental_agreement[0].rented_unit.building_no} ${a.tenant.rental_agreement[0].rented_unit.street}`
+                        : '';
+                    bValue = b.tenant?.rental_agreement?.[0]?.rented_unit 
+                        ? `${b.tenant.rental_agreement[0].rented_unit.building_no} ${b.tenant.rental_agreement[0].rented_unit.street}`
+                        : '';
+                    break;
+                case 'date_reported':
+                    aValue = new Date(a.date_reported || 0);
+                    bValue = new Date(b.date_reported || 0);
+                    break;
+                case 'property_type':
+                    aValue = `${a.maintenanceRequest?.unit_type || ''} ${a.maintenanceRequest?.unit_type || ''}`.trim();
+                    bValue = `${b.maintenanceRequest?.unit_type || ''} ${b.maintenanceRequest?.unit_type || ''}`.trim();
+                    break;
+                case 'reported_issue':
+                    aValue = `${a.maintenanceRequest?.item_name || ''} ${a.maintenanceRequest?.item_name || ''}`.trim();
+                    bValue = `${b.maintenanceRequest?.item_name || ''} ${b.maintenanceRequest?.item_name || ''}`.trim();
+                    break;
+                default:
+                    aValue = getNestedValue(a, sortConfig.key) || '';
+                    bValue = getNestedValue(b, sortConfig.key) || '';
+            }
+    
+            // Handle string comparisons
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return sortConfig.direction === 'asc'
+                    ? aValue.localeCompare(bValue)
+                    : bValue.localeCompare(aValue);
+            }
+    
+            // Handle numeric and date comparisons
+            if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, [maintenanceRequest, sortConfig]);
+
+    console.log('data:', maintenanceRequest);
+    const filteredRequests = sortedRequests.filter((request) => {
+        const searchStr = searchTerm.toLowerCase();
+        const tenantName = `${request.tenant?.firstname} ${request.tenant?.lastname}`.toLowerCase();
+    
+        // Get unit info from rental agreement
+        const unitInfo = request.tenant?.rental_agreement?.[0]?.rented_unit;
+        
+        const issue = request?.reported_issue?.toLowerCase();
+        const otherissue = request?.other_issue?.toLowerCase();
+        const property_Type = request?.unit_type.toLowerCase();
+        const description = request.issue_description?.toLowerCase();
+        const date = request?.date_reported;
+        const formatedDate = formatDate(date);
+    
+        return (
+            issue?.includes(searchStr) ||
+            otherissue?.includes(searchStr) ||
+            formatedDate?.toLowerCase().includes(searchStr) ||
+            property_Type?.includes(searchStr) ||
+            description.includes(searchStr) ||
+            tenantName.includes(searchStr) ||
+            request.tenant?.contact?.includes(searchStr) ||
+
+            // Rented Unit details
+            unitInfo?.boarding_house_name?.toLowerCase().includes(searchStr) ||
+            unitInfo?.apartment_name?.toLowerCase().includes(searchStr) ||
+            unitInfo?.building_no?.toLowerCase().includes(searchStr) ||
+            unitInfo?.street?.toLowerCase().includes(searchStr) ||
+            unitInfo?.barangay?.toLowerCase().includes(searchStr) ||
+            unitInfo?.municipality?.toLowerCase().includes(searchStr)
+        );
     });
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-          const newSelected = unitsData.map((n) => n.id);
-          setSelectedItem(newSelected);
-          return;
+            setSelectedItem(maintenanceRequest.map(n => n.id));
+        } else {
+            setSelectedItem([]);
         }
-        setSelectedItem([]);
     };
 
     const handleCheckBoxChange = (event, id) => {
         const selectedIndex = selectedItem.indexOf(id);
         let newSelected = [];
-    
+
         if (selectedIndex === -1) {
-          newSelected = newSelected.concat(selectedItem, id);
-        } else if (selectedIndex === 0) {
-          newSelected = newSelected.concat(selectedItem.slice(1));
-        } else if (selectedIndex === selectedItem.length - 1) {
-          newSelected = newSelected.concat(selectedItem.slice(0, -1));
-        } else if (selectedIndex > 0) {
-          newSelected = newSelected.concat(
-            selectedItem.slice(0, selectedIndex),
-            selectedItem.slice(selectedIndex + 1),
-          );
+            newSelected = [...selectedItem, id];
+        } else {
+            newSelected = selectedItem.filter(item => item !== id);
         }
         setSelectedItem(newSelected);
     };
 
     const handleExportToExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(unitsData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Units');
-        XLSX.writeFile(wb, 'units_data.xlsx');
-    };
-    
+    const exportData = maintenanceRequest.map(request => ({
+        'Item Name': request.item_name,
+        'Unit Name': request.tenant?.rental_agreement[0]?.rented_unit?.apartment_name,
+        'Issue Description': request.issue_description,
+        'Date Reported': request.date_reported,
+        'Tenant Name': `${request.tenant?.firstname} ${request.tenant?.lastname}`,
+        'Contact': request.tenant?.contact,
+        'Status': request.status
+    }));
 
-
-
-    const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-    };
-
-    const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Maintenance Requests');
+    XLSX.writeFile(wb, 'maintenance_requests.xlsx');
     };
 
-    const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-    };
-
-
-    const filteredUnits = sortedUnits.filter((unit) =>
-        (unit.name && unit.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.location && unit.location.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.propertype && unit.propertype.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.startoccupancy && unit.startoccupancy.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.tenant && unit.tenant.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.contact && unit.contact.toString().includes(searchTerm))
+    const paginatedRequests = filteredRequests.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
     );
-
-    const paginatedUnits = filteredUnits.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
+    
+    
     return (
     <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
         <Grid  container spacing={1} sx={{ mt: '-0.9rem', display:'flex', justifyContent:' center',  }}>
@@ -314,10 +535,33 @@ export default function TenantInformationTable (){
                                         />
                                     </Search>
                                     <GeneralTooltip title="Filter Table" >
-                                        <IconButton sx={{ml: '-0.5rem', mr: '0.6rem'}}>
+                                        <IconButton onClick={handleMenuOpen} sx={{ml: '-0.5rem', mr: '0.6rem'}}>
                                             <TuneIcon fontSize='medium'/>
                                         </IconButton>   
                                     </GeneralTooltip>
+                                    <Menu
+                                        anchorEl={anchorEl}
+                                        open={isMenuOpen}
+                                        onClose={handleMenuClose}
+                                        anchorOrigin={{
+                                            vertical: 'bottom',
+                                            horizontal: 'left',
+                                        }}
+                                        transformOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'left',
+                                        }}
+                                        >
+                                        {categories.map((category) => (
+                                            <MenuItem  
+                                            key={category} 
+                                            selected={category === selectedCategory}
+                                            onClick={() => handleCategoryChange(category)}
+                                            >
+                                            {category}
+                                            </MenuItem>
+                                        ))}
+                                    </Menu>
                                     <GeneralTooltip title="Download file">
                                         <IconButton sx={{ml: '-0.5rem', mr: '0.6rem'}} onClick={handleExportToExcel}>
                                             <CloudDownloadOutlinedIcon fontSize='medium'/>
@@ -348,41 +592,42 @@ export default function TenantInformationTable (){
                                         // }}
                                     />
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('name')}>
-                                    Unit Name {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                <StyledTableCell onClick={() => handleSort('tenant_name')}>
+                                    Tenant Name {sortConfig.key === 'tenant_name' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('location')}>
+                                <StyledTableCell sx={{width:'220px'}} onClick={() => handleSort('location')}>
                                     Location {sortConfig.key === 'location' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' justifyContent="center"/> : <SouthIcon fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('propertype')}>
-                                    Property Type {sortConfig.key === 'propertype' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' justifyContent="center"/> : <SouthIcon fontSize='extrasmall'/>)}
+                                <StyledTableCell onClick={() => handleSort('property_type')}>
+                                    Property Name {sortConfig.key === 'property_type' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' justifyContent="center"/> : <SouthIcon fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('datereported')}>
-                                    Date Reported  {sortConfig.key === 'datereported' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' justifyContent="center"/> : <SouthIcon fontSize='extrasmall'/>)}
+                                <StyledTableCell onClick={() => handleSort('date_reported')}>
+                                    Date Reported  {sortConfig.key === 'date_reported' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' justifyContent="center"/> : <SouthIcon fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('issuetype')}>
-                                    Issues Type  {sortConfig.key === 'issuetype' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' justifyContent="center"/> : <SouthIcon fontSize='extrasmall'/>)}
+                                <StyledTableCell onClick={() => handleSort('reported_issue')}>
+                                    Issues Type  {sortConfig.key === 'reported_issue' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' justifyContent="center"/> : <SouthIcon fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('tenant')}>
-                                    Tenant  {sortConfig.key === 'tenant' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' justifyContent="center"/> : <SouthIcon fontSize='extrasmall'/>)}
-                                </StyledTableCell>
-                                <StyledTableCell onClick={() => handleSort('contact')}>
-                                    Contact No. {sortConfig.key === 'contact' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' justifyContent="center"/> : <SouthIcon fontSize='extrasmall'/>)}
+                                <StyledTableCell sx={{width:'200px'}} onClick={() => handleSort('issue_description')}>
+                                    Description  {sortConfig.key === 'issue_description' && (sortConfig.direction === 'asc' ? <NorthIcon fontSize='extrasmall' justifyContent="center"/> : <SouthIcon fontSize='extrasmall'/>)}
                                 </StyledTableCell>
                                 <StyledTableCell align="center">Action</StyledTableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {paginatedUnits.map((unit, index) => {
-                                    const isSelected = selectedItem.includes(unit.id);
+                                {paginatedRequests.map((info, index) => {
+                                    const isSelected = selectedItem.includes(info.id);
                                     const labelId = `enhanced-table-checkbox-${index}`;
+
+                                      // Get the first rental agreement since it's an array
+                                    const rentalAgreement = info.tenant.rental_agreement[0];
+                                    const rentedUnit = rentalAgreement?.rented_unit;
                                     return (
                                     <StyledTableRow
-                                        key={unit.id}  
+                                        key={info.id}  
                                         tabIndex={-1}
                                         selected={isSelected} 
                                         aria-checked={isSelected} 
-                                        onChange={(event) => handleCheckBoxChange(event, unit.id)}
+                                        onChange={(event) => handleCheckBoxChange(event, info.id)}
                                     >
                                         <TableCell>
                                             <Checkbox
@@ -393,64 +638,86 @@ export default function TenantInformationTable (){
                                                   }}
                                             />
                                         </TableCell>
-                                        <TableCell>{unit.name}</TableCell>
-                                        <TableCell>{unit.location}</TableCell>
-                                        <TableCell>{unit.propertype}</TableCell>
-                                        <TableCell>{unit.datereported}</TableCell>
-                                        <TableCell>{unit.issuestype}</TableCell>
-                                        <TableCell>{unit.tenant || 'N/A'}</TableCell>
-                                        <TableCell>{unit.contact || 'N/A'}</TableCell>
+                                        <TableCell>
+                                            {info.tenant.firstname} {info.tenant.lastname}
+                                            <Divider  sx={{width: '98%'}}/>
+                                            <Typography sx={{fontSize: '12px', color: 'gray', fontStyle: 'italic', mt: '0.3rem'}}>
+                                            Contact no: {info.tenant.contact} 
+                                        
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                           {rentedUnit ? 
+                                            `Bldg no. ${rentedUnit.building_no}. ${rentedUnit.street}. ${rentedUnit.barangay}, ${rentedUnit.municipality}`
+                                            : ''
+                                           }
+                                        </TableCell>
+
+                                        <TableCell>{info.unit_type}</TableCell>
+                                        <TableCell>{formatDate(info.date_reported)}</TableCell>
+                                        <TableCell>{info.reported_issue || info.other_issue}</TableCell>
+                                        <TableCell
+                                        sx={{
+                                            maxWidth: '200px',  // adjust width as needed
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}
+                                        >
+                                            {info.issue_description}
+                                        </TableCell>
                                         <TableCell align="center">
-                                        <AcceptToolTip title="Accept">
-                                            <IconButton onClick={() =>  router.push('/Landlord/Apartment/[id]/RegisterTenant')}>
-                                                <CheckCircleOutlineSharpIcon color='success'/>
-                                            </IconButton>
-                                        </AcceptToolTip>
-                                        <CustomTooltip title="Delete">
-                                            <IconButton>
-                                                <DeleteForeverOutlinedIcon color='warning' />
-                                            </IconButton>
-                                        </CustomTooltip>
+                                        {info.status === 'pending' ?(
+                                         <>
+                                            <Button onClick={() => handleClickOpen(info.id)} variant="contained" size='small'>
+                                                View
+                                            </Button>
+                                            {/* <ViewToolTip title="View">
+                                                <IconButton sx={{'&:hover':{ backgroundColor:'#039be5', }, height:'35px', width:'35px'}} onClick={() => handleClickOpen(info.id)}>
+                                                    <PlagiarismOutlinedIcon color='info'  sx={{ '&:hover':{color:'#fafafa'}}}/>
+                                                </IconButton>
+                                            </ViewToolTip> */}
+                                            {/* <AcceptToolTip title="Accept">
+                                                <IconButton sx={{'&:hover':{ backgroundColor:'#66bb6a', }, height:'35px', width:'35px'}} onClick={() => handleAcceptMaitenance(info.id)}>
+                                                    <CheckCircleOutlineSharpIcon color='success'  sx={{ '&:hover':{color:'#fafafa'}}}/>
+                                                </IconButton>
+                                            </AcceptToolTip>
+                                            <CustomTooltip title="Reject">                        
+                                                <IconButton  sx={{'&:hover':{backgroundColor:'#e57373'}, height:'35px',width:'35px',}}>
+                                                    <DeleteForeverOutlinedIcon color='warning' sx={{ '&:hover':{color:'#fafafa'}}}/>
+                                                </IconButton>
+                                            </CustomTooltip> */}
+                                         </> 
+                                        ):(
+                                            <Chip
+                                            variant="contained"
+                                            label={info.status}
+                                            // color={info.status === 'Accepted' ? '#81c784' : info.status === 'Ongoing' ? 'primary' : 'secondary'}
+                                            sx={{
+                                                backgroundColor: info.status === 'Accepted' ? '#c8e6c9' : '#ffcdd2',
+                                                color: info.status === 'Accepted' ? '#43a047' : '#e53935',
+                                                '& .MuiChip-label': {
+                                                    color: info.status === 'Accepted' ? '#43a047' :  '#e53935' ,
+                                                    fontWeight: 560,
+                                                    
+                                                }
+                                            }}
+                                            />
+                                        ) 
+                                     
+                                     }
                                                                            
                                         </TableCell>
                                     </StyledTableRow>
                                     )
                                 })}
-                                {paginatedUnits.map((unit) => (
-                                <TableRow key={unit.id}>
-                                    <TableCell>
-                                        <Checkbox
-                                            color="primary"
-                                            // checked={isItemSelected}
-                                            // inputProps={{
-                                            // 'aria-labelledby': labelId,
-                                            // }}
-                                        />
-                                    </TableCell>
-                                    <TableCell>{unit.name}</TableCell>
-                                    <TableCell>{unit.location}</TableCell>
-                                    <TableCell>{unit.propertype}</TableCell>
-                                    <TableCell>{unit.datereported}</TableCell>
-                                    <TableCell>{unit.issuestype}</TableCell>
-                                    <TableCell>{unit.tenant || 'N/A'}</TableCell>
-                                    <TableCell>{unit.contact || 'N/A'}</TableCell>
-                                    <TableCell align="center">
-                                    <IconButton onClick={() =>  router.push('/Landlord/Apartment/[id]/RegisterTenant')}>
-                                        <CheckCircleOutlineSharpIcon color='success'/>
-                                    </IconButton>
-                                    <IconButton>
-                                        <DeleteForeverOutlinedIcon color='warning'/>    
-                                    </IconButton>                                     
-                                    </TableCell>
-                                </TableRow>
-                                ))}
                             </TableBody>
                             </Table>
                         </TableContainer>
                         <TablePagination
                         rowsPerPageOptions={[5, 10, 15, 25]}
                         component="div"
-                        count={filteredUnits.length}
+                        count={filteredRequests.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}
@@ -462,6 +729,15 @@ export default function TenantInformationTable (){
             </Grid>
 
         </Grid>
+        <MaintenanceRequestDialog
+            open={open}
+            handleClose={handleClose}
+            loading={loading}
+            setLoading={setLoading}
+            setSuccessful={setSuccessful}
+            setError={setError}
+            viewRequest={viewRequest}
+        />
     </Box>
 
     );

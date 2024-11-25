@@ -34,7 +34,6 @@ export default function PropertyComponent ({loading, setLoading}){
     useEffect(() => {
         const fetchedData = async () => {
             const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-            console.log(userDataString)
             const userData = JSON.parse(userDataString); // parse the datastring into json 
             const accessToken = userData.accessToken;
             if (accessToken){
@@ -74,7 +73,7 @@ export default function PropertyComponent ({loading, setLoading}){
         }
         fetchedData();
         
-    }, [])
+    }, [setLoading])
 
     const handleEdit = (id) => {
         console.log('Edit Property:', id)
@@ -110,7 +109,7 @@ export default function PropertyComponent ({loading, setLoading}){
             </SnackbarProvider>
             
              <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '5px', fontSize: '24px', fontWeight: 'bold',  mt:5}}>
-                List  of Estate Property
+                List  of Property
             </Typography>
             <Grid item xs={12} sx={{marginLeft: '5px', mt:2}}>
                 <Breadcrumbs aria-label="breadcrumb" sx={{ fontSize: { xs: '14px', sm: '15px', md: '15px' } }}>
@@ -172,7 +171,7 @@ export default function PropertyComponent ({loading, setLoading}){
                 property.map((item, index) => {
                     return (
                     <Grid key={index} item xs={12} sm={6} md={4} lg={3}>
-                        <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 820, lg: 890 }, height:434,   padding: '25px', marginTop: '15px', borderRadius: '10px'}}>  
+                        <Paper elevation={3} style={{ maxWidth: { xs: 320, sm: 520,  md: 890, lg: 890 }, height:434,   padding: '25px', marginTop: '15px', borderRadius: '10px'}}>  
                             <CardMedia
                                 sx={{ height: 150 }}
                                 image={`http://127.0.0.1:8000/ApartmentImage/${item.image}`} // Use the URL of the first image
@@ -232,7 +231,7 @@ export default function PropertyComponent ({loading, setLoading}){
                             <Box sx={{display: 'flex', justifyContent: {xs:'flex-start', lg:'space-between'}, alignItems: {xs: 'flex-start', lg: 'center'}, gap:1}}>
                                 <Box>
                                     <Button 
-                                        onClick={() => handleClick(item.id)} 
+                                        onClick={() => handleClick(item.id, item.propertyname)} 
                                         variant="contained" 
                                         sx={{     
                                             background: '#8785d0', 
@@ -253,7 +252,7 @@ export default function PropertyComponent ({loading, setLoading}){
                                         sx={{ display: { xs: 'none', lg: 'inline' },}} // Hide text on mobile
                                         >
                                             <VisibilityOutlinedIcon sx={{mr:{xs:'0', lg:'0.3rem'}, mb: '-0.4rem' }}/> 
-                                             View Property Type
+                                             View Rental Units
                                         </Box> 
                                     </Button>
                                 </Box>

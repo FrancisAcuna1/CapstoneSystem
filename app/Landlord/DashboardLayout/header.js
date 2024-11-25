@@ -1,8 +1,9 @@
 'use client'
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PropTypes from 'prop-types';
-import { AppBar, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Typography, Avatar, StyledBadge, Tooltip, Breadcrumbs } from '@mui/material';
+import { AppBar, Paper, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Typography, Avatar, StyledBadge, Tooltip, Breadcrumbs } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -19,6 +20,7 @@ import { UserButton } from '@clerk/nextjs'
 import { signOut } from "next-auth/react";
 import { fetchData } from 'next-auth/client/_utils';
 import useLogout from '@/app/Authentication/Logout/page';
+import NotificationsDialog from '../ComponentLayout/Labraries/NotificationsDialog';
 
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
@@ -84,6 +86,8 @@ const getRandomColor = () => {
 
 function Header(props) {
     const router = useRouter();
+    const [totalNotif, setTotalNotif] = useState([]);
+    const [isNotificationsOpen, setisNotificationsOpen] = useState(false)
     const { onDrawerToggle } = props;
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -108,16 +112,76 @@ function Header(props) {
         setMobileMoreAnchorEl(event.currentTarget);
     };
 
+    const handleClick = () => {
+        setisNotificationsOpen(!isNotificationsOpen);
+    }
+
    
     const handleLogout = async () => {
-        await signOut({ redirect: false });
-        localStorage.removeItem('userDetails'); // Clear user data
-        sessionStorage.clear(); // Clear token
-        // Redirect to login page
-        window.location.href = '/';
+        const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+        const userData = JSON.parse(userDataString); // parse the datastring into json 
+        const accessToken = userData.accessToken;
+        if(accessToken){
+            try{
+                const response = await fetch(`http://127.0.0.1:8000/api/logout`,{
+                    method:'POST',
+                    headers:{
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                })
+        
+                const data = await response.json();
+                if(response.ok){
+                    await signOut({ redirect: false });
+                    localStorage.removeItem('userDetails'); // Clear user data
+                    sessionStorage.clear(); // Clear token
+                    // Redirect to login page
+                    window.location.href = '/';
+                }else{
+                    console.log('error', response.status);
+                }
+            }catch(error){
+                console.error(error);
+            }
+        }else{
+            console.log('No access token found');
+        }
     };
-      
 
+    useEffect(() => {
+        const totalNotifications = async() => {
+            const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+            const userData = JSON.parse(userDataString); // parse the datastring into json 
+            const accessToken = userData.accessToken;
+            if(accessToken){
+                try{
+                    const response = await fetch(`http://127.0.0.1:8000/api/total_notifications`,{
+                        method:'GET',
+                        headers:{
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${accessToken}`
+                        }
+                    })
+            
+                    const data = await response.json();
+                    if(response.ok){
+                        setTotalNotif(data.count)
+                    }else{
+                        console.log('error', response.status);
+                    }
+                }catch(error){
+                    console.error(error);
+                }
+            }else{
+                console.log('No access token found');
+            }
+        }
+        totalNotifications();
+    }, [])
+      
+    console.log(totalNotif);
+    
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
         <Menu
@@ -170,6 +234,7 @@ function Header(props) {
             size="large"
             aria-label="show 17 new notifications"
             color="inherit"
+            onClick={() => handleClick()}
             >
             <Badge badgeContent={17} color="error">
                 <NotificationsActiveOutlinedIcon />
@@ -199,7 +264,7 @@ function Header(props) {
                 color="primary"
                 position="sticky"
                 elevation={1}
-                sx={ { zIndex: 1, py: 1.3,  backgroundColor: '#ffffff', backgroundImage: 'none',
+                sx={ { zIndex: 1000, py: 1.3,  backgroundColor: '#ffffff', backgroundImage: 'none',
                    
                 }}
                 
@@ -239,8 +304,9 @@ function Header(props) {
                     aria-label="show 17 new notifications"
                     color="inherit"
                     sx={{mr: '0.3rem', "&:hover": {backgroundColor: '#d9defa'}}}
+                    onClick={() => handleClick()}
                     >
-                        <Badge badgeContent={17} color="primary">
+                        <Badge badgeContent={totalNotif} color="primary">
                             <NotificationsActiveOutlinedIcon sx={{color: '#212121',}}/>
                         </Badge>
                     </IconButton>
@@ -259,24 +325,7 @@ function Header(props) {
                     </Avatar>
                     
                 </Box>
-                {/* <header>
-                    <UserButton>
-                      
-                        <UserButton.UserProfilePage label="Custom Page" url="custom" labelIcon={'icon'}>
-                        <CustomPage />
-                        </UserButton.UserProfilePage>
-
-                        
-                        <UserButton.UserProfilePage label="Terms" labelIcon={'DotIcon2'} url="terms">
-                        <div>
-                            <h1>Custom Terms Page</h1>
-                            <p>This is the custom terms page</p>
-                        </div>
-                        </UserButton.UserProfilePage>
-                    </UserButton>
-                </header> */}
-              
-                {/* <UserButton.UserProfilePage /> */}
+                
                 <Box sx={{ display: { xs: 'flex', md: 'flex', lg: 'none'} }}>
                     <IconButton
                     size="large"
@@ -295,6 +344,18 @@ function Header(props) {
             </AppBar>
             {renderMenu}
             {renderMobileMenu}
+            <Box
+            sx={{
+                position: 'fixed', // Changed to fixed for sticky positioning
+                top: '64px', // Adjust this value based on your navbar height
+                right: '20px',
+                zIndex: 1200,
+                width:{xs:'315px', sm:'400px', md:'auto', lg:'auto'}
+            }}
+            >
+            {isNotificationsOpen && <NotificationsDialog />}
+            </Box>
+          
         </React.Fragment>
     );
 }

@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react"
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
+import {Box, LinearProgress} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Navigator from '../DashboardLayout/navigator';
@@ -192,14 +192,13 @@ let theme = createTheme({
   };
 
   
-const drawerWidth = 265;
+const drawerWidth = 278;
 
 
 export default function HomePage (){
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
-  console.log("Session: ", session);
-  console.log("Status: ", status);
   const [mobileOpen, setMobileOpen] = React.useState(false);
  // this code 'isSmUp is Enable the Burger Icon for mobile view
   const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
@@ -250,8 +249,12 @@ export default function HomePage (){
             <Divider />
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <Header onDrawerToggle={handleDrawerToggle} />
+            {loading && <LinearProgress color='primary' sx={{ position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
             <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-                <CardContentHeader/>
+                <CardContentHeader
+                  loading={loading}
+                  setLoading={setLoading}
+                />
                 {/* <Content/> */}
                 
             </Box>

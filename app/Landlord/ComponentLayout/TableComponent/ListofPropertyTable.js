@@ -15,7 +15,9 @@ import Checkbox from '@mui/material/Checkbox';
 import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import * as XLSX from 'xlsx';
+import TenantListDialog from '../Labraries/TenantListDialog';
 
   
 
@@ -125,7 +127,9 @@ const Search = styled('div')(({ theme }) => ({
   
 export default function UnitListTable({propertyId, error, setError, loading, setLoading, setSuccessful, handleEdit}){
   const router = useRouter();
+  const [openDialog, setOpenDialog] = useState(false);
   const [open, setOpen] = useState(false);
+  const [Dialongopen, setDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const isMenuOpen = Boolean(anchorEl);
   const propsid = propertyId;
@@ -133,6 +137,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [selectedItem, setSelectedItem] = useState([]);
+  const [selectedUnit, setSelectedUnit] = useState({id: null, type: ''}) // for selected unit to view payor list
   const [selectedDeleteProperty, setSelectedDeleteProperty] = useState({ id: null, type: '' });
   const [deleting, setDeleting] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
@@ -141,6 +146,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
 
   console.log('ID:', propsid)
   console.log('Data:', propertyData);
+  console.log('data:', selectedUnit);
 
   const categories = ['All', 'Apartment', 'Boardinghouse', 'Available', 'Occupied'];
   console.log("Category:", selectedCategory);
@@ -159,7 +165,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
               ? `http://127.0.0.1:8000/api/property/${propsid}/all_boardinghouse`
               : selectedCategory === "Available" || selectedCategory === "Occupied"
               ? `http://127.0.0.1:8000/api/property/${propsid}/${selectedCategory}`
-              : `http://127.0.0.1:8000/api/property/${propsid}`;
+              : `http://127.0.0.1:8000/api/all_property/${propsid}`;
 
 
               const response = await fetch(url,{
@@ -211,7 +217,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
 
     }
     fetchedData();
-  }, [selectedCategory])
+  }, [selectedCategory, propsid, setError, setLoading])
 
   // for Dialog alert for delete 
   const handleClickOpen = (id, property_type) => {
@@ -222,6 +228,15 @@ export default function UnitListTable({propertyId, error, setError, loading, set
   const handleClose = () => {
     setOpen(false);
   };
+
+  // for dialog for tenant list
+  const handleOpenDialog = (id, property_type) => {
+    setOpenDialog(true);
+    setSelectedUnit({id, property_type})
+  }
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  }
 
 
   const handleDelete = async() => {
@@ -301,7 +316,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
     }
 
   
-  }, []);
+  }, [setSuccessful, setError]);
 
   
 
@@ -444,6 +459,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
     const endIndex = startIndex + rowsPerPage;
     return filteredAndSortedData.slice(startIndex, endIndex);
   }, [filteredAndSortedData, page, rowsPerPage]);
+  console.log(displayedData);
 
   // filter
   const handleMenuOpen = (event) => {
@@ -460,10 +476,17 @@ export default function UnitListTable({propertyId, error, setError, loading, set
     setSelectedCategory(category);
     setAnchorEl(null);
   };
-
   console.log("Category:", selectedCategory);
 
-  console.log(displayedData);
+
+  const handleClickAlertOpen = () => {
+    setDialogOpen(true);
+  }
+
+  const handleCloseAlert = () => {
+    setDialogOpen(false);
+  }
+  
   
   
   
@@ -495,7 +518,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
             component="div"
             letterSpacing={2}
           >
-            List of {selectedCategory} Properties
+            List of {selectedCategory} Rental Units
           </Typography>
 
           {/* Search and Download Options */}
@@ -571,7 +594,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                 <StyledTableCell onClick={() => handleSort('apartment_name')}  >
                   Property Name {sortConfig.key === 'apartment_name' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                 </StyledTableCell>
-                <StyledTableCell onClick={() => handleSort('barangay')} >
+                <StyledTableCell >
                   Location {sortConfig.key === 'barangay' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                 </StyledTableCell>
                 <StyledTableCell onClick={() => handleSort('property_type')} sx={{width: '12%'}}>
@@ -580,7 +603,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                 <StyledTableCell onClick={() => handleSort('number_of_rooms')} sx={{width: '8%'}}>
                   # of Rooms {sortConfig.key === 'number_of_rooms' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                 </StyledTableCell>
-                <StyledTableCell onClick={() => handleSort('number_of_beds')} sx={{width: '8%'}}>
+                <StyledTableCell  sx={{width: '8%'}}>
                   Max # of Occupants per room{sortConfig.key === 'number_of_beds' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                 </StyledTableCell>
                 <StyledTableCell onClick={() => handleSort('capacity')} sx={{width: '8%'}}>
@@ -589,6 +612,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                 <StyledTableCell onClick={() => handleSort('status')} sx={{width: '5%'}}>
                   Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                 </StyledTableCell>
+                
                 <StyledTableCell align="center">Action</StyledTableCell>
                 </TableRow>
             </TableHead>
@@ -616,13 +640,12 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                     <TableCell>
                     {property.apartment_name || property.boarding_house_name}
                       <Divider  sx={{width: '98%'}}/>
-                        <Typography sx={{fontSize: '12px', color: 'gray', fontStyle: 'italic', mt: '0.3rem'}}>
-                        Payor Name: {property.payor_name} 
-                    
+                        <Typography onClick={() => {handleOpenDialog(property.id, property.property_type)}} sx={{cursor:'pointer', fontSize: '14px', color: '#2196f3', fontStyle: 'italic', mt: '0.3rem'}}>
+                          View Payor
                         </Typography>
                     </TableCell>
                     {/* <TableCell>{property.inclusion}</TableCell> */}
-                    <TableCell> {`${property.street}st. ${property.barangay}, ${property.municipality}`}</TableCell>
+                    <TableCell> {`${property.street} st. ${property.barangay}, ${property.municipality}`}</TableCell>
                     <TableCell>{property.property_type}</TableCell>
                     <TableCell>{property.number_of_rooms}</TableCell>
                     <TableCell>
@@ -630,13 +653,25 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                       ? 'N/A'
                       
                       : (() => {
-                        const rooms = property.rooms; //get the id of baording house
+                        const rooms = property.rooms;
                         return rooms.length > 0 
-                          ? rooms.map((room) => (
-                              <Typography key={room.id} sx={{ fontSize: '12px' }}>
-                                Room: {room.room_number}({room.number_of_beds})
-                              </Typography>
-                            ))
+                          ? rooms.map((room) => {
+                            const occupiedBeds = room.beds.filter(bed => bed.status.toLowerCase() === 'occupied');
+                            const availableBeds = room.beds.filter(bed => bed.status.toLowerCase() === 'available');
+                            const availableBedsInfo = availableBeds.map(bed => `Bed ${bed.bed_number}`).join(', ');
+                            const occupiedBedsInfo = occupiedBeds.map(bed => `Bed ${bed.bed_number}`).join(', ');
+                            const tooltipTitle = availableBeds.length > 0 
+                              ? `Available: ${availableBedsInfo}`
+                              : `Occupied Beds: ${occupiedBedsInfo}`;
+                    
+                            return (
+                              <GeneralTooltip key={room.id} title={tooltipTitle} >
+                                <Typography sx={{ fontSize: '12px', cursor: 'pointer'}}>
+                                  Room: {room.room_number} ({occupiedBeds.length}/{room.number_of_beds})
+                                </Typography>
+                              </GeneralTooltip>
+                            );
+                          })
                           : 'No rooms available';
                       })()
                     }
@@ -668,8 +703,8 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                       {/* <IconButton onClick={() =>  router.push('/Landlord/property/[id]/Occupiedpropertys')}>
                           <VisibilityOutlinedIcon color='info'/>
                       </IconButton> */}
-                      <IconButton onClick={() =>  handleClick(property.status, property.id, property.id, property.id, property.id, property.property_type)}>
-                          <VisibilityOutlinedIcon fontSize='medium' color='info'/>
+                      <IconButton sx={{'&:hover':{ backgroundColor:'#039be5', }, height:'35px', width:'35px'}} onClick={() =>  handleClick(property.status, property.id, property.id, property.id, property.id, property.property_type)}>
+                          <VisibilityOutlinedIcon fontSize='medium' color='info' sx={{ '&:hover':{color:'#fafafa'}}}/>
                       </IconButton>
                     
                     </ViewToolTip>
@@ -678,15 +713,38 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                       {/* <IconButton onClick={() =>  router.push('/Landlord/Property/[propsid]/details/[id]')}>
                           <DriveFileRenameOutlineOutlinedIcon color='success'/>
                       </IconButton> */}
-                      <IconButton onClick={() => handleEdit(property.id, property.property_type)}>
-                          <DriveFileRenameOutlineOutlinedIcon color='success'/>
+                      <IconButton sx={{'&:hover':{ backgroundColor:'#66bb6a', }, height:'35px', width:'35px'}} onClick={() => handleEdit(property.id, property.property_type)}>
+                          <DriveFileRenameOutlineOutlinedIcon color='success'  fontSize='medium' sx={{ '&:hover':{color:'#fafafa'}}}/>
                       </IconButton>
                     </AcceptToolTip>
   
                     <DeleteTooltip title="Delete">
-                      <IconButton onClick={() => handleClickOpen(property.id, property.property_type)}>
-                          <DeleteForeverOutlinedIcon color='warning'/>    
+                      {property.status === 'Occupied' ? 
+                      <>
+                      <IconButton 
+                      sx={{'&:hover':{backgroundColor:'#e57373'}, 
+                        height:'35px',
+                        width:'35px',
+                      }} 
+                      onClick={() => handleClickAlertOpen()}
+                      >
+                          <DeleteForeverOutlinedIcon color='warning' fontSize='medium' sx={{ '&:hover':{color:'#fafafa'}}}/>    
                       </IconButton> 
+                      </>
+                      :
+                      <>
+                      <IconButton 
+                      sx={{'&:hover':{backgroundColor:'#e57373'}, 
+                        height:'35px',
+                        width:'35px',
+                      }} 
+                      onClick={() => handleClickOpen(property.id, property.property_type)}
+                      >
+                          <DeleteForeverOutlinedIcon color='warning' fontSize='medium' sx={{ '&:hover':{color:'#fafafa'}}}/>    
+                      </IconButton> 
+                      </>
+                      }
+                     
                     </DeleteTooltip>
                               
                     </TableCell>
@@ -734,14 +792,66 @@ export default function UnitListTable({propertyId, error, setError, loading, set
             </Button>
           </DialogActions>
         </Dialog>
-
-        <Backdrop
-          sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
-          open={deleting}
+        
+        <Dialog
+          open={Dialongopen}
+          onClose={handleCloseAlert}
+          aria-labelledby="delete-dialog-title"
+          aria-describedby="delete-dialog-description"
+          sx={{
+            '& .MuiPaper-root': {
+              borderRadius: 2,
+              padding: 0.9,
+              boxShadow: 3,
+              maxWidth: '400px',
+              margin: 'auto',
+            }
+          }}
         >
-          <CircularProgress color="inherit" />
-        </Backdrop>
+        <DialogTitle
+          id="delete-dialog-title"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent:'start',
+            gap: 1,
+            color: 'error.main',
+            pb: 1.5,
+          }}
+        >
+          <WarningAmberIcon color="error" fontSize="large" />
+          Alert Message
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2}}>
+          <DialogContentText id="delete-dialog-description" sx={{ fontSize: '1rem', mt:2 }}>
+            This property cannot be deleted!
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', mt: 1 }}>
+          <Button 
+            onClick={handleCloseAlert} 
+            color="primary" 
+            variant="contained"
+            sx={{ px: 3, py: 1, borderRadius: 1 }}
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
       </React.Fragment>
+
+      <TenantListDialog
+        handleCloseDialog={handleCloseDialog}
+        handleOpenDialog={handleOpenDialog}
+        setOpenDialog={setOpenDialog}
+        openDialog={openDialog}
+        setSelectedUnit={setSelectedUnit}
+        selectedUnit={selectedUnit}
+        setLoading={setLoading}
+        loading={loading}
+        setError={setError}
+        setSuccessful={setSuccessful}
+      />
     </Box>
     
   );

@@ -1,20 +1,27 @@
 "use client"
 import * as React from 'react';
-import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from "next-auth/react"
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
 import {Box, LinearProgress} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Navigator from '../../DashboardLayout/navigator';
-import Header from '../../DashboardLayout/header';
+import Navigator from '../DashboardLayout/navigator';
+import Header from '../DashboardLayout/header';
 import { Divider } from '@mui/material';
+import PaymentTransactionComponent from '../ComponentLayout/HeroContent/PaymentTransactionComponent';
 import dynamic from 'next/dynamic';
-import EditTenantComponent from '../../ComponentLayout/HeroContent/EditTenantComponent';
-// import MaintenaceRequestComponent from '../ComponentLayout/MaintenanceRequestComponent/page'
+import { UserButton } from '@clerk/nextjs'
+// const PaymentTransactionComponent = dynamic(() => import('../../ComponentLayout/HeroContent/PaymentTransactionComponent'), {
+//   ssr: false
+//   }) 
 
+const LoadingState = dynamic(() => import('../ComponentLayout/Labraries/LoadingState'), {
+  ssr: false
+}) 
 
 
 // function Copyright() {
@@ -47,10 +54,36 @@ let theme = createTheme({
       },
     },
     typography: {
+      fontFamily: [
+        'Montserrat',
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+        'Roboto',
+        'Arial',
+        'sans-serif',
+      ].join(','),
       h5: {
         fontWeight: 500,
         fontSize: 26,
         letterSpacing: 0.5,
+        color:'#212121',
+      },
+      h4: {
+        fontWeight: 550,
+        fontSize: 26,
+        letterSpacing: 0.5,
+        color:'#212121'
+       
+      },
+      body1: {
+        fontFamily: 'Montserrat, sans-serif',
+        fontWeight: 500,
+        color:'#263238'
+      },
+      body2: {
+        fontFamily: 'Montserrat, sans-serif',
+        fontWeight: 400,
       },
     },
     shape: {
@@ -183,26 +216,42 @@ let theme = createTheme({
       },
     },
   };
+
   
-const drawerWidth = 256;
-
-export default function TenantInformationPage (){
-    const [loading, setLoading]= useState(false)
-    const params = useParams();
-    const tenantId = params.id;
-    console.log(tenantId)
+const drawerWidth = 278;
 
 
-    const [mobileOpen, setMobileOpen] = React.useState(false);
-    // this code 'isSmUp is Enable the Burger Icon for mobile view
-    const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
+export default function PaymentTransactionPage (){
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const { data: session, status } = useSession();
+  // console.log("Session: ", session);
+  // console.log("Status: ", status);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+ // this code 'isSmUp is Enable the Burger Icon for mobile view
+  const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
 
-    const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-    };
+  const handleDrawerToggle = () => {
+  setMobileOpen(!mobileOpen);
+  };
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.replace('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    // return <>
+    //   {/* <LoadingState/> */}
+    // </>
+    return <p>Loading...</p>; // You can add a loading spinner here if needed
+  }
+
+  if (status === "authenticated"){
     return (
-        <>
+      <>
         <ThemeProvider theme={theme}>
         <Box sx={{ display: 'flex', minHeight: '100vh' }}>
             <CssBaseline />
@@ -220,22 +269,22 @@ export default function TenantInformationPage (){
                 />
             )}
                 <Navigator
-                    PaperProps={{ style: { width: drawerWidth } }}
-                    sx={{ display: { sm: 'none', xs: 'none', lg: 'block' } }}
-                    
+                  PaperProps={{ style: { width: drawerWidth } }}
+                  sx={{ display: { sm: 'none', xs: 'none', lg:'block' } }}
+                  
                 />
             </Box>
             <Divider />
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <Header onDrawerToggle={handleDrawerToggle} />
-            {loading && <LinearProgress sx={{ color:"#673ab7", position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
+            {loading && <LinearProgress color='primary' sx={{ position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
             <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-                <EditTenantComponent
-                    loading={loading}
-                    setLoading={setLoading}
-                    tenantId={tenantId}
-                />
+              <PaymentTransactionComponent
+                setLoading={setLoading}
+                loading={loading}
+              />
                 {/* <Content/> */}
+                
             </Box>
             <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
                 {/* <Copyright/> */}
@@ -243,7 +292,15 @@ export default function TenantInformationPage (){
             </Box>
         </Box>
         </ThemeProvider>
-        
-        </>
+      
+      </>
     )
+
+  }
+
+  return null;
+
+  
+
+  
 }

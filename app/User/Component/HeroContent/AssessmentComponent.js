@@ -1,15 +1,19 @@
 "use client"
 import * as React from 'react';
-import { useEffect, useState} from 'react';
+import { useEffect, useState, useCallback} from 'react';
 import { Container, Paper, Typography,Box, Grid, Button, Link, Breadcrumbs, Divider, Skeleton, Avatar} from '@mui/material';
 import AssesmentFeeTable from '../TableComponent/AssessmentTable';
 import '/app/style.css';
-
+import { format, parseISO } from 'date-fns';
 
 
 export default function AssessmentFeeComponent({setLoading, loading}){
     const [tenantInformation, setTenantInformation] = useState([]);
+    const [paymentInfo, setPaymentInfo] = useState([]);
+    const [lastPayment, setLastPayment] = useState(null);
 
+    console.log(paymentInfo);
+    
 
     useEffect(() => {
         const fetchedData = async () => {
@@ -55,17 +59,114 @@ export default function AssessmentFeeComponent({setLoading, loading}){
         };
         
         fetchedData();
-      }, []);
+      }, [setLoading]);
 
       console.log(tenantInformation)
 
-      const totalBalanced = tenantInformation.reduce((acc, item) => {
-        return acc + (item.rental_fee - item.deposit);
-      }, 0).toFixed(2) || '0.00';
+    useEffect(() => {
+        const fethcedPaymentData = async() => {
+            setLoading(true);
+            const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+            const userData = JSON.parse(userDataString); // parse the datastring into json 
+            const accessToken = userData.accessToken;
+            const userId = userData.user.id; 
+            if(accessToken){
+                try{
+                    const response = await fetch(`http://127.0.0.1:8000/api/tenant_payment/${userId}`,{
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${accessToken}`
+                        }
+                    })
+                    const data = await response.json();
+                    if(response.ok){
+                        console.log('Data:', data.data);
+                        setPaymentInfo(data.data)
+                    }else{
+                        console.log('Error:', response.status)
+                    }
+                }catch(error){
+                    console.log('Error:', error)
+                }
+            }else{
+                console.log('Error: Access token is not available')
+            }
+        }
 
-    //   (tenantInformation && tenantInformation?.rental_fee - tenantInformation?.deposit || '')
-      console.log(totalBalanced);
-      
+        fethcedPaymentData();
+    }, [setLoading])
+
+    const formatDate = (dateString) => {
+        if(!dateString){
+            return null;
+        }
+    
+        try{
+            const parseDate = parseISO(dateString);
+            return format(parseDate, 'MMM d, yyyy');
+        }catch(error){
+            console.log('Error formating Date:', error);
+            return dateString;
+        }
+    }
+    
+    const calculateBalance = () => {
+        if (!tenantInformation || !tenantInformation[0] || !paymentInfo) {
+            return '0.00';
+        }
+    
+        const info = tenantInformation[0]; // Assuming there's only one tenant information object
+    
+        const totalPayment = paymentInfo.reduce((total, payment) => {
+            return total + Number(payment.amount);
+        }, 0);
+        
+        console.log('total:', totalPayment)
+    
+        // const leaseStartDate = new Date(info.lease_start_date);
+        // const currentDate = new Date();
+        
+        // Calculate the number of months from lease start to current date
+        const currentDate = new Date('2025-01-20'); 
+        const leaseStartDate = new Date('2024-11-11');
+        const monthsRented = (currentDate.getFullYear() - leaseStartDate.getFullYear()) * 12 + (currentDate.getMonth() - leaseStartDate.getMonth());
+        console.log('months:',monthsRented);
+        
+        
+    
+        // Calculate the total rental fee due
+        const totalRentalFee = monthsRented  * Number(info.rental_fee);
+    
+        const balance = totalRentalFee - totalPayment;
+        return balance.toFixed(2);
+    };
+    const totalBalanced = tenantInformation ? calculateBalance() : '0.00';
+    console.log(totalBalanced);
+
+    const getLastPayment = (payments) => {
+        if (!payments || payments.length === 0) return null;
+        
+        const sortedPayments = [...payments].sort((a, b) => 
+            new Date(b.date) - new Date(a.date)
+        );
+        
+        return sortedPayments[0];
+    }; // Empty dependency array since this function doesn't depend on any external values
+
+    useEffect(() => {
+     
+        if (paymentInfo) {
+            const lastPayment = getLastPayment(paymentInfo);
+            setLastPayment(lastPayment);
+        }
+   
+    }, [paymentInfo]);
+    
+   console.log(lastPayment);
+   
+    
+    
 
     return (
         <>
@@ -120,7 +221,7 @@ export default function AssessmentFeeComponent({setLoading, loading}){
                                         {info.rented_unit.apartment_name} {info.rented_unit.boarding_house_name}
                                         </Typography>
                                         <Typography variant='body1' sx={{}}>
-                                        Lease start date: {info.lease_start_date}
+                                        Lease start date: {formatDate(info.lease_start_date)}
                                         </Typography>
                                         <Typography variant='body1' sx={{}}>
                                         {info.tenant.street} st. {info.tenant.barangay}, {info.tenant.municipality}, Sorsogon
@@ -183,12 +284,12 @@ export default function AssessmentFeeComponent({setLoading, loading}){
                                                 <Box  bgcolor={'#eeeeee'} display='flex' alignItems='center'> 
                                                     <Grid container justifyContent='space-between'>
                                                         <Grid item>
-                                                            <Typography variant="body1" color={'black'} sx={{ fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'},  ml: '1.2rem', mt: 1,  }} letterSpacing={2} gutterBottom>
+                                                            <Typography variant="body1" color={'black'} sx={{color:'#3e3e3e', fontWeight:'550', fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'},  ml: '1.2rem', mt: 1,  }} letterSpacing={2} gutterBottom>
                                                             Total Amount:
                                                             </Typography>
                                                         </Grid>
                                                         <Grid item>
-                                                            <Typography variant="body1" color={'black'} sx={{ fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'}, mr: 1,  mt: 1,  }} letterSpacing={2} gutterBottom>
+                                                            <Typography variant="body1" sx={{fontWeight:'550', color:'#3e3e3e', fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'}, mr: 1,  mt: 1,  }} letterSpacing={2} gutterBottom>
                                                             {item.rental_fee}
                                                             </Typography>
                                                         </Grid>
@@ -210,16 +311,22 @@ export default function AssessmentFeeComponent({setLoading, loading}){
                                                     <Box  bgcolor={'#eeeeee'} display='flex' alignItems='center' mt={'-0.9rem'}> 
                                                         <Grid container justifyContent='space-between'>
                                                             <Grid item>
-                                                                <Typography variant="body1" color={'black'} sx={{ fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'},  ml: '1.2rem', mt: 1,  }} letterSpacing={2} gutterBottom>
+                                                                <Typography variant="body1" sx={{color:'#3e3e3e', fontWeight:'550', fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'},  ml: '1.2rem', mt: 1,  }} letterSpacing={2} gutterBottom>
                                                                 Total Amount:
                                                                 </Typography>
                                                             </Grid>
                                                             <Grid item>
-                                                                <Typography variant="body1" color={'#2e7d32'} sx={{ fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'}, mr: 1,  mt: 1,  }} letterSpacing={2} gutterBottom>
-                                                                {item.deposit}
+                                                                <Typography variant="body1" color={'#2e7d32'} sx={{fontWeight:'550', fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'}, mr: 1,  mt: 1,  }} letterSpacing={2} gutterBottom>
+                                                                {lastPayment?.amount}
                                                                 </Typography>
                                                             </Grid>
                                                         </Grid>
+                                                    </Box>
+                                                    <Box sx={{display:'flex', justifyContent:'space-between'}}>
+                                                        <Box></Box>
+                                                        <Typography variant='body1' sx={{mr:'0.5rem', mt:'0.1rem', fontWeight:'550', fontSize:'0.8rem', color:'#757575'}}>
+                                                        {formatDate(lastPayment?.date)}
+                                                        </Typography>
                                                     </Box>
                                                     {/* <Typography variant="body1" color={'gray'} sx={{display:'flex', justifyContent:'start', fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '14px'},  ml: '1.2rem', mt: 1,  }} letterSpacing={2} gutterBottom>
                                                     Payment Summary: 1000
@@ -240,12 +347,12 @@ export default function AssessmentFeeComponent({setLoading, loading}){
                                                     <Box  bgcolor={'#eeeeee'} display='flex' alignItems='center' mt={'-0.9rem'}> 
                                                         <Grid container justifyContent='space-between'>
                                                             <Grid item>
-                                                                <Typography variant="body1" color={'black'} sx={{fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'},  ml: '1.2rem', mt: 1,  }} letterSpacing={2} gutterBottom>
+                                                                <Typography variant="body1" sx={{color:'#3e3e3e', fontWeight:'550', fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'},  ml: '1.2rem', mt: 1,  }} letterSpacing={2} gutterBottom>
                                                                 Total Amount:
                                                                 </Typography>
                                                             </Grid>
                                                             <Grid item>
-                                                                <Typography variant="body1" color={'#c62828'} sx={{fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'}, mr: 1,  mt: 1,  }} letterSpacing={2} gutterBottom>
+                                                                <Typography variant="body1" color={'#c62828'} sx={{fontWeight:'550', fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'}, mr: 1,  mt: 1,  }} letterSpacing={2} gutterBottom>
                                                                 {/* {totalBalanced} */}
                                                                 {totalBalanced}
                                                                 </Typography>

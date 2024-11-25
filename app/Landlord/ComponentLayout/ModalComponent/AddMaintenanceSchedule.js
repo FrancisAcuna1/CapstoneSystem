@@ -1,8 +1,6 @@
 'use client'
-
-import React from "react"
-import { useState } from "react"
-import { Grid, Box, Paper, Typography, Button, Divider, Link, Fade, Breadcrumbs, TextField, FormControl, InputLabel, Select, MenuItem} from '@mui/material';
+import React, { useEffect, useState} from "react";
+import { Grid, Box, Paper, Typography, Button, Divider, Link, Fade, Breadcrumbs, TextField, Autocomplete, FormControl, FormHelperText, FormControlLabel, Switch, InputLabel, Select, MenuItem} from '@mui/material';
 import { Modal as BaseModal } from '@mui/base/Modal';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import PropTypes from 'prop-types';
@@ -139,95 +137,589 @@ const Backdrop = React.forwardRef((props, ref) => {
     `,
   );
 
+  const ColorButton = ({ selected, color, onClick }) => (
+    <Button
+      onClick={onClick}
+      sx={{
+        minWidth: 'unset',
+        width: 24,
+        height: 24,
+        borderRadius: '50%',
+        padding: 0,
+        backgroundColor: color,
+        border: `2px solid ${selected ? '#1976d2' : '#e0e0e0'}`,
+        marginRight: 1,
+        marginBottom: 1,
+        '&:hover': {
+          backgroundColor: color,
+        }
+      }}
+    />
+  );
 
-export default function ModalComponent({open, handleOpen, handleClose}){
+  const colors = [
+    { id: 'default', value: '#2196f3' },
+    { id: 'red', value: '#f44336' },
+    { id: 'purple', value: '#9c27b0' },
+    { id: 'indigo', value: '#c7d2fe' },
+    { id: 'yellow', value: '#fef08a' },
+    { id: 'orange', value: '#fed7aa' },
+    { id: 'gray', value: '#e5e7eb' },
+    { id: 'white', value: '#ffffff' },
+    { id: 'pink', value: '#e91e63' },
+    { id: 'green', value: '#bbf7d0' },
+    { id: 'blue', value: '#bfdbfe' },
+    { id: 'lavender', value: '#7e57c2' }
+  ];
+
+  const textColors = [
+    { id: 'default', value: '#ffffff' },
+    { id: 'black', value: '#000000' },
+    { id: 'gray', value: '#6b7280' },
+    { id: 'silver', value: '#cbd5e1' },
+    { id: 'red', value: '#ef4444' },
+    { id: 'yellow', value: '#eab308' },
+    { id: 'green', value: '#22c55e' },
+    { id: 'blue', value: '#3b82f6' },
+    { id: 'indigo', value: '#6366f1' },
+    { id: 'purple', value: '#a855f7' },
+    { id: 'pink', value: '#ec4899' },
+    { id: 'orange', value: '#f97316' }
+  ];
+
+export default function AddMaintenanceSchedule({open, handleOpen, handleClose, setSuccessful, setError, setLoading, loading, selectedScheduleId, isEditMode, initialDateSelection}){
+  const [selectedBgColor, setSelectedBgColor] = useState('default');
+  const [selectedTextColor, setSelectedTextColor] = useState('default');
+  const [formError, setFormError] = useState({})
+  const [acceptedRequest, setAcceptedRequest] = useState([]);
+  const [edit, setEdit] = useState({
+    id: '',
+    title: ''
+  })
+  const [scheduleData, setScheduleData] = useState({
+    maintenance_id: '',
+    title: '',
+    status: '',
+    start_date: null,
+    end_date: null,
+  })
+  // const [isAllDay, setIsAllDay] = useState(false);
+  // const [startDate, setStartDate] = useState(dayjs());
+  // const [endDate, setEndDate] = useState(dayjs().add(1, 'hour'));
+  console.log(acceptedRequest);
+  console.log(scheduleData);
+  console.log(selectedTextColor);
+  console.log(selectedBgColor);
+  console.log(selectedScheduleId);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setScheduleData({
+        ...scheduleData,
+        [name]: value
+    });
+
+    setFormError(prev => ({
+        ...prev,
+        [name]: ''
+    }));
+  }
 
 
-    return (
-        <Box sx={{ display: 'flex', justifySelf: 'end', mt:1.5, }}>
-            <Button variant="contained"  onClick={handleOpen} sx={{background: '#f78028','&:hover': {backgroundColor: '#ffab40',}, borderRadius: '15px', p:1.1, mb: 2 }}>
-                <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
-                Add New Schedule
-            </Button>
-            <Modal
-                aria-labelledby="transition-modal-title"
-                aria-describedby="transition-modal-description"
-                open={open}
-                onClose={handleClose}
-                closeAfterTransition
-                slots={{ backdrop: StyledBackdrop }}
+  const validateForm = () => {
+    let tempErrors = {};
+    let isValid = true;
+
+    if (!scheduleData.maintenance_id) {
+        tempErrors.maintenance_id = 'Reported Issue is required';
+        isValid = false;
+    }
+    if (!scheduleData.title) {
+        tempErrors.title = 'Title of Schedule is required';
+        isValid = false;
+    }
+    if (!scheduleData.status) {
+        tempErrors.status = 'Status type is required';
+        isValid = false;
+    }
+    if (!scheduleData.start_date) {
+        tempErrors.start_date = 'Start date type is required';
+        isValid = false;
+    }
+    if (!scheduleData.end_date) {
+      tempErrors.end_date = 'End date type is required';
+      isValid = false;
+    }
+
+    setFormError(tempErrors);
+    return isValid;
+  }
+
+  useEffect(() => {
+    const fethcedAccepted = async() => {
+      const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+      const userData = JSON.parse(userDataString); // parse the datastring into json 
+      const accessToken = userData.accessToken;
+      if(accessToken){
+        const response = await fetch(`http://127.0.0.1:8000/api/get_accepted`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          }
+        })
+        const data = await response.json()
+        if(response.ok){
+          console.log(data.data);
+          setAcceptedRequest(data.data);
+        }else{
+          console.log('error', error.message);
+        }
+      }else{
+        console.log('No access token found!');
+        
+      }
+    }
+    fethcedAccepted()
+  }, [])
+
+   // Fetch schedule data for editing
+  // In your useEffect for editing
+  useEffect(() => {
+    const fetchEditSchedule = async () => {
+      try {
+        // Extensive logging
+        console.log('Edit Mode Triggered');
+        console.log('Selected Schedule ID:', selectedScheduleId);
+        console.log('Is Edit Mode:', isEditMode);
+
+        if (!selectedScheduleId || !isEditMode) {
+          console.log('No schedule ID or not in edit mode');
+          return;
+        }
+
+        const userDataString = localStorage.getItem('userDetails');
+        if (!userDataString) {
+          console.error('No user data found');
+          return;
+        }
+
+        const userData = JSON.parse(userDataString);
+        const accessToken = userData?.accessToken;
+
+        if (!accessToken) {
+          console.error('No access token found');
+          return;
+        }
+
+        const response = await fetch(`http://127.0.0.1:8000/api/edit_schedule/${selectedScheduleId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          }
+        });
+
+        const responseData = await response.json();
+        console.log('Full Response Data:', responseData);
+
+        if (response.ok && responseData.data) {
+          const scheduleDetails = responseData.data;
+          const startDate = scheduleDetails.start_date ? dayjs(scheduleDetails.start_date) : null;
+          const endDate = scheduleDetails.end_date ? dayjs(scheduleDetails.end_date) : null;
+
+          console.log('Schedule Details Received:', scheduleDetails);
+
+          // Set schedule data
+          setScheduleData({
+            maintenance_id: scheduleDetails.maintenance_request_id || '',
+            title: scheduleDetails.schedule_title || '',
+            status: scheduleDetails.status || '',
+            start_date: startDate || '',
+            end_date: endDate || '',
+          });
+
+          const bgColorId = colors.find(c => c.value === scheduleDetails.bg_color)?.id || 'default';
+          const textColorId = textColors.find(c => c.value === scheduleDetails.text_color)?.id || 'default';
+          
+          console.log('Background Color ID:', bgColorId);
+          console.log('Text Color ID:', textColorId);
+
+          setSelectedTextColor(textColorId);
+          setSelectedBgColor(bgColorId);
+
+          // Set edit state if needed
+          // setEdit({
+          //   id: scheduleDetails.maintenance_request_id || '',
+          //   title: scheduleDetails.schedule_title || '',
+          // });
+        } else {
+          console.error('Failed to fetch schedule details', responseData);
+        }
+      } catch (error) {
+        console.error('Error in fetchEditSchedule:', error);
+      }
+    };
+    fetchEditSchedule();
+  }, [selectedScheduleId, isEditMode]);
+
+  const handleSubmit = async(e) => {
+    e.preventDefault()
+
+    if (!validateForm()) {
+        return; // Stop submission if validation fails
+    }
+
+    const userDataString = localStorage.getItem('userDetails');
+    const userData = JSON.parse(userDataString);
+    const accessToken = userData?.accessToken;
+    setLoading(true);
+
+    const formattedFormData = {
+      ...scheduleData,
+      start_date: scheduleData.start_date ? scheduleData.start_date.format('MM/DD/YYYY') : null,
+      end_date: scheduleData.end_date ? scheduleData.end_date.format('MM/DD/YYYY') : null,
+      text_color: textColors.find(color => color.id === selectedTextColor)?.value || textColors[0].value,
+      bg_color: colors.find(color => color.id === selectedBgColor)?.value || colors[0].value,
+    };
+    console.log(formattedFormData);
+
+      
+
+    if (accessToken) {
+      try{
+        const url = selectedScheduleId 
+        ? `http://127.0.0.1:8000/api/update_schedule/${selectedScheduleId}`
+        : 'http://127.0.0.1:8000/api/add_schedule'
+      
+        const method = selectedScheduleId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formattedFormData),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          setScheduleData({
+            maintenance_id: '',
+            title: '',
+            status: '',
+            start_date: '',
+            end_date: '',
+            textColor: '',
+            bg_color: '',
+          });
+          localStorage.setItem('successMessage', data.message || 'Operation Success!');
+          window.location.reload();
+          setLoading(false)
+        } else {
+          localStorage.setItem('errorMessage', data.error || 'Operation Error!');
+          window.location.reload();
+          setLoading(false)
+          console.log(data.error)
+        }
+      }catch(error){
+        console.log(error)
+        console.log('Error to submit')
+      }
+    }
+  };
+
+  useEffect(() => {
+    const successMessage = localStorage.getItem('successMessage');
+    const errorMessage = localStorage.getItem('errorMessage')
+    if (successMessage) {
+      setSuccessful(successMessage);
+      setTimeout(() => {
+        localStorage.removeItem('successMessage');
+      }, 3000);
+    }
+
+    if(errorMessage){
+      setError(errorMessage);
+      setTimeout(() => {
+        localStorage.removeItem('errorMessage');
+      }, 3000);
+    }
+
+  
+  }, [setSuccessful, setError]);
+
+
+  
+  const handleReportedIssue = (selectedIssue) => {
+    if (selectedIssue) {
+      setScheduleData(prev => ({
+        ...prev,
+        maintenance_id: selectedIssue.id, // Set tenant_id
+      }));
+        
+    }else{
+      setScheduleData(prev => ({
+        ...prev,
+        maintenance_id: '', 
+      }))
+    }
+    setFormError(prev => ({
+      ...prev,
+      maintenance_id: ''
+    }));
+  };
+
+  const handleDateChange = (name, value) => {
+    setScheduleData({
+      ...scheduleData,
+      [name]: value,
+    });
+    if (value) {
+        setFormError(prev => ({ ...prev, [name]: '' })); // Clear error if valid
+    }
+  };
+
+  console.log(scheduleData.title)
+  console.log(scheduleData.maintenance_id)
+  console.log(scheduleData.status)
+
+  return (
+    <Box sx={{ display: 'flex', justifySelf: 'end', mt:1.5, }}>
+      <Button variant="contained"  onClick={handleOpen} sx={{background: 'primary','&:hover': {backgroundColor: '#b6bdf1',}, borderRadius: '15px', p:1.1, mb: 2 }}>
+        <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
+          {isEditMode ? 'Edit Schedule' : 'Add New Schedule'}
+      </Button>
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={open}
+        onClose={() => {
+          handleClose()
+          setScheduleData({
+            maintenance_id: '',
+            title: '',
+            status: '',
+            start_date: null,
+            end_date: null,
+          })
+          setFormError({})
+        }}
+        closeAfterTransition
+        slots={{ backdrop: StyledBackdrop }}
+      >
+        <Fade in={open}>
+          <ModalContent style={{ width: '90%', maxWidth: '600px' }}>
+          <Box onSubmit={handleSubmit} component="form"  noValidate>
+            <Typography variant='h1' letterSpacing={3} sx={{ fontSize: '20px' }}>
+              {selectedScheduleId && selectedScheduleId ? 'Edit Schedule' : 'Add New Schedule'}
+            </Typography>
+
+            <TextField
+              fullWidth
+              label="Title"
+              variant="outlined"
+              margin="normal"
+              name="title"
+              value={scheduleData.title || ''}  // Remove 'habo kona'
+              onChange={handleChange}
+              error={Boolean(formError.title)}
+              helperText={formError.title}
+            />
+           
+            <FormControl fullWidth required  error={Boolean(formError.maintenance_id)} sx={{mt:1}}> 
+              <Autocomplete 
+                  id="tenant-autocomplete"
+                  options={acceptedRequest}
+                  getOptionLabel={(option) => `${option.reported_issue}` || ''}
+                  value={acceptedRequest.find(issue => issue.id === scheduleData.maintenance_id) || null}
+                  onChange={(event, newValue) => {
+                  
+                    handleReportedIssue(newValue); // Pass the entire newValue
+                  }}
+                  renderInput={(params) => (
+                      <TextField
+                          {...params}
+                          label="Reported issue"
+                          required
+                          error={Boolean(formError.maintenance_id)}
+                          helperText={formError.maintenance_id}
+                          InputProps={{
+                              ...params.InputProps,
+                              endAdornment: params.InputProps.endAdornment,
+                          }}
+                      />
+                  )}
+                  isOptionEqualToValue={(option, value) => option.id === value.id} // Compare IDs
+                  renderOption={(props, option) => (
+                      <li {...props} key={option.id}>
+                          {option.reported_issue}
+                      </li>
+                  )}
+                  autoComplete
+                  autoHighlight
+                  clearOnEscape
+              />
+            </FormControl>
+            
+            <FormControl error={Boolean(formError.status)} fullWidth margin="normal" sx={{mt:2}}>
+                <InputLabel error={Boolean(formError.status)} required>Status</InputLabel>
+                <Select 
+                error={Boolean(formError.status)} 
+                label="Status"
+                name="status"
+                value={scheduleData.status || ''} // Add fallback
+                onChange={handleChange}
+                >
+                  <MenuItem value='To do'>To Do</MenuItem>
+                  <MenuItem value='In Progress'>In Progress</MenuItem>
+                  <MenuItem value='Completed'>Completed</MenuItem>
+                </Select>
+                {formError.status && (
+                  <FormHelperText 
+                      error 
+                      sx={{
+                      marginLeft: '14px',
+                      marginRight: '14px',
+                      fontSize: '0.75rem',
+                      }}
+                  >
+                      {formError.status}
+                  </FormHelperText>
+                )}
+            </FormControl>
+
+              {/* <FormControlLabel
+                control={
+                  <Switch
+                    checked={isAllDay}
+                    onChange={(e) => setIsAllDay(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label="All day"
+                sx={{ my: 2 }}
+              /> */}
+
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Grid container spacing={2} sx={{mt:0.4}}>
+                <Grid item xs={12} sm={6}>
+                <DatePicker
+                  label="Start Date"
+                  name="start_date"
+                  sx={{width: '100%'}}
+                  value={scheduleData.start_date} 
+                  onChange={(newValue) => handleDateChange('start_date', newValue)}
+                  fullWidth
+                  error={Boolean(formError.start_date)} 
+                  slotProps={{
+                      textField: {
+                        error: Boolean(formError.start_date),
+                        helperText: formError.start_date,
+                        fullWidth: true
+                      }
+                  }}
+                  // renderInput={(params) => <TextField {...params} fullWidth />}
+                />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                <DatePicker
+                  label="End Date"
+                  name="end_date"
+                  sx={{width: '100%'}}
+                  value={scheduleData.end_date} 
+                  onChange={(newValue) => handleDateChange('end_date', newValue)}
+                  fullWidth
+                  error={Boolean(formError.end_date)} 
+                  slotProps={{
+                      textField: {
+                        error: Boolean(formError.end_date),
+                        helperText: formError.end_date,
+                        fullWidth: true
+                      }
+                  }}
+                  // renderInput={(params) => <TextField {...params} fullWidth />}
+                />
+                </Grid>
+              </Grid>
+                
+            </LocalizationProvider>
+              
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="subtitle2" gutterBottom sx={{mt:2}}> 
+                Background Color
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 2, mt:2}}>
+                {colors.map((color) => (
+                  <ColorButton
+                    key={color.id}
+                    color={color.value}
+                    selected={selectedBgColor === color.id}
+                    onClick={() => setSelectedBgColor(color.id)}
+                  />
+                ))}
+              </Box>
+            </Box>
+
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Text Color
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 2, mt:2 }}>
+                {textColors.map((color) => (
+                  <ColorButton
+                    key={color.id}
+                    color={color.value}
+                    selected={selectedTextColor === color.id}
+                    onClick={() => setSelectedTextColor(color.id)}
+                  />
+                ))}
+              </Box>
+            </Box>
+              
+            <Button 
+            variant='contained' 
+            type="submit"
+            sx={{
+              width:'100%',
+              background: 'primary',
+              '&:hover': {backgroundColor: '#b6bdf1',}, 
+              padding: '8px', 
+              fontSize: '16px', 
+              mt:4 
+              }}
             >
-                <Fade in={open}>
-                <ModalContent sx={style}>
-                    <Typography variant='h1' letterSpacing={3} sx={{ fontSize: '20px' }}>Add New Schedule</Typography>
-                    <FormControl fullWidth margin="normal" sx={{mt:3}}>
-                        <InputLabel required>Select Apartment</InputLabel>
-                        <Select>
-                            <MenuItem value={1}>Apartment no.1</MenuItem>
-                            <MenuItem value={2}>Apartment no.2</MenuItem>
-                            <MenuItem value={3}>Apartment no.3</MenuItem>    
-                            <MenuItem value={4}>Apartment no.4</MenuItem>  
-                            <MenuItem value={5}>Apartment no.5</MenuItem>  
-                            <MenuItem value={6}>Apartment no.6</MenuItem>  
-                            <MenuItem value={7}>Apartment no.7</MenuItem>  
-                            <MenuItem value={8}>Apartment no.8</MenuItem>  
-                        </Select>
-                    </FormControl>
-                    <FormControl fullWidth margin="normal" sx={{mt:-0.1}}>
-                        <InputLabel required>Select Room</InputLabel>
-                        <Select>
-                            <MenuItem value={1}>Room no.1</MenuItem>
-                            <MenuItem value={2}>Room no.2</MenuItem>
-                            <MenuItem value={3}>Room no.3</MenuItem>    
-                            <MenuItem value={4}>Room no.4</MenuItem>  
-                            <MenuItem value={5}>Room no.5</MenuItem>  
-                            <MenuItem value={6}>Room no.6</MenuItem>  
-                            <MenuItem value={7}>Room no.7</MenuItem>  
-                            <MenuItem value={8}>Room no.8</MenuItem>  
-                        </Select>
-                    </FormControl>
-                    <TextField id="taskname" label="Task Name" variant="outlined" fullWidth margin="normal" sx={{mt:-0.1}} />
-                    <TextField id="estimatedamount" label="Estamated Amount" type="number" variant="outlined" fullWidth margin="normal" sx={{mt:-0.1}} />
-                    <FormControl fullWidth margin="normal" sx={{mt:-0.1}}>
-                        <InputLabel required>Status</InputLabel>
-                        <Select>
-                            <MenuItem value={1}>To Do</MenuItem>
-                            {/* <MenuItem value={2}>Room no.2</MenuItem>
-                            <MenuItem value={3}>Room no.3</MenuItem>     */}
-                        </Select>
-                    </FormControl>
-                    <TextField id="description" label="Task Description" variant="outlined" multiline maxRows={5} fullWidth margin="normal" sx={{mt:-0.1}}/>
-                    <Grid item xs={12} sm={6}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          label="Start Date"
-                          name="startDate"
-                          sx={{width: '100%'}}
-                          value={formData.startDate}
-                          onChange={(newValue) => handleDateChange('startDate', newValue)}
-                          fullWidth
-                          renderInput={(params) => <TextField {...params} fullWidth />}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                                label="End Date"
-                                name="endDate"
-                                sx={{width: '100%'}}
-                                value={formData.endDate}
-                                onChange={(newValue) => handleDateChange('endDate', newValue)}
-                                fullWidth
-                                renderInput={(params) => <TextField {...params} fullWidth />}
-                            />
-                        </LocalizationProvider>
-                    </Grid>
-                    
-                    <Button variant='contained' sx={{background: 'primary','&:hover': {backgroundColor: '#b6bdf1',}, padding: '8px', fontSize: '16px', mt:4 }}>Add </Button>
-                </ModalContent>
-                </Fade>
-            </Modal>
-        </Box>
-    )
+              Add 
+            </Button>
+
+            <Button
+              variant="outlined"
+              fullWidth
+              sx={{
+                fontSize: '16px',
+                marginTop: '10px',
+                borderRadius: '10px',
+                padding: '10px',
+                color: '#000',
+                borderColor: '#000',
+                '&:hover': {
+                  backgroundColor: '#f5f5f5',
+                  borderColor: '#000',
+                },
+              }}
+              onClick={() => {
+                handleClose()
+                setScheduleData({})
+                setFormError({})
+              }}
+            >
+              Cancel
+            </Button>
+          </Box>
+          </ModalContent>
+        </Fade>
+      </Modal>
+    </Box>
+  )
 }

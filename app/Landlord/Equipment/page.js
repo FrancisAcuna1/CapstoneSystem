@@ -1,6 +1,8 @@
 "use client"
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -184,10 +186,14 @@ let theme = createTheme({
     },
   };
   
-const drawerWidth = 256;
+  const drawerWidth = 278;
 
 export default function EquipmentPage (){
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  // console.log("Session: ", session);
+  // console.log("Status: ", status);  
   const [mobileOpen, setMobileOpen] = React.useState(false);
    // this code 'isSmUp is Enable the Burger Icon for mobile view
    const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
@@ -196,8 +202,20 @@ export default function EquipmentPage (){
   setMobileOpen(!mobileOpen);
   };
 
-  return (
-    <>
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.replace('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if(status === "loading"){
+    return <p>Loading...</p>;
+  }
+
+  if(status === 'authenticated'){
+
+    return (
       <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
           <CssBaseline />
@@ -237,7 +255,7 @@ export default function EquipmentPage (){
           </Box>
       </Box>
       </ThemeProvider>
-    
-    </>
-  )
+      
+    )
+  }
 }

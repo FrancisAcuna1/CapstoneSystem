@@ -187,14 +187,14 @@ let theme = createTheme({
   };
 
   
-const drawerWidth = 256;
+  const drawerWidth = 278
 
 export default function PropertyPage (){
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
-  console.log("Session: ", session);
-  console.log("Status: ", status);
+  // console.log("Session: ", session);
+  // console.log("Status: ", status);
   const [mobileOpen, setMobileOpen] = React.useState(false);
  // this code 'isSmUp is Enable the Burger Icon for mobile view
   const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));

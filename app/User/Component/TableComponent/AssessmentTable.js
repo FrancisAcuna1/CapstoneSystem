@@ -6,6 +6,8 @@ import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined
 import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
 import * as XLSX from 'xlsx';
+import { format, parseISO } from 'date-fns';
+
 
 const StyledTableCell = styled(TableCell)({
   fontWeight: 'bold',
@@ -39,6 +41,9 @@ export default function AssesmentFeeTable({ tenantId, setLoading, loading }) {
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
   const [searchTerm, setSearchTerm] = useState('');
 
+  console.log('data:', paymentDetails);
+  
+
   useEffect(() => {
     const fetchedData = async () => {
       setLoading(true); // Start loading
@@ -69,7 +74,7 @@ export default function AssesmentFeeTable({ tenantId, setLoading, loading }) {
                 if (Array.isArray(result.data)) {
                   setPaymentDetails(result.data); // Array of objects
                 } else {
-                  setPaymentDetails([result.data]); // Single object
+                  setPaymentDetails([result.data.data]); // Single object
                 }
               } else {
                 console.error('No data in response:', result);
@@ -88,7 +93,23 @@ export default function AssesmentFeeTable({ tenantId, setLoading, loading }) {
     };
     
     fetchedData();
-  }, [tenantId]);
+  }, [tenantId, setLoading]);
+
+  const formatDate = (dateString) => {
+    if(!dateString){
+        return null;
+    }
+
+    try{
+        const parseDate = parseISO(dateString);
+        return format(parseDate, 'MMM d, yyyy');
+    }catch(error){
+        console.log('Error formating Date:', error);
+        return dateString;
+    }
+  }
+
+  
 
   const handleSort = (columnKey) => {
     let direction = 'asc';
@@ -191,8 +212,8 @@ export default function AssesmentFeeTable({ tenantId, setLoading, loading }) {
               {paginatedPayments.map((item) => (
                 <StyledTableRow key={item.id}>
                   <TableCell>{item.tenant?.firstname || 'N/A'}</TableCell>
-                  <TableCell>{item.lease_start_date || 'N/A'}</TableCell>
-                  <TableCell>{item.deposit || 'N/A'}</TableCell>
+                  <TableCell>{formatDate(item.date) || 'N/A'}</TableCell>
+                  <TableCell>{item.amount || 'N/A'}</TableCell>
                 </StyledTableRow>
               ))}
               </TableBody>

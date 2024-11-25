@@ -6,7 +6,7 @@ import { Grid, Box, Paper, Typography, Button, Divider, Link, Fade, Breadcrumbs,
 import StatusTable from '../TableComponent/StatusTable';
 import StatusCards from '../Labraries/StatusCards';
 
-export default function StatusComponent(){
+export default function StatusComponent({setLoading, loading}){
     return(
         <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
             <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '5px', fontSize: '24px', fontWeight: 'bold',  mt:5}}>
@@ -26,7 +26,10 @@ export default function StatusComponent(){
 
             <Grid  container spacing={1} sx={{ mt: '-0.9rem', display:'flex', justifyContent:' center',  }}>
                 <Grid item xs={12}>
-                    <StatusCards/>
+                    <StatusCards
+                        setLoading={setLoading}
+                        loading={loading}
+                    />
                   
                 </Grid>
                 <Grid item xs={12} >
@@ -44,7 +47,11 @@ export default function StatusComponent(){
                                 List of Maintenance Request
                             </Typography> */}
 
-                            <StatusTable/> 
+                            <StatusTable
+                                setLoading={setLoading}
+                                loading={loading}
+                            
+                            /> 
                         </Paper>
                     {/* <Paper elevation={3} style={{ maxWidth: { xs: 300, sm: 740,  md: 940, lg: 1400 }, padding: '0px', marginTop: '15px', borderRadius: '15px'}}>  
                         <Grid container alignItems="center" justifyContent="space-between">

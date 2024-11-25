@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/navigation.js';
@@ -192,25 +193,48 @@ function AppAppBar({ mode, toggleColorMode }) {
                   >
                     <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
                   </Box>
-                  <MenuItem>Features</MenuItem>
-                  <MenuItem>Testimonials</MenuItem>
-                  <MenuItem>Highlights</MenuItem>
-                  <MenuItem>Pricing</MenuItem>
-                  <MenuItem>FAQ</MenuItem>
+                  <Link href="/" passHref   style={{ textDecoration: 'none' }}>
+                  <MenuItem component="a" sx={{ py: '6px', px: '12px'}}>
+                    <Typography variant="body2" color="text.primary" letterSpacing={1}>
+                      Home
+                    </Typography>
+                  </MenuItem>
+                  </Link>
+                  <Link href="/Proptrack/Properties" passHref style={{ textDecoration: 'none' }}>
+                    <MenuItem component="a" sx={{ py: '6px', px: '12px' }}>
+                      <Typography variant="body2" color="text.primary" letterSpacing={1}>
+                        Properties
+                      </Typography>
+                    </MenuItem>
+                  </Link>
+                  <Link href="/Proptrack/AboutUs" passHref style={{ textDecoration: 'none' }}>
+                    <MenuItem component="a" sx={{ py: '6px', px: '12px' }}>
+                      <Typography variant="body2" color="text.primary" letterSpacing={1}>
+                        About Us
+                      </Typography>
+                    </MenuItem>
+                  </Link>
+                  <Link href="/Proptrack/Contact" passHref style={{ textDecoration: 'none' }}>
+                    <MenuItem component="a" sx={{ py: '6px', px: '12px' }}>
+                      <Typography variant="body2" color="text.primary" letterSpacing={1}>
+                        Contact
+                      </Typography>
+                    </MenuItem>
+                  </Link>
                   <Divider />
                   <MenuItem>
                     <Button
                       color="primary"
                       variant="contained"
                       component="a"
-                      href="/material-ui/getting-started/templates/sign-up/"
+                      onClick={() => router.push('../../../Authentication/Login')}
                       target="_blank"
                       sx={{ width: '100%' }}
                     >
-                      Sign up
+                      Sign In
                     </Button>
                   </MenuItem>
-                  <MenuItem>
+                  {/* <MenuItem>
                     <Button
                       color="primary"
                       variant="outlined"
@@ -221,7 +245,7 @@ function AppAppBar({ mode, toggleColorMode }) {
                     >
                       Sign in
                     </Button>
-                  </MenuItem>
+                  </MenuItem> */}
                 </Box>
               </Drawer>
             </Box>

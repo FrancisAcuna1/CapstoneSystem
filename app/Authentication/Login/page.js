@@ -134,7 +134,7 @@ export default function LoginPage() {
 
       if (response.ok) {
         const updatedSession = await getSession();
-        localStorage.setItem('userDetails', JSON.stringify(updatedSession))
+        localStorage.setItem('userDetails', JSON.stringify(updatedSession)) // set the user to local storage
         if (updatedSession && updatedSession.user) {
           console.log('Login successful:', updatedSession.user);
           console.log('Login successful:', updatedSession.user.role);

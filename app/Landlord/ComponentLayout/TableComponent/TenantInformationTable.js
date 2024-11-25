@@ -157,7 +157,7 @@ export default function TenantInformationTable ({setLoading, loading, handleEdit
             }
         }
         fetchedData();
-    }, [])
+    }, [setLoading])
 
     // console.log()
     const handleClick = (id) => {
@@ -195,27 +195,6 @@ export default function TenantInformationTable ({setLoading, loading, handleEdit
         }
         return 0;
     });
-    // const sortedUnits = React.useMemo(() => {
-    //     let sortableItems = [...tenantInformation];
-    //     if (sortConfig.key !== null) {
-    //       sortableItems.sort((a, b) => {
-    //         const aValue = getNestedValue(a, sortConfig.key);
-    //         const bValue = getNestedValue(b, sortConfig.key);
-    //         if (aValue < bValue) {
-    //           return sortConfig.direction === 'asc' ? -1 : 1;
-    //         }
-    //         if (aValue > bValue) {
-    //           return sortConfig.direction === 'asc' ? 1 : -1;
-    //         }
-    //         return 0;
-    //       });
-    //     }
-    //     return sortableItems;
-    // }, [tenantInformation, sortConfig]);
-
-    // const getNestedValue = (obj, key) => {
-    //     return key.split('.').reduce((acc, part) => acc && acc[part], obj);
-    // };
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
@@ -248,8 +227,8 @@ export default function TenantInformationTable ({setLoading, loading, handleEdit
     const handleExportToExcel = () => {
         const ws = XLSX.utils.json_to_sheet(tenantInformation);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Units');
-        XLSX.writeFile(wb, 'units_data.xlsx');
+        XLSX.utils.book_append_sheet(wb, ws, 'tenantInformation');
+        XLSX.writeFile(wb, 'tenantInformation.xlsx');
     };
 
 
@@ -269,20 +248,20 @@ export default function TenantInformationTable ({setLoading, loading, handleEdit
 
 
     const filteredUnits = sortedUnits.filter((unit) =>
-        (unit.tenant.firstname && unit.tenant.firstname.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.tenant.middlename && unit.tenant.middlename.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.tenant.lastname && unit.tenant.lastname.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.tenant.street && unit.tenant.street.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.tenant.barangay && unit.tenant.barangay.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.tenant.municipality && unit.tenant.municipality.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.rented_unit.property_type && unit.rented_unit.property_type.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.lease_start_date && unit.lease_start_date.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.rented_unit.status && unit.rented_unit.status.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.rented_unit.apartment_name && unit.rented_unit.apartment_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.rented_unit.boarding_house_name && unit.rented_unit.boarding_house_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (unit.tenant.contact && unit.tenant.contact.toString().includes(searchTerm))
-      );
-    
+        (unit.firstname && unit.firstname.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.middlename && unit.middlename.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.lastname && unit.lastname.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.street && unit.street.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.barangay && unit.barangay.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.municipality && unit.municipality.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.rental_agreement[0] && unit.rental_agreement[0].rented_unit_type && unit.rental_agreement[0].rented_unit_type.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.rental_agreement[0] && unit.rental_agreement[0].lease_start_date && unit.rental_agreement[0].lease_start_date.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.rental_agreement[0] && unit.rental_agreement[0].lease_end_date && unit.rental_agreement[0].lease_end_date.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.status && unit.status && unit.status.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.rental_agreement && unit.rental_agreement[0]?.rented_unit?.apartment_name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (unit.rental_agreement && unit.rental_agreement[0]?.rented_unit?.boarding_house_name?.toLowerCase().includes(searchTerm.toLowerCase()))||
+        (unit.contact && unit.contact.toString().includes(searchTerm))
+  );
 
     const paginatedUnits = filteredUnits.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
@@ -407,23 +386,26 @@ export default function TenantInformationTable ({setLoading, loading, handleEdit
                                         }}
                                     />
                                 </StyledTableCell>
-                                <StyledTableCell  onClick={() => handleSort('tenant.firstname')}>
-                                    Tenant {sortConfig.key === 'tenant.firstname' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                <StyledTableCell  onClick={() => handleSort('firstname')}>
+                                    Tenant {sortConfig.key === 'firstname' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell  onClick={() => handleSort('tenant.contact')}>
+                                <StyledTableCell  onClick={() => handleSort('contact')}>
                                     Contact No. {sortConfig.key === 'contact' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell  onClick={() => handleSort('location')}>
-                                    Location {sortConfig.key === 'location' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                <StyledTableCell  onClick={() => handleSort('street')}>
+                                    Location {sortConfig.key === 'street' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell  onClick={() => handleSort('unitname')}>
-                                    Unit Name {sortConfig.key === 'unitname' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                <StyledTableCell  onClick={() => handleSort('apartment_name')}>
+                                    Unit Name {sortConfig.key === 'apartment_name' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
-                                <StyledTableCell  onClick={() => handleSort('propertype')}>
-                                    Property Type {sortConfig.key === 'propertype' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                <StyledTableCell  onClick={() => handleSort('rented_unit_type')}>
+                                    Property Type {sortConfig.key === 'rented_unit_type' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
                                 <StyledTableCell  onClick={() => handleSort('startoccupancy')}>
                                     Start Occupancy {sortConfig.key === 'startoccupancy' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
+                                </StyledTableCell>
+                                <StyledTableCell  onClick={() => handleSort('startoccupancy')}>
+                                    Status {sortConfig.key === 'startoccupancy' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                                 </StyledTableCell>
                                 {/* <StyledTableCell onClick={() => handleSort('status')}>
                                     status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
@@ -452,16 +434,15 @@ export default function TenantInformationTable ({setLoading, loading, handleEdit
                                                         }}
                                                 />
                                             </TableCell>
-                                            <TableCell>{`${unit.tenant.firstname || ''} ${unit.tenant.middlename || ''} ${unit.tenant.lastname || ''}`}</TableCell>
-                                            <TableCell>{unit.tenant.contact || ''}</TableCell>
-                                            <TableCell>{`${unit.tenant.street}, ${unit.tenant.barangay}, ${unit.tenant.municipality}`}</TableCell>
-                                            <TableCell>{unit.rented_unit.apartment_name}</TableCell>
-                                            
-                                            <TableCell>{unit.rented_unit.property_type}</TableCell>
-                                            <TableCell>{unit.lease_start_date}</TableCell>
+                                            <TableCell>{`${unit.firstname || ''} ${unit.middlename || ''} ${unit.lastname || ''}`}</TableCell>
+                                            <TableCell>{unit.contact || ''}</TableCell>
+                                            <TableCell>{`${unit.street}, ${unit.barangay}, ${unit.municipality}`}</TableCell>
+                                            <TableCell>{(unit?.rental_agreement[0]?.rented_unit?.apartment_name || unit?.rental_agreement[0]?.rented_unit?.boarding_house_name) || 'N/A'}</TableCell>
+                                            <TableCell>{(unit?.rental_agreement[0]?.rented_unit?.property_type) || 'N/A'}</TableCell>
+                                            <TableCell>{(unit?.rental_agreement[0]?.lease_start_date) || 'N/A'}</TableCell>
                                             
 
-                                            {/* <TableCell>
+                                            <TableCell>
                                                 <Chip
                                                     label={unit.status}
                                                     variant="contained"
@@ -478,11 +459,11 @@ export default function TenantInformationTable ({setLoading, loading, handleEdit
                                                         }
                                                     }}
                                                 />
-                                            </TableCell> */}
+                                            </TableCell>
                                             
                                             <TableCell align="center">
                                             <AcceptToolTip title='Edit'>
-                                                <IconButton onClick={() => handleEdit(unit.tenant.id)}>
+                                                <IconButton onClick={() => handleEdit(unit.id)}>
                                                     <EditOutlinedIcon color='success'/>
                                                 </IconButton>
                                             </AcceptToolTip>

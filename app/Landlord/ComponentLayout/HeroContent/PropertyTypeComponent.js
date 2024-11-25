@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Typography, Box,  Breadcrumbs, Link, Grid, Fab, LinearProgress} from '@mui/material';
-import ListofPropertyTable from '../TableComponent/ListofPropertyTable';
+// import ListofPropertyTable from '../TableComponent/ListofPropertyTable';
 import AddPropertyModal from '../ModalComponent/AddPropertyModal';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { styled, useTheme, css } from '@mui/system';
@@ -10,7 +10,10 @@ import SuccessSnackbar from '../Labraries/snackbar';
 import { SnackbarProvider } from 'notistack';
 import ErrorSnackbar from '../Labraries/ErrorSnackbar'
 import zIndex from '@mui/material/styles/zIndex';
-
+import dynamic from 'next/dynamic';
+const ListofPropertyTable = dynamic(() => import('../TableComponent/ListofPropertyTable'), {
+  ssr: false
+  }) 
 
 const AddButton = styled(Fab)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -27,24 +30,51 @@ export default function PropertyTypeComponent({propertyId, loading, setLoading})
   const [editItem, setEditItem] = useState(null);
   const [selectedProperty, setSelectedProperty] = useState('');
   const [open, setOpen] = useState(false);
+  const [propName, setPropName] = useState([]);
   const router = useRouter();
   const id = propertyId;
+
   console.log('id:', id);
   console.log('Error:', error)
+  console.log(propName)
 
+
+  useEffect(() => {
+    const fetchedPropertyName = async() => {
+      const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+      const userData = JSON.parse(userDataString); // parse the datastring into json 
+      const accessToken = userData.accessToken;
+      if(accessToken){
+        try{
+          const response = await fetch(`http://127.0.0.1:8000/api/property_address/${propertyId}`,{
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            }
+          })
+          const data = await response.json();
+          if(response.ok){
+            setPropName(data.data);
+          }
+        }catch(error){
+          console.log('Error', error)
+        }
+      }
+    }
+    fetchedPropertyName();
+  }, [setLoading, propertyId])
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleEdit = (id, propertyType) => {
+  const handleEdit = (id) => {
     console.log('Edit Property:', id)
     setSelectedProperty(propertyType);
     setEditItem(id);
     setOpen(true);
   }
-  
 
- 
 
 
   return (
@@ -62,7 +92,7 @@ export default function PropertyTypeComponent({propertyId, loading, setLoading})
         />
       </SnackbarProvider>
         <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '5px', fontSize: '24px', fontWeight: 'bold',  mt:5}}>
-            List of Propreties - id Acuna
+            List of Rental Units - {propName.propertyname}
         </Typography>
         <Grid item xs={12} sx={{marginLeft: '5px', mt:2}}>
             <Breadcrumbs aria-label="breadcrumb"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '15px' } }}>

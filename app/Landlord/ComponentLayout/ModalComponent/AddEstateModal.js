@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { TextField, Typography, Box, Fab, Button, Fade, IconButton } from '@mui/material';
+import { TextField, Typography, Box, Fab, Button, Fade, IconButton, FormHelperText, FormControl, InputLabel,Select, MenuItem } from '@mui/material';
 import { styled, css } from '@mui/system';
 import { Modal as BaseModal } from '@mui/base/Modal';
+import Image from 'next/image';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
@@ -92,14 +93,17 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
   const [isLoading, setLoading] = useState(false);
   const router = useRouter();
   const editItem = editproperty;
+  const [errors, setErrors] = useState({});
+  const [allBarangays, setAllBarangays] = useState([])
   const [newProperty, setNewProperty] = useState({
     propertyname: '',
-    // street: '',
     barangay: '',
-    municipality: 'Sorsogon City'
+    municipality: 'Sorsogon City',
   });
 
   console.log('id:', editItem)
+  console.log('propdata:', newProperty);
+  console.log(allBarangays)
 
   
   const handleChange = (e) => {
@@ -108,20 +112,39 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
         ...newProperty,
         [name]: value
     });
-  }
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      console.log('anauthenticated')
-      router.push('/'); // Redirect to login if not authenticated
+     // Clear error when field is modified
+     if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
     }
-  }, [status, router]);
+  }
+  
+  useEffect(() => {
+    const fetchedBarangays = async() => {
+      try{
+        const response = await fetch('https://psgc.gitlab.io/api/cities/056216000/barangays', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
 
-  // useEffect(() => {
-  //   if (editItem) {
-  //     console.log('id:', editItem)
-  //   }
-  // }, [editItem]) // for edit property
+          }
+        })
+        const data = await response.json();
+        // const barangayNames = data.map(barangay => barangay.name);
+        // console.log('Barangay names:', barangayNames);
+        console.log('barangay:', data);
+        
+        setAllBarangays(data)
+      }catch(error){
+
+      }
+    }
+    fetchedBarangays();
+  }, [])
 
   useEffect(() => {
     const fetchDataEdit =  async () => {
@@ -144,12 +167,15 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
 
           if(response.ok){
             setNewProperty({
-              propertyname: data?.editProperty?.propertyname,
-              // street: data?.editProperty?.street,
-              barangay: data?.editProperty?.barangay,
-              municipality: data?.editProperty?.municipality,
+              propertyname: data.editProperty.propertyname || '',
+              // street: data.editProperty.street,
+              barangay: data.editProperty.barangay || '',
+              municipality: data.editProperty.municipality,
             })
-            setSelectedImage(data?.editProperty?.image )
+            // setSelectedImage(data?.editProperty?.image )
+            if (data.editProperty.image) {
+              setSelectedImage(data.editProperty.image);
+            }
             console.log('Edit:', newProperty);
             console.log('Edit:', selectedImage)
             setSuccessful(successMessage);
@@ -168,8 +194,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
 
     }
     fetchDataEdit()
-
-  }, [editItem])
+  }, [editItem, newProperty, selectedImage, handleClose, setError, setSuccessful])
 
 
   const handleSubmit = async (e) => {
@@ -187,26 +212,44 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
       console.log('Token:', accessToken); 
       console.log({selectedImage});
 
-      if (!newProperty.propertyname || !newProperty.barangay || !selectedImage){
-        localStorage.setItem('errorMessage', 'Please fill all required field' || 'Operation successful!');
-        window.location.reload();
-        setLoading(false);
-        handleClose();
-      }
-
       const method = editItem ? 'POST' : 'POST';
 
       try {
         const formData = new FormData()
+        let hasErrors = false;
+        let newErrors = {};
+
+        if (!newProperty.propertyname?.trim()) {
+          newErrors.propertyname = 'Estate Property name is required';
+          hasErrors = true;
+        }
+        if (!newProperty.barangay?.trim()) {
+          newErrors.barangay = 'Barangay address is required';
+          hasErrors = true;
+        }
+        if (!selectedImage || selectedImage.length === 0) {
+          hasErrors = true;
+          newErrors.images = 'At least one image is required';
+        }
+        if (hasErrors) {
+          setErrors(newErrors);
+          setLoading(false);
+          return;
+        }
         formData.append('propertyname', newProperty.propertyname);
         // formData.append('street', newProperty.street);
         formData.append('barangay', newProperty.barangay);
-        formData.append('municipality', newProperty.municipality);
+        formData.append('municipality', "Sorsogon City");
 
-        if(selectedImage && selectedImage instanceof File){
-          formData.append('image', selectedImage)
+        // if(selectedImage && selectedImage instanceof File){
+        //   formData.append('image', selectedImage)
+        // }
+
+        // Modify image appending to use the file from selectedImage
+        if (selectedImage && selectedImage.file) {
+          formData.append('image', selectedImage.file);
         }
-
+        
         if (editItem) {
           formData.append('_method', 'PUT'); // Indicate to Laravel that this is an update
         }
@@ -249,15 +292,11 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
         } else {
          if(data.error)
          {
-          console.log(data.error) // for empty field
-          setError(data.error)
-          handleClose();
+          localStorage.setItem('errorMessage', data.error || 'Operation Error!');
+          window.location.reload();
          }else{
           localStorage.setItem('errorMessage', data.message || 'Operation Error!');
           window.location.reload();
-          // console.log(data.message); // for duplicate entry
-          // setError(data.message);
-          handleClose();
          }
         
         }
@@ -270,6 +309,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
     }else{
       console.error('Authentication error: Token missing or invalid');
       setSuccessful(false)
+      setError('Authentication error: Token missing or invalid');
     }
     
   };
@@ -290,39 +330,68 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
         localStorage.removeItem('errorMessage');
       }, 3000);
     }
-
-
-
   
-  }, []);
+  }, [setError, setSuccessful]);
 
-  const handleImageChange = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setSelectedImage(e.target.files[0]);
+  // Remove duplicates by preferring non-district entries
+  const uniqueBarangays = Object.values(allBarangays.reduce((acc, current) => {
+    // If we haven't seen this barangay name before, add it
+    if (!acc[current.name]) {
+      acc[current.name] = current;
+    } else {
+      // If we have seen it before, prefer the one without an oldName
+      if (!current.oldName || (current.oldName && !acc[current.name].oldName)) {
+        acc[current.name] = current;
+      }
     }
+    return acc;
+  }, {}));
+
+  // Sort barangays alphabetically
+  const sortedBarangays = uniqueBarangays.sort((a, b) => 
+    a.name.localeCompare(b.name)
+  );
+
+
+  // const handleImageChange = (e) => {
+  //   if (e.target.files && e.target.files.length > 0) {
+  //     setSelectedImage(e.target.files[0]);
+  //   }
+  // };
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Create a preview URL for the selected image
+      const previewUrl = URL.createObjectURL(file);
+      
+      // Set the selected image with both the file and preview URL
+      setSelectedImage({
+        file: file,
+        preview: previewUrl
+      });
+    }
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      images: ''
+    }))
+
   };
 
-
-
-
-
-
-  
- 
-
+  console.log(selectedImage)
 
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5, mb: 3 }}>
       <AddButton variant="extended" aria-label="add" onClick={handleOpen} sx={{zIndex: 0, backgroundColor: '#f78028', '&:hover': { backgroundColor: '#ffa726' } }}>
         <AddCircleOutlineIcon sx={{ mr: 1 }} />
-        Add New Estate
+        Add New Property
       </AddButton>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={open}
         onClose={() => {
+          setErrors({})
           handleClose();
           setEditProperty(null);
           setNewProperty({
@@ -351,7 +420,8 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
                 name="propertyname"
                 value={newProperty.propertyname}
                 onChange={handleChange}
-              
+                error={Boolean(errors.propertyname)}
+                helperText={errors.propertyname}
               />
               {/* <TextField 
                 required 
@@ -363,7 +433,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
                 value={newProperty.street}
                 onChange={handleChange}
               /> */}
-              <TextField 
+              {/* <TextField 
                 required 
                 id="barangay"
                 label="Barangay"
@@ -372,7 +442,36 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
                 name="barangay"
                 value={newProperty.barangay}
                 onChange={handleChange}
-              />
+              /> */}
+              <FormControl fullWidth error={Boolean(errors.apartmentstatus)}>
+                <InputLabel id="demo-simple-select-label" error={Boolean(errors.apartmentstatus)}>Barangay</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  name="barangay"
+                  value={newProperty.barangay}
+                  label="Barangay"
+                  onChange={handleChange}
+                  error={Boolean(errors.barangay)}
+                  helperText={errors.barangay}
+                >
+                  {sortedBarangays.map((item) =>(
+                    <MenuItem key={item.code} value={item.name}>{item.name}</MenuItem>
+                  ))}
+                </Select>
+                {errors.barangay && (
+                <FormHelperText 
+                  error 
+                  sx={{
+                    marginLeft: '14px',
+                    marginRight: '14px',
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  {errors.barangay}
+                </FormHelperText>
+                )}
+              </FormControl>
               <TextField
                 id="municipality"
                 label="Municipality"
@@ -381,13 +480,13 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
                 InputProps={{ readOnly: true }}
                 fullWidth
                 margin="normal"
-                name="municipality"
-                value={newProperty.municipality} // Ensure this is bound to state
-                onChange={handleChange}
+                name="municipality" // Ensure this matches your state key
+                value={newProperty.municipality}
+                // onChange={handleChange}
               />
               <Box
                 sx={{
-                  border: '2px dashed #ccc',
+                  border: `2px dashed ${errors.images ? '#d32f2f' : '#ccc'}`,
                   borderRadius: '5px',
                   padding: '20px',
                   textAlign: 'center',
@@ -396,27 +495,56 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
               >
                 <Box sx={{ marginBottom: '-10px' }}>
                   {selectedImage ? (
+                    <>
+                    <Image
+                      src={
+                        typeof selectedImage === 'string' 
+                          ? `http://127.0.0.1:8000/ApartmentImage/${selectedImage}`
+                          : selectedImage.preview
+                      }
+                      alt="Property Image"
+                      width={200}
+                      height={200}
+                      style={{
+                        width: '100%',
+                        height: '200px', // Fixed height
+                        objectFit: 'cover',
+                        borderRadius: '4px'
+                      }}
+                    />
                     <Typography variant="body1" gutterBottom sx={{ color: 'gray', fontSize: '18px' }}>
                     {typeof selectedImage === 'string' ? selectedImage : selectedImage.name} 
                     <IconButton>
                       <HighlightOffOutlinedIcon color='warning' onClick={() => setSelectedImage(null)} />
                     </IconButton>
                     </Typography>
+                    </>
                   ):(
                   <Typography variant="body1" gutterBottom sx={{ color: 'gray' }}>
-                  Drop or Select 
+                  Drop or Select Property Image
                   </Typography>
                   )}
                   <IconButton component="label">
                     <CloudUploadOutlinedIcon fontSize="large" />
                     <input type="file" accept=".gif,.jpg,.jpeg,.png,.svg," name='image' hidden onChange={handleImageChange} />
                   </IconButton>
+                  {errors.images && (
+                    <FormHelperText
+                      error
+                      sx={{
+                          display: 'block',
+                          textAlign: 'center',
+                          marginTop: 1
+                      }}
+                    >
+                      {errors.images}
+                    </FormHelperText>
+                  )}
                 </Box>
               </Box>
 
               <Button
                 type="submit"
-              
                 variant="contained"
                 fullWidth
                 sx={{
@@ -448,6 +576,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
                 }}
                 onClick={() => {
                   handleClose();
+                  setErrors({})
                   setEditProperty(null);
                   setNewProperty({
                     propertyname: '',

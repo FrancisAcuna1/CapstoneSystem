@@ -3,6 +3,7 @@ import * as React  from 'react';
 import useClient from 'next/client';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -195,6 +196,7 @@ export default function OccupiedBoardingHousePage (){
   const router = useRouter();
   const params = useParams();
   const [loading, setLoading] = useState(false)
+  const { data: session, status } = useSession();
   const boardinghouseId = params?.occupiedboardinghouseId;
   const propsId = params.id;
   console.log('Boarding House ID:', boardinghouseId);
@@ -209,6 +211,22 @@ export default function OccupiedBoardingHousePage (){
   };
 
   
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log('anauthenticated')
+      router.push('/'); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    // return <>
+    //   <LoadingState/>
+    // </>
+    // You can add a loading spinner here if needed
+  }
+
+  if (status == "authenticated"){
 
   return (
     <>
@@ -240,7 +258,7 @@ export default function OccupiedBoardingHousePage (){
           <Header onDrawerToggle={handleDrawerToggle} />
           <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
               {/* <h1>Boarding House Details page</h1> */}
-              asdasd
+             
               <OccupiedBoardinghouse 
                 boardinghouseId={boardinghouseId} 
                 propsId={propsId}
@@ -258,4 +276,6 @@ export default function OccupiedBoardingHousePage (){
     
     </>
   )
+  }
+  null;
 }

@@ -48,6 +48,14 @@ export const authOptions = {
     }),
   ],
   
+  pages: {
+    signIn: "/",
+  },
+  session: {
+    maxAge: 60 * 60,
+    strategy: 'jwt',
+  },
+
   callbacks: {
     // async signIn({ user, account }) {
     //   // const response = await fetch("http://127.0.0.1:8000/api/login")
@@ -126,13 +134,6 @@ export const authOptions = {
      
       return session;
     },
-  },
-  pages: {
-    signIn: "/",
-  },
-  session: {
-    maxAge: 60 * 60 * 24,
-    strategy: 'jwt',
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

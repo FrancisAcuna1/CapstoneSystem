@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect } from "react"
 import { useState } from "react"
-import { Grid, Box, Paper, Typography, Button, Divider, Link, Fade, Breadcrumbs, TextField,FormHelperText} from '@mui/material';
+import { Grid, Box, Paper, Typography, Button, Divider, Link, Fade, Breadcrumbs, TextField,FormHelperText, FormControl, MenuItem, Autocomplete, CircularProgress,} from '@mui/material';
 import { Modal as BaseModal } from '@mui/base/Modal';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import PropTypes from 'prop-types';
@@ -81,7 +81,7 @@ const Backdrop = React.forwardRef((props, ref) => {
         gap: 8px;
         overflow: hidden;
         background-color: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
-        border-radius: 18px;
+        border-radius: 10px;
         border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
         box-shadow: 0 4px 12px
             ${theme.palette.mode === 'dark' ? 'rgb(0 0 0 / 0.5)' : 'rgb(0 0 0 / 0.2)'};
@@ -104,11 +104,33 @@ const Backdrop = React.forwardRef((props, ref) => {
         
     `,
   );
-  
 
 
-export default function EditTenantModal({open, handleOpen, handleClose,setLoading, setSuccessful, setError, error, editItem, setEditItem}){
+const SORSOGON_MUNICIPALITIES = [
+  { code: '056202000', name: 'Barcelona' },
+  { code: '056203000', name: 'Bulan' },
+  { code: '056204000', name: 'Bulusan' },
+  { code: '056205000', name: 'Casiguran' },
+  { code: '056206000', name: 'Castilla' },
+  { code: '056207000', name: 'Donsol' },
+  { code: '056208000', name: 'Gubat' },
+  { code: '056209000', name: 'Irosin' },
+  { code: '056210000', name: 'Juban' },
+  { code: '056211000', name: 'Magallanes' },
+  { code: '056212000', name: 'Matnog' },
+  { code: '056213000', name: 'Pilar' },
+  { code: '056214000', name: 'Prieto Diaz' },
+  { code: '056215000', name: 'Santa Magdalena' },
+  { code: '056216000', name: 'Sorsogon City' }
+];
+
+
+
+export default function EditTenantModal({open, handleOpen, handleClose, loading, setLoading, setSuccessful, setError, error, editItem, setEditItem}){
     const [contact, setContact] = useState('');
+    const [municipalityCode, setMunicipalityCode] = useState('');
+    const [allBarangays, setAllBarangays] = useState([]);
+    const [formError, setFormError] = useState({})
     const [formData, setFormData] = useState({
         firstname: '',
         middlename: '',
@@ -132,6 +154,100 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
         [name]: value
     });
   }
+
+  const validateForm = () => {
+    let tempErrors = {};
+    let isValid = true;
+
+    // First Name validation
+    if (!formData.firstname) {
+        tempErrors.firstname = 'First name is required';
+        isValid = false;
+    } else if (formData.firstname.length < 2) {
+        tempErrors.firstname = 'First name must be at least 2 characters';
+        isValid = false;
+    }
+
+    if(!formData.lastname){
+        tempErrors.lastname = 'Last name is required';
+        isValid = false;
+    }else if (formData.lastname.length < 2) {
+        tempErrors.lastname = 'First name must be at least 2 characters';
+        isValid = false;
+    }
+
+    // address validation
+    if(!formData.street){
+        tempErrors.street = 'Street Address is required';
+        isValid = false;
+    }else if (formData.street.length < 4) {
+        tempErrors.street = 'Street Address must be at least 4 characters';
+        isValid = false;
+    }
+
+    if(!formData.barangay){
+        tempErrors.barangay = 'Barangay address is required';
+        isValid = false;
+    }else if (formData.barangay.length < 4) {
+        tempErrors.barangay = 'Barangay must be at least 4 characters';
+        isValid = false;
+    }
+
+    if(!formData.municipality){
+        tempErrors.municipality = 'Municipality address is required';
+        isValid = false;
+    }else if (formData.municipality.length < 4) {
+        tempErrors.municipality = 'Municipality must be at least 4 characters';
+        isValid = false;
+    }
+
+    // Email validation
+    if (!formData.email) {
+        tempErrors.email = 'Email is required';
+        isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        tempErrors.email = 'Email is invalid';
+        isValid = false;
+    }
+
+    // Contact validation
+    if (!formData.contact) {
+        tempErrors.contact = 'Contact number is required';
+        isValid = false;
+    } else if (!/^\d{11}$/.test(formData.contact)) {
+        tempErrors.contact = 'Contact must be 11 digits';
+        isValid = false;
+    }
+
+    // Add more validations as needed for other fields...
+
+    setFormError(tempErrors);
+    return isValid;
+  };
+
+  useEffect(() => {
+    const fetchedDataAddress = async() => {
+        try{
+            const response = await fetch(`https://psgc.gitlab.io/api/cities-municipalities/${municipalityCode}/barangays`,{
+                method: 'GET',
+                headers: {  
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                }
+            })
+            const data = await response.json();
+            if(response.ok){
+                console.log('data:', data);
+                setAllBarangays(data);
+            }else{
+                console.log('error:', response.status);
+            }
+        }catch(error){
+            console.error(error);
+        }
+    }
+    fetchedDataAddress();
+  },[municipalityCode, setAllBarangays])
 
   useEffect(() => {
     const fetchDataEdit = async () => {
@@ -170,11 +286,17 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
       }
     }
     fetchDataEdit();
-  }, [editItem, setFormData])
+  }, [editItem, setFormData, error, setError, formData])
 
 
   const handleSubmit = async(e) => {
     e.preventDefault()
+
+    // Validate form before submission
+    if (!validateForm()) {
+      return; // Stop submission if validation fails
+    }
+
     setLoading(true);
 
     const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
@@ -250,7 +372,7 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
     }
 
   
-  }, []);
+  }, [setSuccessful, setError]);
 
   
   const formatContact = (value) => {
@@ -284,6 +406,64 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
             contact: formattedValue
         });
     };
+
+    // Handle municipality change
+  const handleMunicipalityChange = (event) => {
+    const selectedMunicipalityName = event.target.value;
+    const selectedMunicipality = SORSOGON_MUNICIPALITIES.find(
+        m => m.name === selectedMunicipalityName
+    );
+
+    // Update form data with selected municipality
+    setFormData(prev => ({
+        ...prev,
+        municipality: selectedMunicipalityName,
+        barangay: '' // Reset barangay when municipality changes
+    }));
+
+    // Set the municipality code for fetching barangays
+    if (selectedMunicipality) {
+        setMunicipalityCode(selectedMunicipality.code);
+    }
+    setFormError(prev => ({
+        ...prev,
+        municipality: ''  
+    }));
+  };
+
+  // Handle barangay change
+  const handleBarangayChange = (event) => {
+      const { value } = event.target;
+      setFormData(prev => ({
+      ...prev,
+      barangay: value
+      }));
+
+      
+      setFormError(prev => ({
+          ...prev,
+          barangay: ''  
+      }));
+  };
+
+       // Remove duplicates by preferring non-district entries
+    const uniqueBarangays = Object.values(allBarangays.reduce((acc, current) => {
+    // If we haven't seen this barangay name before, add it
+      if (!acc[current.name]) {
+        acc[current.name] = current;
+      } else {
+        // If we have seen it before, prefer the one without an oldName
+        if (!current.oldName || (current.oldName && !acc[current.name].oldName)) {
+            acc[current.name] = current;
+        }
+      }
+      return acc;
+    }, {}));
+
+    // Sort barangays alphabetically
+    const sortedBarangays = uniqueBarangays.sort((a, b) => 
+        a.name.localeCompare(b.name)
+    );
 
 
 
@@ -423,53 +603,97 @@ export default function EditTenantModal({open, handleOpen, handleClose,setLoadin
                     />
                 </Grid>
                 <Grid item xs={12} sm={4} sx={{mt:-1}}>
-                    <TextField 
-                        id="barangay" 
-                        label="Barangay" 
-                        name='barangay' 
-                        value={formData.barangay}
-                        onChange={handleChange}
-                        variant="outlined" 
-                        fullWidth 
-                        margin="normal" 
-                        autoFocus 
-                        autoComplete='barangay' 
-                        
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: '10px', // Adjust the border-radius as needed
-                                fontStyle: 'Poppins, serif',
-                                fontSize: '15px'
-                            },
-                            '& .MuiFormLabel-root': { // Add this to target the label
-                                fontSize: '15px' // Change the font size to 12px (or any other value you prefer)
-                            }       
-                        }}  
+                  <FormControl fullWidth required error={Boolean(formError.barangay)} sx={{ mt: 2 }}>
+                    <Autocomplete
+                    id="municipality-autocomplete"
+                    options={sortedBarangays}
+                    disabled={!formData.municipality}
+                    getOptionLabel={(option) => option.name || ''}
+                    value={allBarangays.find(mun => mun.name === formData.barangay) || null}
+                    onChange={(event, newValue) => {
+                        handleBarangayChange({
+                            target: { value: newValue ? newValue.name : '' }
+                        });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Barangay"
+                        required
+                        error={Boolean(formError.barangay)}
+                        helperText={formError.barangay}
+                        InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                                <>
+                                    {loading && <CircularProgress color="inherit" size={20} />}
+                                    {params.InputProps.endAdornment}
+                                </>
+                            ),
+                        }}
+                      />
+                    )}
+                    loading={loading}
+                    isOptionEqualToValue={(option, value) => option.name === value.name}
+                    renderOption={(props, option) => (
+                      <li {...props} key={option.code}>
+                        {loading && <CircularProgress color="inherit" size={20} />}
+                        {option.name} 
+                      </li>
+                    )}
+                    fullWidth
+                    // Add these props for better UX
+                    autoComplete
+                    autoHighlight
+                    clearOnEscape
                     />
+                  </FormControl>
+                    
                 </Grid>
-                <Grid item xs={12} sm={4} sx={{mt:-1}}>
-                    <TextField 
-                        id="municipality" 
-                        label="Municipality" 
-                        name='municipality' 
-                        value={formData.municipality}
-                        onChange={handleChange}
-                        variant="outlined"
-                        fullWidth 
-                        margin="normal"
-                        autoFocus 
-                        autoComplete='municipality' 
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: '10px', // Adjust the border-radius as needed
-                                fontStyle: 'Poppins, serif',
-                                fontSize: '15px'
-                            },
-                            '& .MuiFormLabel-root': { // Add this to target the label
-                                fontSize: '15px' // Change the font size to 12px (or any other value you prefer)
-                            }       
-                        }}  
-                    />
+                <Grid item xs={12} sm={4} sx={{mt:1}}>
+                  <FormControl fullWidth required error={Boolean(formError.municipality)}>
+                  <Autocomplete
+                    id="municipality-autocomplete"
+                    options={SORSOGON_MUNICIPALITIES}
+                    getOptionLabel={(option) => option.name || ''}
+                    value={SORSOGON_MUNICIPALITIES.find(mun => mun.name === formData.municipality) || null}
+                    onChange={(event, newValue) => {
+                        handleMunicipalityChange({
+                            target: { value: newValue ? newValue.name : '' }
+                        });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Municipality"
+                        required
+                        error={Boolean(formError.municipality)}
+                        helperText={formError.municipality}
+                        InputProps={{
+                          ...params.InputProps,
+                          endAdornment: (
+                            <>
+                              {loading && <CircularProgress color="inherit" size={20} />}
+                              {params.InputProps.endAdornment}
+                            </>
+                          ),
+                        }}
+                      />
+                    )}
+                    loading={loading}
+                    isOptionEqualToValue={(option, value) => option.name === value.name}
+                    renderOption={(props, option) => (
+                        <li {...props} key={option.code}>
+                            {option.name}
+                        </li>
+                    )}
+                    fullWidth
+                    // Add these props for better UX
+                    autoComplete
+                    autoHighlight
+                    clearOnEscape
+                  />
+                  </FormControl>
                 </Grid>
             </Grid>
             <Button variant='contained' type='submit' sx={{width: '100%',background: 'primary','&:hover': {backgroundColor: '#b6bdf1',}, padding: '8px', fontSize: '16px', mt:4 }}>Submit </Button>

@@ -12,6 +12,8 @@
     "@clerk/nextjs": "^5.6.0",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
+    "@fontsource/montserrat": "^5.1.0",
+    "@fontsource/poppins": "^5.1.0",
     "@fullcalendar/core": "^6.1.15",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
@@ -36,6 +38,8 @@
     "react-big-calendar": "^1.13.4",
     "react-dom": "^18",
     "react-router-dom": "^6.25.1",
+    "react-slick": "^0.30.2",
+    "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.12",
     "sweetalert2": "^11.14.3",
     "xlsx": "^0.18.5"

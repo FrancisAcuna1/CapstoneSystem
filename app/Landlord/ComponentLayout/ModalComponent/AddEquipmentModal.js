@@ -191,7 +191,7 @@ export default function AddEquipmentModal({open, handleOpen, handleClose,setLoad
       }
     }
     fetchDataEdit();
-  }, [editItem])
+  }, [editItem, setError, error])
 
 
   const handleSubmit = async(e) => {
@@ -244,7 +244,6 @@ export default function AddEquipmentModal({open, handleOpen, handleClose,setLoad
           
           }else{
             console.log(data.message); // for duplicate entry
-            setError(data.message);
             handleClose();
           }
         }
@@ -277,7 +276,7 @@ export default function AddEquipmentModal({open, handleOpen, handleClose,setLoad
     }
 
   
-  }, []);
+  }, [setSuccessful, setError]);
 
 
 
@@ -298,7 +297,7 @@ export default function AddEquipmentModal({open, handleOpen, handleClose,setLoad
         <Fade in={open}>
         <ModalContent sx={style}>
           <Typography variant='h1' letterSpacing={3} sx={{ fontSize: '20px' }}>Add New Equipment</Typography>
-          <Box onSubmit={handleSubmit} component="form"  noValidate>          
+          <Box component="form" onSubmit={handleSubmit}  noValidate>          
           <TextField 
             id="taskname" 
             label="Equipment Name" 
@@ -326,36 +325,10 @@ export default function AddEquipmentModal({open, handleOpen, handleClose,setLoad
                   borderColor: '#000',
               },
           }}
-          onClick={handleClose}
-          // onClick={() => {
-          //   handleClose()
-          //   setEditItem(null);
-          //   setNewApartment({
-          //     propertyid: propertyId,
-          //     apartmentname: '',
-          //     capacity: '',
-          //     rentalfee: '',
-          //     payorname:'none',
-          //     apartmentstatus:'',
-          //     buildingno: '' ,
-          //     street: '',
-          //     barangay: '' ,
-          //     municipality: 'Sorsogon City' ,
-          //   })
-          //   setNewBoardinghouse({
-          //     propertyid: propertyId,
-          //     boardinghousename: '',
-          //     rentalfee: '',
-          //     payorname:'none',
-          //     boardinghousestatus:'',
-          //     buildingno: '' ,
-          //     street: '',
-          //     barangay: '' ,
-          //     municipality: 'Sorsogon City' ,
-          //   })
-          //   setSelectedImage(null);
-          //   setSelectedProperty('')
-          // }}
+          onClick={() => {
+            handleClose();
+            setAddEquipment({});
+          }}
         >
             Cancel
         </Button>

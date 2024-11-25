@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect, useState } from "react";
 import {
   Box, Paper, Table, TableBody, TableHead, TableContainer, TableRow, Toolbar,
@@ -8,6 +9,8 @@ import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined
 import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
 import * as XLSX from 'xlsx';
+import { format, parseISO } from 'date-fns';
+
 
 const StyledTableCell = styled(TableCell)({
   fontWeight: 'bold',
@@ -34,65 +37,88 @@ const GeneralTooltip = styled(({ className, ...props }) => (
   },
 });
 
-export default function PaymentHistoryTable({ tenantId, setLoading, loading }) {
+export default function PaymentHistoryTable({ TenantId, setLoading, loading }) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [paymentDetails, setPaymentDetails] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
   const [searchTerm, setSearchTerm] = useState('');
 
+  console.log(paymentDetails);
+  console.log('Id:', TenantId);
+  
+
+  // Add data fetching with proper error handling and dependencies
   useEffect(() => {
+    let isMounted = true; // Add mounted check
+
     const fetchedData = async () => {
+      if (!TenantId) return; // Add guard clause
+      
       setLoading(true);
-      const userDataString = localStorage.getItem('userDetails');
-      const userData = JSON.parse(userDataString);
-      const accessToken = userData.accessToken;
-      if (accessToken) {
-        try {
-            const response = await fetch(`http://127.0.0.1:8000/api/show_payment/${tenantId}`, {
-                method: 'GET',
-                headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-                }
-            });
+      try {
+        const userDataString = localStorage.getItem('userDetails');
+        if (!userDataString) {
+          throw new Error('No user details found');
+        }
 
-            const result = await response.json();
-        
-            console.log('API Response:', result);
+        const userData = JSON.parse(userDataString);
+        const accessToken = userData.accessToken;
 
-            if (response.ok) {
-            if (result.data) {
-                console.log('Data type:', typeof result.data);
-                console.log('Is array:', Array.isArray(result.data));
-                
-                if (typeof result.data === 'object' && !Array.isArray(result.data)) {
-                // Single object
-                setPaymentDetails([result.data]);
-                } else if (Array.isArray(result.data)) {
-                // Array of objects
-                setPaymentDetails(result.data);
-                } else {
-                console.error('Unexpected data format:', result.data);
-                setError('Received unexpected data format from server');
-                }
-            } else {
-                console.error('No data in response:', result);
-                setError('No data received from server');
-            }
-            } else {
-            console.error('Error:', response.status, result);
-            setError(`Error ${response.status}: ${result.message || 'Unknown error'}`);
-            }
-        } catch (error) {
-          console.log(error);
-        } finally {
+        if (!accessToken) {
+          throw new Error('No access token found');
+        }
+
+        const response = await fetch(`http://127.0.0.1:8000/api/show_payment/${TenantId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to fetch payment details');
+        }
+
+        if (isMounted) {
+          setPaymentDetails(data.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching payment details:', error);
+        if (isMounted) {
+
+          setPaymentDetails([]);
+        }
+      } finally {
+        if (isMounted) {
           setLoading(false);
         }
       }
     };
+
     fetchedData();
-  }, [tenantId, setLoading]);
+
+    return () => {
+      isMounted = false; // Cleanup
+    };
+  }, [TenantId, setLoading]);
+
+  const formatDate = (dateString) => {
+    if(!dateString){
+        return null;
+    }
+
+    try{
+        const parseDate = parseISO(dateString);
+        return format(parseDate, 'MMM d, yyyy');
+    }catch(error){
+        console.log('Error formating Date:', error);
+        return dateString;
+    }
+  }
 
   const handleSort = (columnKey) => {
     let direction = 'asc';
@@ -182,9 +208,9 @@ export default function PaymentHistoryTable({ tenantId, setLoading, loading }) {
             <TableBody>
               {paginatedPayments.map((item) => (
                 <StyledTableRow key={item.id}>
-                  <TableCell>{item.tenant?.firstname || 'N/A'}</TableCell>
-                  <TableCell>{item.lease_start_date || 'N/A'}</TableCell>
-                  <TableCell>{item.deposit || 'N/A'}</TableCell>
+                  <TableCell>{item.tenant?.firstname || 'N/A'} {item.tenant?.lastname || 'N/A'}</TableCell>
+                  <TableCell>{formatDate(item.date || 'N/A')}</TableCell>
+                  <TableCell>{item.amount || 'N/A'}</TableCell>
                 </StyledTableRow>
               ))}
             </TableBody>
