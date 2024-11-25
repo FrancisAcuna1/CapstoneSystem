@@ -57,44 +57,44 @@ export const authOptions = {
   },
 
   callbacks: {
-    // async signIn({ user, account }) {
-    //   // const response = await fetch("http://127.0.0.1:8000/api/login")
-    //   // console.log("data: ", response)
-    //   try{
-    //     const response = await fetch("http://127.0.0.1:8000/api/userdata",{
-    //       method: "GET",
-    //       headers: {
-    //         "Authorization": `Bearer ${user.accessToken}`,
-    //         'Content-Type': 'application/json',
-    //         "Accept": "application/json",
-    //       }
+    async signIn({ user, account }) {
+      // const response = await fetch("http://127.0.0.1:8000/api/login")
+      // console.log("data: ", response)
+      try{
+        const response = await fetch("http://127.0.0.1:8000/api/userdata",{
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${user.accessToken}`,
+            'Content-Type': 'application/json',
+            "Accept": "application/json",
+          }
 
-    //     })
-    //     const fetchedData = await response.json();
-    //     console.log("fetchedData: ", fetchedData);
+        })
+        const fetchedData = await response.json();
+        console.log("fetchedData: ", fetchedData);
 
-    //     if (response.ok){
-    //       // throw new Error(`Failed to fetch user data: ${response.status}`);
-    //       if(fetchedData.username === user.username && fetchedData.role === user.user_type){
-    //         user.id = fetchedData.id.toString();
-    //         user.firstname = fetchedData.firstname;
-    //         user.middlename = fetchedData.middlename || null;
-    //         user.lastname = fetchedData.lastname;
-    //         user.username = fetchedData.username;
-    //         user.role = fetchedData.user_type;
-    //         // user.accessToken = fetchedData.token;
-    //       }
-    //       return true;
-    //     }else{
-    //       throw new Error(`Failed to fetch user data: ${response.status}`)
-    //     }
-    //   }catch (error) {
-    //     console.error("Error Checking user in database:", error);
-    //     return false; // Indicate sign-in failure
-    //   }
-    //   // return true;
+        if (response.ok){
+          // throw new Error(`Failed to fetch user data: ${response.status}`);
+          if(fetchedData.username === user.username && fetchedData.role === user.user_type){
+            user.id = fetchedData.id.toString();
+            user.firstname = fetchedData.firstname;
+            user.middlename = fetchedData.middlename || null;
+            user.lastname = fetchedData.lastname;
+            user.username = fetchedData.username;
+            user.role = fetchedData.user_type;
+            // user.accessToken = fetchedData.token;
+          }
+          return true;
+        }else{
+          throw new Error(`Failed to fetch user data: ${response.status}`)
+        }
+      }catch (error) {
+        console.error("Error Checking user in database:", error);
+        return false; // Indicate sign-in failure
+      }
+      // return true;
       
-    // },
+    },
 
     async jwt({ token, user }) {
       if (user) {
