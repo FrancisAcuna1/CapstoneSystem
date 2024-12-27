@@ -15,20 +15,21 @@ import Checkbox from '@mui/material/Checkbox';
 import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { 
+  WarningAmber as WarningAmberIcon, 
+  Close as CloseIcon, 
+  DeleteForever as DeleteForeverIcon 
+} from '@mui/icons-material'
 import * as XLSX from 'xlsx';
 import TenantListDialog from '../Labraries/TenantListDialog';
-
+import { SnackbarProvider, useSnackbar } from 'notistack';
+import AlertDialog from '../Labraries/RentalUnitAlertDialog';
+import NoResultUI from '../Labraries/NoResults';
   
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    
-    // backgroundColor: alpha(theme.palette.common.black, 0.1), // Semi-transparent background
-    // '&:hover': {
-    //   backgroundColor: alpha(theme.palette.common.black, 0.15),
-    // },
     marginRight: theme.spacing(2),
     marginLeft: 0,
     width: '100%',
@@ -62,7 +63,7 @@ const Search = styled('div')(({ theme }) => ({
         width: '25ch',
       },
       color: theme.palette.common.black, // Text color
-      fontSize: '14px'
+      fontSize: '15px'
     },
   }));
 
@@ -125,8 +126,9 @@ const Search = styled('div')(({ theme }) => ({
 
  
   
-export default function UnitListTable({propertyId, error, setError, loading, setLoading, setSuccessful, handleEdit}){
+export default function UnitListTable({propertyId, error, setError, loading, setLoading, setSuccessful, handleEdit, refreshTrigger, onRefresh}){
   const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
   const [openDialog, setOpenDialog] = useState(false);
   const [open, setOpen] = useState(false);
   const [Dialongopen, setDialogOpen] = useState(false);
@@ -153,8 +155,8 @@ export default function UnitListTable({propertyId, error, setError, loading, set
 
   useEffect(() => {
     const fetchedData = async () => {
-      const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-      const userData = JSON.parse(userDataString); // parse the datastring into json 
+      const userDataString = localStorage.getItem('userDetails');
+      const userData = JSON.parse(userDataString); 
       const accessToken = userData.accessToken;
       if (accessToken){
           try{
@@ -208,7 +210,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
 
           }catch (error) {
               console.error("Error fetching data:", error);
-              setError(error);
+             
 
           } finally {
               setLoading(false); // Set loading to false regardless of success or failure
@@ -217,7 +219,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
 
     }
     fetchedData();
-  }, [selectedCategory, propsid, setError, setLoading])
+  }, [selectedCategory, propsid, refreshTrigger, setLoading])
 
   // for Dialog alert for delete 
   const handleClickOpen = (id, property_type) => {
@@ -238,85 +240,103 @@ export default function UnitListTable({propertyId, error, setError, loading, set
     setOpenDialog(false);
   }
 
+  console.log(selectedDeleteProperty)
+  console.log(selectedItem)
 
   const handleDelete = async() => {
-    const {id, property_type} = selectedDeleteProperty;
+    // const {id, property_type} = selectedDeleteProperty;
+    let data;
+    const selectedData = selectedItem.map(item => {
+      const [id, propertyType] = item.split('-');
+      const formatedText = propertyType === 'boardinghouse'
+      ? 'Boarding House'
+      : propertyType.charAt(0).toUpperCase() + propertyType.slice(1);
+      return {id: parseInt(id), property_type: formatedText};
+    })
 
     const userDataString = localStorage.getItem('userDetails'); // get the 
     const userData = JSON.parse(userDataString); // parse the datastring into 
     const accessToken = userData.accessToken;
     console.log('Token:', accessToken)
+    
 
     if(accessToken){
-    
-      try{
-        setDeleting(true);
-        const endpoint = property_type === "Apartment"
-        ? `http://127.0.0.1:8000/api/delete_apartment/${id}`
-        : `http://127.0.0.1:8000/api/delete_boardinghouse/${id}`;
+      let success = true;
+      for(const {id, property_type} of selectedData){
+        const property = displayedData.find(
+          (item) => item.id === id && item.property_type === property_type
+        );
 
-        const response = await fetch(endpoint, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            'Authorization': `Bearer ${accessToken},`
-          }
-        })
-
-        const data = await response.json();
-        console.log("Response data:", data);
-        console.log("Response status:", response.status);
-       
-
-        if(response.ok){
-          setOpen(false); 
-          localStorage.setItem('successMessage', data.message || 'Operation Sucess!');
-          window.location.reload();
-          
-        }else{
-          if(data.error){
-            console.log(data.error)
-            localStorage.setItem('errorMessage', data.message || 'Operation Error!');
-            window.location.reload();
-            setOpen(false); // Close dialog after delete
-          }else{
-            console.log(data.message);
-            localStorage.setItem('errorMessage', data.message || 'Operation Error!');
-            window.location.reload();
-           
-          }
+        if (!property) {
+          console.log(`Property with ID ${id} and Type ${property_type} not found`);
+          continue;
         }
 
-
-      }catch(error){
-        console.error('An error occurred:', error);
-        setError(error.message);
-      }finally{
-        setDeleting(false);
+        try{
+          setDeleting(true);
+          const endpoint = property_type === "Apartment"
+          ? `http://127.0.0.1:8000/api/delete_apartment/${id}`
+          : `http://127.0.0.1:8000/api/delete_boardinghouse/${id}`;
+  
+          const response = await fetch(endpoint, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              'Authorization': `Bearer ${accessToken},`
+            }
+          })
+  
+          data = await response.json();
+          console.log("Response data:", data);
+          console.log("Response status:", response.status);
+         
+          if(!response.ok){
+            success = false;
+            console.log('Error deleting property')
+            enqueueSnackbar(data.message, {variant: 'error'})
+            setDeleting(false);
+            setLoading(false);
+          }
+  
+        }catch(error){
+          console.error('An error occurred:', error);
+          // setError(error.message);
+        }finally{
+          setDeleting(false);
+        }
       }
+      if(success){
+        enqueueSnackbar(data.message, {variant: 'success'})
+        setOpen(false);
+        setLoading(false);
+        setDeleting(false);
+        setSelectedItem([]);
+        onRefresh();
+      }
+      
     }
   }
 
   
-  useEffect(() => {
-    const successMessage = localStorage.getItem('successMessage');
-    const errorMessage = localStorage.getItem('errorMessage')
-    if (successMessage) {
-      setSuccessful(successMessage);
-      setTimeout(() => {
-        localStorage.removeItem('successMessage');
-      }, 3000);
-    }
+  // useEffect(() => {
+  //   const successMessage = localStorage.getItem('successMessage');
+  //   const errorMessage = localStorage.getItem('errorMessage')
+  //   if (successMessage) {
+  //     setSuccessful(successMessage);
+  //     setTimeout(() => {
+  //       localStorage.removeItem('successMessage');
+  //     }, 3000);
+  //   }
 
-    if(errorMessage){
-      setError(errorMessage);
-      setTimeout(() => {
-        localStorage.removeItem('errorMessage');
-      }, 3000);
-    }
+  //   if(errorMessage){
+  //     setError(errorMessage);
+  //     setTimeout(() => {
+  //       localStorage.removeItem('errorMessage');
+  //     }, 3000);
+  //   }
 
   
-  }, [setSuccessful, setError]);
+  // }, [setSuccessful, setError]);
 
   
 
@@ -410,7 +430,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
     // Combine apartments and boarding houses 
     const allProperties = [
       ...propertyData.apartments.map((item) => ({ ...item, uniqueKey: `${item.id}-apartment`})),
-      ...propertyData.boarding_houses.map((item) => ({ ...item, uniqueKey: `${item.id}-boarding`,})),
+      ...propertyData.boarding_houses.map((item) => ({ ...item, uniqueKey: `${item.id}-boardinghouse`,})),
     ];
 
     console.log(allProperties)
@@ -487,14 +507,11 @@ export default function UnitListTable({propertyId, error, setError, loading, set
     setDialogOpen(false);
   }
   
-  
-  
-  
+  console.log(selectedItem)
   
   return (
     <Box sx={{ maxWidth: 1400,  margin: 'auto', overflowX: 'auto',}}>
-        
-      <Paper elevation={3} sx={{maxWidth: { xs: 312, sm: 767,  md: 1000, lg: 1490, borderRadius: '12px'  }}}>
+      <Paper elevation={3} sx={{maxWidth: { xs: 312, sm: 767,  md: 1000, lg: 1490, borderRadius: '12px', borderTop: '4px solid', borderTopColor: '#7e57c2'}}}>
         <Toolbar
           sx={{
             pl: { sm: 2 },
@@ -506,6 +523,26 @@ export default function UnitListTable({propertyId, error, setError, loading, set
             gap: { xs: 2, sm: 0 },
           }}
         >
+          {selectedItem.length > 0 ? (
+          <>
+          <Typography
+            sx={{
+              flex: '1 1 100%',
+              mt: '1rem',
+              mb: '0.4rem',
+              fontSize: { xs: '22px', sm: '18px', md: '18px', lg: '22px' },
+            }}
+            variant="h6"
+            id="tableTitle"
+            component="div"
+            letterSpacing={2}
+          >
+           Selected Item {selectedItem.length}
+          </Typography>
+            
+          </>
+          ):(
+          <>
           <Typography
             sx={{
               flex: '1 1 100%',
@@ -520,8 +557,42 @@ export default function UnitListTable({propertyId, error, setError, loading, set
           >
             List of {selectedCategory} Rental Units
           </Typography>
-
-          {/* Search and Download Options */}
+          </>
+          )}
+         
+          {selectedItem.length > 0 ? (
+          <>
+            {selectedItem.some((selectedId) => displayedData.some(item => item.uniqueKey === selectedId && item.status === 'Occupied')) ? (
+              <DeleteTooltip title="Delete">
+              <IconButton 
+              sx={{'&:hover':{backgroundColor:'#e57373'}, 
+                height:'35px',
+                width:'35px',
+                mt:2,
+                mr:3.3
+              }} 
+              onClick={() => handleClickAlertOpen()}
+              >
+                <DeleteForeverOutlinedIcon color='warning' fontSize='medium' sx={{ '&:hover':{color:'#fafafa'}}}/>    
+              </IconButton> 
+              </DeleteTooltip>
+            ):(
+              <DeleteTooltip>
+              <IconButton 
+              sx={{'&:hover':{backgroundColor:'#e57373'}, 
+                height:'35px',
+                width:'35px',
+                mt:2,
+                mr:3.3
+              }} 
+              onClick={() => handleClickOpen()}
+              >
+                <DeleteForeverOutlinedIcon color='warning' fontSize='medium' sx={{ '&:hover':{color:'#fafafa'}}}/>    
+              </IconButton> 
+              </DeleteTooltip>
+            )}
+          </>
+          ):(
           <Box
             sx={{
               display: 'flex',
@@ -541,7 +612,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
               <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
             </Search>
             <GeneralTooltip title="Filter Table">
-              <IconButton  onClick={handleMenuOpen} sx={{mt: 1, }}>
+              <IconButton  onClick={handleMenuOpen} sx={{mt: 1, mr:2 }}>
                 <TuneIcon fontSize="medium" />
               </IconButton>
             </GeneralTooltip>
@@ -568,12 +639,13 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                 </MenuItem>
               ))}
             </Menu>
-            <GeneralTooltip title="Download file">
+            {/* <GeneralTooltip title="Download file">
               <IconButton sx={{mt: 1, mr:2}} onClick={handleExportToExcel}>
                 <CloudDownloadOutlinedIcon fontSize="medium" />
               </IconButton>
-            </GeneralTooltip>
+            </GeneralTooltip> */}
           </Box>
+          )}
         </Toolbar>
           
       {/* <Box sx={{maxWidth: { xs: 312, sm: 767,  md: 1000, lg: 1400}}}> */}
@@ -594,13 +666,13 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                 <StyledTableCell onClick={() => handleSort('apartment_name')}  >
                   Property Name {sortConfig.key === 'apartment_name' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                 </StyledTableCell>
-                <StyledTableCell >
+                <StyledTableCell  sx={{width: '22%'}}>
                   Location {sortConfig.key === 'barangay' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                 </StyledTableCell>
-                <StyledTableCell onClick={() => handleSort('property_type')} sx={{width: '12%'}}>
+                <StyledTableCell onClick={() => handleSort('property_type')}>
                   Property Type {sortConfig.key === 'property_type' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                 </StyledTableCell>
-                <StyledTableCell onClick={() => handleSort('number_of_rooms')} sx={{width: '8%'}}>
+                <StyledTableCell onClick={() => handleSort('number_of_rooms')}  sx={{width: '8%'}}>
                   # of Rooms {sortConfig.key === 'number_of_rooms' && (sortConfig.direction === 'asc' ? <NorthIcon   fontSize='extrasmall' justifyContent="center" color="#bdbdbd"/> : <SouthIcon  fontSize='extrasmall'/>)}
                 </StyledTableCell>
                 <StyledTableCell  sx={{width: '8%'}}>
@@ -617,7 +689,8 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                 </TableRow>
             </TableHead>
             <TableBody>
-              {displayedData.map((property, index) => {
+              {displayedData.length > 0 ? 
+                (displayedData.map((property, index) => {
                 const isSelected = selectedItem.includes(property.uniqueKey)
                 const labelId = `enhanced-table-checkbox-${index}`;
                 return (
@@ -645,7 +718,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                         </Typography>
                     </TableCell>
                     {/* <TableCell>{property.inclusion}</TableCell> */}
-                    <TableCell> {`${property.street} st. ${property.barangay}, ${property.municipality}`}</TableCell>
+                    <TableCell> {`Bldg.no ${property.building_no} ${property.street} st. ${property.barangay}, ${property.municipality}`}</TableCell>
                     <TableCell>{property.property_type}</TableCell>
                     <TableCell>{property.number_of_rooms}</TableCell>
                     <TableCell>
@@ -700,57 +773,75 @@ export default function UnitListTable({propertyId, error, setError, loading, set
                     </TableCell>
                     <TableCell align="center">
                     <ViewToolTip title="View Details">
-                      {/* <IconButton onClick={() =>  router.push('/Landlord/property/[id]/Occupiedpropertys')}>
-                          <VisibilityOutlinedIcon color='info'/>
-                      </IconButton> */}
                       <IconButton sx={{'&:hover':{ backgroundColor:'#039be5', }, height:'35px', width:'35px'}} onClick={() =>  handleClick(property.status, property.id, property.id, property.id, property.id, property.property_type)}>
                           <VisibilityOutlinedIcon fontSize='medium' color='info' sx={{ '&:hover':{color:'#fafafa'}}}/>
                       </IconButton>
-                    
                     </ViewToolTip>
                   
                     <AcceptToolTip title="Edit">
-                      {/* <IconButton onClick={() =>  router.push('/Landlord/Property/[propsid]/details/[id]')}>
-                          <DriveFileRenameOutlineOutlinedIcon color='success'/>
-                      </IconButton> */}
                       <IconButton sx={{'&:hover':{ backgroundColor:'#66bb6a', }, height:'35px', width:'35px'}} onClick={() => handleEdit(property.id, property.property_type)}>
                           <DriveFileRenameOutlineOutlinedIcon color='success'  fontSize='medium' sx={{ '&:hover':{color:'#fafafa'}}}/>
                       </IconButton>
                     </AcceptToolTip>
-  
-                    <DeleteTooltip title="Delete">
-                      {property.status === 'Occupied' ? 
-                      <>
-                      <IconButton 
-                      sx={{'&:hover':{backgroundColor:'#e57373'}, 
-                        height:'35px',
-                        width:'35px',
-                      }} 
-                      onClick={() => handleClickAlertOpen()}
-                      >
-                          <DeleteForeverOutlinedIcon color='warning' fontSize='medium' sx={{ '&:hover':{color:'#fafafa'}}}/>    
-                      </IconButton> 
-                      </>
-                      :
-                      <>
-                      <IconButton 
-                      sx={{'&:hover':{backgroundColor:'#e57373'}, 
-                        height:'35px',
-                        width:'35px',
-                      }} 
-                      onClick={() => handleClickOpen(property.id, property.property_type)}
-                      >
-                          <DeleteForeverOutlinedIcon color='warning' fontSize='medium' sx={{ '&:hover':{color:'#fafafa'}}}/>    
-                      </IconButton> 
-                      </>
-                      }
-                     
-                    </DeleteTooltip>
+                  
+                    {/* <DeleteTooltip title="Delete">
+                    {property.status === 'Occupied' ? 
+                    <>
+                    <IconButton 
+                    sx={{'&:hover':{backgroundColor:'#e57373'}, 
+                      height:'35px',
+                      width:'35px',
+                    }} 
+                    onClick={() => handleClickAlertOpen()}
+                    >
+                        <DeleteForeverOutlinedIcon color='warning' fontSize='medium' sx={{ '&:hover':{color:'#fafafa'}}}/>    
+                    </IconButton> 
+                    </>
+                    :
+                    <>
+                    <IconButton 
+                    sx={{'&:hover':{backgroundColor:'#e57373'}, 
+                      height:'35px',
+                      width:'35px',
+                    }} 
+                    onClick={() => handleClickOpen(property.id, property.property_type)}
+                    >
+                        <DeleteForeverOutlinedIcon color='warning' fontSize='medium' sx={{ '&:hover':{color:'#fafafa'}}}/>    
+                    </IconButton> 
+                    </>
+                    }
+                    </DeleteTooltip> */}
+                   
+                    
                               
                     </TableCell>
                   </StyledTableRow>
                 )
-              })}
+              })):(
+                <StyledTableRow>
+                  <TableCell 
+                    colSpan={12} 
+                    sx={{ 
+                    p: 0, // Remove padding
+                    backgroundColor: "transparent", // Remove background
+                    borderBottom: "none", // Optional: Remove table row bottom border
+                    }}
+                  >
+                    <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "100%",
+                        minHeight: "300px",
+                        textAlign: "center",
+                    }}
+                    >
+                      <NoResultUI/>
+                    </Box>
+                  </TableCell>
+                </StyledTableRow>
+              )}
             </TableBody>
               
              
@@ -769,77 +860,76 @@ export default function UnitListTable({propertyId, error, setError, loading, set
       </Paper>
 
       <React.Fragment>
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="delete-dialog-title"
-          aria-describedby="delete-dialog-description"
-        >
-          <DialogTitle id="delete-dialog-title">
-            Confirm Deletion
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="delete-dialog-description">
-              Are you sure you want to delete this item? This action cannot be undone.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={handleDelete} color="error" variant="contained">
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
-        
-        <Dialog
-          open={Dialongopen}
-          onClose={handleCloseAlert}
-          aria-labelledby="delete-dialog-title"
-          aria-describedby="delete-dialog-description"
-          sx={{
-            '& .MuiPaper-root': {
+        <Dialog 
+          open={open} 
+          onClose={handleClose} 
+          maxWidth="xs" 
+          fullWidth
+          PaperProps={{
+              sx: {
               borderRadius: 2,
-              padding: 0.9,
-              boxShadow: 3,
-              maxWidth: '400px',
-              margin: 'auto',
-            }
+              boxShadow: '0 12px 24px rgba(0,0,0,0.1)',
+              }
           }}
         >
-        <DialogTitle
-          id="delete-dialog-title"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent:'start',
-            gap: 1,
-            color: 'error.main',
-            pb: 1.5,
-          }}
-        >
-          <WarningAmberIcon color="error" fontSize="large" />
-          Alert Message
-        </DialogTitle>
-        <DialogContent sx={{ pt: 2}}>
-          <DialogContentText id="delete-dialog-description" sx={{ fontSize: '1rem', mt:2 }}>
-            This property cannot be deleted!
-          </DialogContentText>
+        <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            p: 2, 
+            pb: 0 
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <WarningAmberIcon color="error" />
+          <Typography variant="h6" fontWeight="bold">
+              Confirm Deletion
+          </Typography>
+          </Box>
+          <IconButton onClick={handleClose} size="small">
+          <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <DialogContent>
+            <DialogContentText>
+            Are you sure you want to remove this units? 
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                This action cannot be undone and will permanently delete the units information.
+            </Typography>
+            </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', mt: 1 }}>
-          <Button 
-            onClick={handleCloseAlert} 
-            color="primary" 
+
+        <DialogActions sx={{ p: 2, pt: 0, mt:2 }}>
+            <Button 
+            onClick={handleClose} 
+            color="inherit"
+            variant="text"
+            >
+            Cancel
+            </Button>
+            <Button 
+            onClick={handleDelete} 
+            color="error"
             variant="contained"
-            sx={{ px: 3, py: 1, borderRadius: 1 }}
-          >
-            OK
-          </Button>
+            startIcon={<DeleteForeverIcon />}
+            sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 600
+            }}
+            >
+            Delete Units
+            </Button>
         </DialogActions>
-      </Dialog>
+        </Dialog>
       </React.Fragment>
 
+      <AlertDialog
+      handleClose={handleCloseAlert}
+      open={Dialongopen}
+      />
+
+      <SnackbarProvider maxSnack={3}>
       <TenantListDialog
         handleCloseDialog={handleCloseDialog}
         handleOpenDialog={handleOpenDialog}
@@ -852,6 +942,7 @@ export default function UnitListTable({propertyId, error, setError, loading, set
         setError={setError}
         setSuccessful={setSuccessful}
       />
+      </SnackbarProvider>
     </Box>
     
   );

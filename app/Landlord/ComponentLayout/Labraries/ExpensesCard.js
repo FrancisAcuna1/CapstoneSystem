@@ -17,7 +17,10 @@ import AccountBalanceWalletOutlined from '@mui/icons-material/AccountBalanceWall
 import TrendingUpOutlined from '@mui/icons-material/TrendingUpOutlined';
 import TrendingDownOutlined from '@mui/icons-material/TrendingDownOutlined';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { styled } from '@mui/material/styles';
+import useSWR from "swr";
 
 // Custom styled components
 const StyledCard = styled(Card)(({ theme, color }) => ({
@@ -58,45 +61,75 @@ const ValueChangeIndicator = styled(Box)(({ theme, positive }) => ({
   marginLeft: theme.spacing(1),
 }));
 
+const fetcher = async([url, token, selectedMonth, selectedYear]) => {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      month: selectedMonth,
+      year: selectedYear,
+    }),
+  })
+  if(!response.ok){
+    throw new Error(response.statusText);
+  }
+  return response.json();
+}
+
 export default function ExpensesCard({ loading, setLoading, selectedMonth, selectedYear }) {
   const [totalExpenses, setTotalExpenses] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
   const theme = useTheme();
 
+
+  const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+  ]
+
+  const getUserToken = () => {
+    const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
+    const userData = JSON.parse(userDataString); // parse the datastring into json
+    const accessToken = userData.accessToken;
+    return accessToken;
+  }
+  const token = getUserToken();
+  const {data: response, error, isLoading} = useSWR(
+    token && selectedMonth && selectedYear ? [`http://127.0.0.1:8000/api/calculate_expenses`, token, selectedMonth, selectedYear] : null,
+    fetcher, {
+      refreshInterval: 1000,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      errorRetryCount: 3,
+      onLoadingSlow: () => setLoading(true),
+    }
+  )
+  console.log(error);
   useEffect(() => {
-    const fetchTotalExpenses = async () => {
-      const userDataString = localStorage.getItem('userDetails');
-      const userData = JSON.parse(userDataString);
-      const accessToken = userData.accessToken;
-      setLoading(true);
-      
-      if (accessToken) {
-        try {
-          const response = await fetch(`http://127.0.0.1:8000/api/calculate_expenses`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({
-              month: selectedMonth,
-              year: selectedYear,
-            }),
-          });
-          const data = await response.json();
-          if (response.ok) {
-            setTotalExpenses(data.data);
-            setLoading(false);
-          }
-        } catch (error) {
-          console.log(error);
-          setLoading(false);
-        }
-      }
-    };
-    
-    fetchTotalExpenses();
-  }, [selectedMonth, selectedYear, setLoading]);
+    if(response?.data){
+      setTotalExpenses(response?.data);
+      setLoading(false)
+    }else if(isLoading){
+      setLoading(true)
+    }
+  }, [response, isLoading, setLoading, setTotalExpenses])
+  
+
+  console.log(totalExpenses)
+ 
 
   const formatCurrency = (value) => {
     if (!value) return '0.00';
@@ -113,8 +146,12 @@ export default function ExpensesCard({ loading, setLoading, selectedMonth, selec
       icon: AccountBalanceWalletOutlined,
       color: theme.palette.primary.main,
       tooltip: 'Sum of all expenses for the selected period',
-      change: '+12%',
-      positive: false
+      change:  selectedMonth !== "all" ? totalExpenses.monthly_change_type === 'Increase' ? `+${totalExpenses?.monthly_percentage_change}%` : `${totalExpenses?.monthly_percentage_change}%` 
+      : totalExpenses.yearly_change_type === 'Increase'
+      ? `+${totalExpenses.total_expense_percentage_yearly}%`
+      : `${totalExpenses.total_expense_percentage_yearly}%`,
+      positive: totalExpenses.yearly_change_type === 'Increase' ? false : true,
+      subtitle1: selectedMonth === 'all' ? `vs last year` : 'vs last month',
     },
     {
       title: 'Highest Expenses',
@@ -122,8 +159,11 @@ export default function ExpensesCard({ loading, setLoading, selectedMonth, selec
       icon: TrendingUpOutlined,
       color: theme.palette.error.main,
       tooltip: 'Highest spending recorded in the selected period',
-      change: '+24%',
-      positive: false
+      change: totalExpenses.highest_expense_change_type === 'Increase' 
+      ? `+${totalExpenses?.highest_expense_percentage}%`
+      : `${totalExpenses?.highest_expense_percentage}%`,
+      positive: totalExpenses.highest_expense_change_type === 'Increase' ? false : true,
+      subtitle1: selectedMonth === 'all' ? `vs last year` : 'vs last month',
     },
     {
       title: 'Lowest Expenses',
@@ -132,8 +172,11 @@ export default function ExpensesCard({ loading, setLoading, selectedMonth, selec
       color: theme.palette.success.main,
       tooltip: 'Lowest spending recorded in the selected period',
       subtitle: totalExpenses?.min_expense_month,
-      change: '-8%',
-      positive: true
+      change: totalExpenses.lowest_expense_change_type === 'Increase'
+      ? `+${totalExpenses.lowest_expense_percentage}%`
+      : `${totalExpenses.lowest_expense_percentage}%`,
+      positive: totalExpenses.lowest_expense_change_type === 'Increase'  ? false : true,
+      subtitle1: selectedMonth === 'all' ? `vs last year` : 'vs last month',
     },
   ];
 
@@ -204,7 +247,7 @@ export default function ExpensesCard({ loading, setLoading, selectedMonth, selec
                             variant="body2"
                             sx={{ color: theme.palette.text.secondary }}
                           >
-                            vs last month
+                            {card.subtitle1}
                           </Typography>
                           <ValueChangeIndicator positive={card.positive}>
                             {card.change}

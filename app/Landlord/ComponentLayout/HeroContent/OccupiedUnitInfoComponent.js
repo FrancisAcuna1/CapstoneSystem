@@ -1,488 +1,985 @@
-'use client'
-import React, { useEffect } from 'react';
-import { Box, Grid, Typography,  Link, Breadcrumbs, Paper, Card, CardContent, Avatar,  Divider, Button, Skeleton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Backdrop, CircularProgress} from '@mui/material'
-import { useState } from 'react';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useRouter } from 'next/navigation';
-import { Email, Phone } from '@mui/icons-material';
-import dynamic from 'next/dynamic';
-import { format, parseISO } from 'date-fns';
+"use client";
+import React, { useEffect } from "react";
+import {
+  Box,
+  Grid,
+  Typography,
+  Link,
+  Breadcrumbs,
+  Paper,
+  Card,
+  CardContent,
+  Avatar,
+  Divider,
+  Button,
+  Skeleton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Backdrop,
+  CircularProgress,
+  IconButton,
+} from "@mui/material";
+import { useState } from "react";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { useRouter } from "next/navigation";
+import { Email, Phone } from "@mui/icons-material";
+import {
+  WarningAmber as WarningAmberIcon,
+  Close as CloseIcon,
+  DeleteForever as DeleteForeverIcon,
+  NavigateNext as NavigateNextIcon,
+  Home as HomeOutlinedIcon
+} from "@mui/icons-material";
+import Swal from "sweetalert2";
+import dynamic from "next/dynamic";
+import { format, parseISO } from "date-fns";
+
 // import PaymentHistoryTable from '../TableComponent/PaymentHistoryTable';
-const PaymentHistory = dynamic(() => import('../TableComponent/paymenthistorytable'), {
-ssr: false
-}) 
+const PaymentHistory = dynamic(
+  () => import("../TableComponent/paymenthistorytable"),
+  {
+    ssr: false,
+  }
+);
 
-export default function OccupiedTenantInformation({apartmentId, propsId, loading, setLoading}) {
-    const  router = useRouter();  
-    const [open, setOpen] = useState(false);
-    const [tenantInformation, setTenantInformation] = useState([]); 
-    const [paymentInfo, setPaymentInfo] = useState([])
-    const [selectedDeleteTenant, setSelectedDeleteTenant] = useState({ id: null });
-    const [deleting, setDeleting] = useState(false);
-    const TenantId = tenantInformation?.tenant?.id;
-    // const johnDoePayments = rows.filter(row => row.col1 === 'John Doe');
+export default function OccupiedTenantInformation({
+  apartmentId,
+  propsId,
+  loading,
+  setLoading,
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [tenantInformation, setTenantInformation] = useState([]);
+  const [paymentInfo, setPaymentInfo] = useState([]);
+  const [selectedDeleteTenant, setSelectedDeleteTenant] = useState({
+    id: null,
+  });
+  const [deleting, setDeleting] = useState(false);
+  const [totalBalanced, setTotalBalanced] = useState([]);
+  const TenantId = tenantInformation?.tenant?.id;
 
-    console.log('Tenant:', tenantInformation);
-    console.log(paymentInfo);
-    console.log(TenantId);
-  
-    
-    useEffect(() => {
-        const fetchedData = async () => {
-            setLoading(true);
-            const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-            const userData = JSON.parse(userDataString); // parse the datastring into json 
-            const accessToken = userData.accessToken;
+  console.log("Tenant:", tenantInformation);
+  console.log(paymentInfo);
+  console.log(TenantId);
+  console.log(totalBalanced);
 
-            if(accessToken){
-                try{
-                    const response = await fetch(`http://127.0.0.1:8000/api/show_tenant_info/${apartmentId}/Apartment`,{
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    })
-                    
-                    const data = await response.json()
-                    console.log(data)
+  useEffect(() => {
+    const fetchedData = async () => {
+      setLoading(true);
+      const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
+      const userData = JSON.parse(userDataString); // parse the datastring into json
+      const accessToken = userData.accessToken;
 
-                    if(response.ok){
-                        console.log(data)
-                        setTenantInformation(data.data)
-                        setLoading(false)
-                    }else{
-                        console.log('Error:', response.status)
-                        setLoading(false)
-                    }
-                }catch(error){
-                    console.log('Error:', error)
-                    setLoading(false)
-                }finally{
-                    console.log('error')
-                    setLoading(false)
-                }
+      if (accessToken) {
+        try {
+          const response = await fetch(
+            `http://127.0.0.1:8000/api/show_tenant_info/${apartmentId}/Apartment`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+              },
             }
+          );
+
+          const data = await response.json();
+          console.log(data);
+
+          if (response.ok) {
+            console.log(data);
+            setTenantInformation(data.data);
+            setLoading(false);
+          } else {
+            console.log("Error:", response.status);
+            setLoading(false);
+          }
+        } catch (error) {
+          console.log("Error:", error);
+          setLoading(false);
+        } finally {
+          console.log("error");
+          setLoading(false);
         }
+      }
+    };
 
-        fetchedData();
-    }, [apartmentId, setLoading])
+    fetchedData();
+  }, [apartmentId, setLoading]);
 
-    useEffect(() => {
-        const fethcedPaymentData = async() => {
-            setLoading(true);
-            const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-            const userData = JSON.parse(userDataString); // parse the datastring into json 
-            const accessToken = userData.accessToken;
+  useEffect(() => {
+    const fethcedPaymentData = async () => {
+      setLoading(true);
+      const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
+      const userData = JSON.parse(userDataString); // parse the datastring into json
+      const accessToken = userData.accessToken;
 
-            if(accessToken){
-                try{
-                    const response = await fetch(`http://127.0.0.1:8000/api/tenant_payment/${TenantId}`,{
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    })
-                    const data = await response.json();
-                    if(response.ok){
-                        console.log('Data:', data.data);
-                        setPaymentInfo(data.data)
-                    }else{
-                        console.log('Error:', response.status)
-                    }
-                }catch(error){
-                    console.log('Error:', error)
-                }
-            }else{
-                console.log('Error: Access token is not available')
+      if (accessToken) {
+        try {
+          const response = await fetch(
+            `http://127.0.0.1:8000/api/tenant_payment/${TenantId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+              },
             }
+          );
+          const data = await response.json();
+          if (response.ok) {
+            console.log("Data:", data.data);
+            setPaymentInfo(data.data);
+          } else {
+            console.log("Error:", response.status);
+          }
+        } catch (error) {
+          console.log("Error:", error);
         }
+      } else {
+        console.log("Error: Access token is not available");
+      }
+    };
 
-        fethcedPaymentData();
-    }, [TenantId, setLoading])
+    fethcedPaymentData();
+  }, [TenantId, setLoading]);
 
-    const formatDate = (dateString) => {
-        if(!dateString){
-            return null;
+  useEffect(() => {
+    const fetchDeliquentData = async () => {
+      const userDataString = localStorage.getItem("userDetails");
+      const userData = JSON.parse(userDataString);
+      const accessToken = userData.accessToken;
+
+      if (accessToken) {
+        try {
+          const response = await fetch(
+            `http://127.0.0.1:8000/api/get_delequent/${TenantId}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          if (response.ok) {
+            // Only add to the array if there's delinquent data
+            if (data.data && data.data.length > 0) {
+              setTotalBalanced(data.data);
+            }
+          } else {
+            console.log("Error fetching data for tenant ID:", payor.tenant.id);
+            console.log(data.error);
+          }
+        } catch (error) {
+          console.error(
+            "Error fetching delinquent data for tenant:",
+            payor.tenant.id,
+            error
+          );
         }
+      } else {
+        console.log("Access token not found!");
+      }
+    };
 
-        try{
-            const parseDate = parseISO(dateString);
-            return format(parseDate, 'MMM d, yyyy');
-        }catch(error){
-            console.log('Error formating Date:', error);
-            return dateString;
-        } 
+    fetchDeliquentData();
+  }, [TenantId]);
+
+  //this code is to get the lastpayment Date of tenant
+  const lastPayment = paymentInfo[paymentInfo.length - 1] || 0;
+  console.log(lastPayment);
+
+  //this code is to filter the overdue to get the balanced;
+  const filteredOverdue = totalBalanced.filter(
+    (item) => item.status === "Overdue"
+  );
+  const balanced = filteredOverdue.reduce(
+    (total, item) => total + parseFloat(item.amount_overdue),
+    0
+  );
+  console.log(filteredOverdue);
+  console.log(balanced);
+
+  const formatDate = (dateString) => {
+    if (!dateString) {
+      return null;
     }
 
-    // this code is to calculate the balanced.
-    const calculateBalance = () => {
-        // Check if tenantInformation and rental_fee exist
-        if (!tenantInformation || !tenantInformation.rental_fee) {
-            return '0.00'; // Return default value if rental_fee is not available
-        }
-    
-        const totalPayment = paymentInfo.reduce((total, payment) => {
-            return total + Number(payment.amount);
-        }, 0); // Added initial value of 0
-    
-        // Check if lease_start_date exists
-        if (!tenantInformation.lease_start_date) {
-            return '0.00'; // Return default value if lease_start_date is not available
-        }
-    
-        // Calculate the number of months the tenant has been renting
-        const leaseStartDate = new Date(tenantInformation.lease_start_date);
-        const currentDate = new Date();
-      // Sample values for current date and lease start date
-        // const currentDate = new Date('2025-11-20'); 
-        // const leaseStartDate = new Date('2024-11-05');
-
-        // Calculate months rented
-        const monthsRented = (currentDate.getFullYear() - leaseStartDate.getFullYear()) * 12 + (currentDate.getMonth() - leaseStartDate.getMonth());
-
-        console.log(`Months Rented: ${monthsRented}`);
-    
-        // Calculate the total rental fee for the months rented
-        const totalRentalFee = monthsRented * Number(tenantInformation.rental_fee);
-    
-        const balance = totalRentalFee  - totalPayment;
-        return balance;
-    };
-    
-    // Use the function with error handling
-    const totalBalanced = tenantInformation ? calculateBalance() : '0.00';
-
-    // const totalBalanced = (tenantInformation.rental_fee - tenantInformation.deposit).toFixed(2) || '';
-    
-
-      // for Dialog alert for delete 
-    console.log('id', selectedDeleteTenant)
-    const handleClickOpen = (id) => {
-        setSelectedDeleteTenant({id});
-        setOpen(true);
-
-    };
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const handleDelete = async() => {
-        const {id} = selectedDeleteTenant;
-        console.log(id);
-        
-        const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-        const userData = JSON.parse(userDataString); // parse the datastring into json 
-        const accessToken = userData.accessToken;
-
-        if(accessToken){
-            try{
-                setDeleting(true);
-                const response = await fetch(`http://127.0.0.1:8000/api/remove_tenant_occupancy/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                })
-
-                const data = await response.json()
-
-                if(response.ok){
-                    localStorage.setItem('successMessage', data.message || 'Operation successful!');
-                    window.history.back();
-                }else{
-                    console.log('Error:', response.status)
-                    if(data.error)
-                    {
-                        console.log(data.error) // for empty field
-                        setError(data.error)
-                        handleClose();
-                    }else{
-                        localStorage.setItem('errorMessage', data.message || 'Operation Error!');
-                        window.location.reload();
-                        // console.log(data.message); // for duplicate entry
-                        // setError(data.message);
-                        handleClose();
-                    }
-                }
-
-            }catch(error){
-                console.log('Error:', error)
-            }
-        }else{
-            localStorage.setItem('errorMessage', 'Please login to perform this action!');
-        }
-        
-       
+    try {
+      const parseDate = parseISO(dateString);
+      return format(parseDate, "MMM d, yyyy");
+    } catch (error) {
+      console.log("Error formating Date:", error);
+      return dateString;
     }
-    
+  };
 
-    return (
+  // for Dialog alert for delete
+  console.log("id", selectedDeleteTenant);
+  const handleClickOpen = (id) => {
+    setSelectedDeleteTenant({ id });
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleDelete = async () => {
+    const { id } = selectedDeleteTenant;
+    console.log(id);
+
+    const userDataString = localStorage.getItem("userDetails");
+    const userData = JSON.parse(userDataString);
+    const accessToken = userData.accessToken;
+
+    if (accessToken) {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/remove_tenant_occupancy/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          Swal.fire({
+            icon: "success",
+            title: "Payments Processed",
+            text: "All selected tenant payments have been recorded successfully.",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirect to the previous page
+              window.history.back(); // Go back to the previous page in browser history
+            }
+          });
+          handleClose();
+        } else {
+          console.log("Error:", response.status);
+          if (data.error) {
+            console.log(data.error);
+            setError(data.error);
+            handleClose();
+          } else {
+            localStorage.setItem(
+              "errorMessage",
+              data.message || "Operation Error!"
+            );
+            window.location.reload();
+            handleClose();
+          }
+        }
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    } else {
+      localStorage.setItem(
+        "errorMessage",
+        "Please login to perform this action!"
+      );
+    }
+  };
+
+  return (
     <>
-        <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
-            <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '5px', fontSize: '24px', fontWeight: 'bold',  mt:5}}>
-                Tenant Information
+      <Box sx={{ maxWidth: 1400, margin: "auto" }}>
+        <Typography
+          variant="h5"
+          letterSpacing={3}
+          sx={{
+            marginLeft: "5px",
+            fontSize: "24px",
+            fontWeight: "bold",
+            mt: 5,
+          }}
+        >
+          Tenant Information
+        </Typography>
+        <Grid item xs={12} sx={{ marginLeft: "5px", mt: 2 }}>
+          <Breadcrumbs
+            separator={
+              <NavigateNextIcon sx={{ fontSize: "22px", ml: -0.6, mr: -0.6 }} />
+            }
+            aria-label="breadcrumb"
+            sx={{ fontSize: { xs: "14px", sm: "15px", md: "15px" } }}
+          >
+            {/* <Typography color="inherit">Navigation</Typography> */}
+            <Link
+              letterSpacing={2}
+              underline="hover"
+              color="inherit"
+              href="/Landlord/Home"
+            >
+              <HomeOutlinedIcon sx={{color:'#673ab7', mt:0.5}}/>
+            </Link>
+            <Link
+              letterSpacing={2}
+              underline="hover"
+              color="inherit"
+              href="/Landlord/Property"
+            >
+              Property
+            </Link>
+            <Link
+              letterSpacing={2}
+              underline="hover"
+              color="inherit"
+              href={`/Landlord/Property/${propsId}`}
+            >
+              List of Units
+            </Link>
+            <Typography
+              letterSpacing={2}
+              color="text.primary"
+              sx={{ fontSize: { xs: "14px", sm: "15px", md: "15px" } }}
+            >
+              Tenant Information
             </Typography>
-            <Grid item xs={12} sx={{marginLeft: '5px', mt:2}}>
-                <Breadcrumbs aria-label="breadcrumb"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '15px' } }}>
-                    {/* <Typography color="inherit">Navigation</Typography> */}
-                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Home">
-                        Home
-                    </Link>
-                    <Link letterSpacing={2} underline="hover" color="inherit" href="/Landlord/Property">
-                        Property
-                    </Link>
-                    <Link letterSpacing={2} underline="hover" color="inherit" href={`/Landlord/Property/${propsId}`}>
-                        List of Units
-                    </Link>
-                    <Typography letterSpacing={2} color="text.primary"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '15px' } }}>Tenant Information</Typography>
-                </Breadcrumbs>
-            </Grid>
-            <Box sx={{mt:'4rem'}}>
+          </Breadcrumbs>
+        </Grid>
+        <Box sx={{ mt: "4rem" }}></Box>
 
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={5} lg={5}>
+          <Paper
+            elevation={3}
+            sx={{
+              width: { xs: 300, lg: "auto" },
+              height: { xs: "65vh", sm: "43vh", md: "43vh", lg: "50vh" },
+              padding: "30px",
+              marginTop: "15px",
+              borderRadius: "12px",
+              // background: 'linear-gradient(145deg, #ffffff 0%, #f0f4f8 100%)',
+              // boxShadow: '0 16px 32px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.05)',
+              position: 'relative',
+              overflow: 'hidden',
+              // transition: 'transform 0.3s ease-in-out',
+              // '&:hover': {
+              //   transform: 'scale(1.02)'
+              // }
+            }}
+          >
+            {loading ? (
+              <>
+                <Box>
+                  <Skeleton 
+                    variant="rectangular" 
+                    height={140} 
+                    animation="wave"
+                    sx={{ 
+                      borderRadius: '12px', 
+                      bgcolor: 'grey.300', 
+                    }} 
+                  />
+                  <Skeleton width="100%" animation="wave" sx={{  bgcolor: 'grey.300', mt: 2 }} />
+                  <Skeleton width="90%" animation="wave" sx={{  bgcolor: 'grey.300', mt: 1 }} />
+                  <Skeleton width="40%" animation="wave" sx={{  bgcolor: 'grey.300', mt: 1 }} />
+                  <Box sx={{ display: 'flex', gap: 2, mt: 5, justifyContent: 'center' }}>
+                    <Skeleton width={'50%'} height={60} animation="wave" sx={{ borderRadius: '8px' }} />
+                  </Box>
+                </Box>
+              </>
+            ) : (
+              <>
+                {/* Decorative Background Element */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '-50px',
+                    right: '-50px',
+                    width: 150,
+                    height: 150,
+                    background: 'linear-gradient(135deg, rgba(90,74,205,0.1) 0%, rgba(90,74,205,0.2) 100%)',
+                    borderRadius: '50%',
+                    transform: 'rotate(45deg)',
+                    zIndex: 0
+                  }}
+                />
+
+                <Grid 
+                  container 
+                  justifyContent="center" 
+                  sx={{ 
+                    mb: 2, 
+                    mt: 1, 
+                    position: 'relative', 
+                    zIndex: 1 
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      width: 120,
+                      height: 120,
+                      backgroundColor: "#3f51b5",
+                      // backgroundColor: 'linear-gradient(145deg, #6a5acd 0%, #5a4acd 100%)',
+                      fontSize: "3.5rem",
+                      boxShadow: '0 10px 20px rgba(90,74,205,0.3)',
+                      border: '4px solid white'
+                    }}
+                    aria-label="tenant-avatar"
+                  >
+                    {tenantInformation?.tenant?.firstname?.charAt(0)}
+                    {tenantInformation?.tenant?.lastname?.charAt(0)}
+                  </Avatar>
+                </Grid>
+
+                <Typography 
+                  variant="h5" 
+                  align="center" 
+                  gutterBottom 
+                  sx={{
+                    fontWeight: 700,
+                    color: '#2c3e50',
+                    letterSpacing: 1,
+                    mb: 2
+                  }}
+                >
+                  {tenantInformation?.tenant?.firstname}{" "}
+                  {tenantInformation?.tenant?.middlename || ''}{" "}
+                  {tenantInformation?.tenant?.lastname}
+                </Typography>
+
+                <Grid 
+                  container 
+                  alignItems="center" 
+                  justifyContent="center" 
+                  sx={{ mb: 1 }}
+                >
+                  <Grid item>
+                    <Email 
+                      fontSize="small" 
+                      sx={{ 
+                        color: '#7f8c8d', 
+                        mr: 1 
+                      }} 
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Typography 
+                      variant="body1" 
+                      sx={{ 
+                        color: '#34495e',
+                        fontWeight: 500
+                      }}
+                    >
+                      {tenantInformation?.tenant?.email}
+                    </Typography>
+                  </Grid>
+                </Grid>
+
+                <Grid 
+                  container 
+                  alignItems="center" 
+                  justifyContent="center" 
+                  sx={{ mb: 2 }}
+                >
+                  <Grid item>
+                    <Phone 
+                      fontSize="small" 
+                      sx={{ 
+                        color: '#7f8c8d', 
+                        mr: 1 
+                      }} 
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Typography 
+                      variant="body1" 
+                      sx={{ 
+                        color: '#34495e',
+                        fontWeight: 500
+                      }}
+                    >
+                      {tenantInformation?.tenant?.contact}
+                    </Typography>
+                  </Grid>
+                </Grid>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    mb: 2
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    onClick={() => handleClickOpen(tenantInformation?.tenant?.id)}
+                    sx={{
+                      borderRadius: '12px',
+                      px: 3,
+                      py: 1,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    Remove Tenant
+                  </Button>
+                </Box>
+
+                <Divider 
+                  sx={{ 
+                    my: 2,
+                    backgroundColor: 'rgba(0,0,0,0.12)' 
+                  }} 
+                />
+
+                <Typography
+                  variant="body1"
+                  align="center"
+                  sx={{
+                    mt: "1rem",
+                    color: '#2c3e50',
+                    fontWeight: 600,
+                    letterSpacing: 0.5
+                  }}
+                >
+                  <strong>Lease Start Date:</strong>{" "}
+                  {formatDate(tenantInformation?.lease_start_date)}
+                </Typography>
+              </>
+            )}
+          </Paper>
+          </Grid>
+          <Grid item xs={12} md={5} lg={7}>
+          <Paper
+              elevation={3}
+              sx={{
+                height: { xs: "65vh", sm: "43vh", md: "43vh", lg: "50vh" },
+                padding: "25px",
+                marginTop: "15px",
+                borderRadius: "12px",
+                overflow:'hidden',
+                position: 'relative',
+                // background: 'linear-gradient(145deg, #f0f0f0 0%, #ffffff 100%)',
+                // boxShadow: '0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.05)',
+                // transition: 'transform 0.3s ease-in-out',
+                // '&:hover': {
+                //   transform: 'scale(1.02)',
+                // }
+              }}
+            >
+              {loading ? (
+                <Box>
+                  <Skeleton 
+                    variant="rounded" 
+                    width="100%" 
+                    height={80} 
+                    animation="wave"
+                    sx={{ 
+                      bgcolor: 'grey.300', 
+                      borderRadius: '12px', 
+                      marginBottom: 2 
+                    }} 
+                  />
+                  <Skeleton 
+                    variant="rounded" 
+                    width="100%" 
+                    height={80} 
+                    animation="wave"
+                    sx={{ 
+                      bgcolor: 'grey.300', 
+                      borderRadius: '12px', 
+                      marginBottom: 2 
+                    }} 
+                  />
+                  <Skeleton 
+                    variant="rounded" 
+                    width="100%" 
+                    height={80} 
+                    animation="wave"
+                    sx={{ 
+                      bgcolor: 'grey.300', 
+                      borderRadius: '12px', 
+                      marginBottom: 2 
+                    }} 
+                  />
+                  <Skeleton 
+                    variant="rounded" 
+                    width="100%" 
+                    height={80} 
+                    animation="wave"
+                    sx={{ 
+                      bgcolor: 'grey.300', 
+                      borderRadius: '12px' 
+                    }} 
+                  />
+                </Box>
+                
+              ) : (
+                <>
+                  {/* Rental Fee Section */}
+                  <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '-50px',
+                    right: '-50px',
+                    width: 150,
+                    height: 150,
+                    background: 'linear-gradient(135deg, rgba(90,74,205,0.1) 0%, rgba(90,74,205,0.2) 100%)',
+                    borderRadius: '50%',
+                    transform: 'rotate(45deg)',
+                    zIndex: 0
+                  }}
+                  />
+                  <Grid container justifyContent="start" sx={{ mb: 2 }}>
+                    <Box>
+                      <Typography
+                        variant="h5"
+                        color="#333"
+                        sx={{
+                          fontSize: {
+                            xs: "18px",
+                            sm: "18px",
+                            md: "20px",
+                            lg: "20px",
+                          },
+                          fontWeight: 600,
+                          marginTop: "0.1rem",
+                          letterSpacing: 1,
+                          borderBottom: '2px solid #4a4a4a',
+                          paddingBottom: '8px'
+                        }}
+                      >
+                        Rental Fee
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid container justifyContent="start" sx={{ mb: 2 }}>
+                    <Grid item xs={12}>
+                      <Box
+                        bgcolor="rgba(238, 238, 238, 0.6)"
+                        borderRadius="12px"
+                        p={2}
+                        sx={{
+                          backdropFilter: 'blur(5px)',
+                          border: '1px solid rgba(255,255,255,0.2)'
+                        }}
+                      >
+                        <Grid container justifyContent="space-between" alignItems="center">
+                          <Grid item>
+                            <Typography
+                              variant="body1"
+                              color="text.secondary"
+                              sx={{
+                                fontSize: {
+                                  xs: "16px",
+                                  sm: "19px",
+                                  md: "16px",
+                                  lg: "19px",
+                                },
+                                fontWeight: 500,
+                              }}
+                            >
+                              Total Amount
+                            </Typography>
+                          </Grid>
+                          <Grid item>
+                            <Typography
+                              variant="body1"
+                              color="primary.dark"
+                              sx={{
+                                fontSize: {
+                                  xs: "16px",
+                                  sm: "19px",
+                                  md: "16px",
+                                  lg: "19px",
+                                },
+                                fontWeight: 700,
+                              }}
+                            >
+                              {tenantInformation.rental_fee}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  </Grid>
+
+                  {/* Payment Section */}
+                  <Grid container justifyContent="start" sx={{ mb: 2 }}>
+                    <Box>
+                      <Typography
+                        variant="h5"
+                        color="#333"
+                        sx={{
+                        fontSize: {
+                            xs: "18px",
+                            sm: "18px",
+                            md: "20px",
+                            lg: "20px",
+                          },
+                          fontWeight: 600,
+                          marginTop: "0.2rem",
+                          letterSpacing: 1,
+                          borderBottom: '2px solid #4a4a4a',
+                          paddingBottom: '8px'
+                        }}
+                      >
+                        Payment
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid container justifyContent="start" sx={{ mb: 2 }}>
+                    <Grid item xs={12}>
+                      <Box
+                        bgcolor="rgba(46, 125, 50, 0.1)"
+                        borderRadius="12px"
+                        p={2}
+                        sx={{
+                          backdropFilter: 'blur(5px)',
+                          border: '1px solid rgba(46, 125, 50, 0.2)'
+                        }}
+                      >
+                        <Grid container justifyContent="space-between" alignItems="center">
+                          <Grid item>
+                            <Typography
+                              variant="body1"
+                              color="text.secondary"
+                              sx={{
+                                fontSize: {
+                                  xs: "16px",
+                                  sm: "19px",
+                                  md: "16px",
+                                  lg: "19px",
+                                },
+                                fontWeight: 500,
+                              }}
+                            >
+                              Total Amount
+                            </Typography>
+                          </Grid>
+                          <Grid item>
+                            <Typography
+                              variant="body1"
+                              color="#2e7d32"
+                              sx={{
+                                fontSize: {
+                                  xs: "16px",
+                                  sm: "19px",
+                                  md: "16px",
+                                  lg: "19px",
+                                },
+                                fontWeight: 700,
+                              }}
+                            >
+                              {lastPayment.amount || ''}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                        
+                      </Box>
+                      <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            mt: 1,
+                            mr:1
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "text.secondary",
+                              fontStyle: 'italic'
+                            }}
+                          >
+                            {formatDate(lastPayment.date)}
+                          </Typography>
+                        </Box>
+                    </Grid>
+                  </Grid>
+
+                  {/* Balance Section */}
+                  <Grid container justifyContent="start" sx={{ mb: 2 }}>
+                    <Box>
+                      <Typography
+                        variant="h5"
+                        color="#333"
+                        sx={{
+                        fontSize: {
+                            xs: "18px",
+                            sm: "18px",
+                            md: "20px",
+                            lg: "20px",
+                          },
+                          fontWeight: 600,
+                          marginTop: "-0.9rem",
+                          letterSpacing: 1,
+                          borderBottom: '2px solid #4a4a4a',
+                          paddingBottom: '8px'
+                        }}
+                      >
+                        Balance
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid container justifyContent="start" sx={{ mb: 2 }}>
+                    <Grid item xs={12}>
+                      <Box
+                        bgcolor="rgba(198, 40, 40, 0.1)"
+                        borderRadius="12px"
+                        p={2}
+                        sx={{
+                          backdropFilter: 'blur(5px)',
+                          border: '1px solid rgba(198, 40, 40, 0.2)'
+                        }}
+                      >
+                        <Grid container justifyContent="space-between" alignItems="center">
+                          <Grid item>
+                            <Typography
+                              variant="body1"
+                              color="text.secondary"
+                              sx={{
+                                fontSize: {
+                                  xs: "16px",
+                                  sm: "19px",
+                                  md: "16px",
+                                  lg: "19px",
+                                },
+                                fontWeight: 500,
+                              }}
+                            >
+                              Total Amount
+                            </Typography>
+                          </Grid>
+                          <Grid item>
+                            <Typography
+                              variant="body1"
+                              color="#c62828"
+                              sx={{
+                                fontSize: {
+                                  xs: "16px",
+                                  sm: "19px",
+                                  md: "16px",
+                                  lg: "19px",
+                                },
+                                fontWeight: 700,
+                              }}
+                            >
+                              {Number(balanced)?.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </>
+              )}
+            </Paper>
+          </Grid>
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={12} lg={12}>
+            <Paper
+              elevation={2}
+              style={{
+                height: { xs: "20vh", lg: "20vh" },
+                marginTop: "15px",
+                borderRadius: "8px",
+                padding: "1rem 0rem 0rem 0rem",
+              }}
+            >
+              <Grid>
+                <PaymentHistory
+                  TenantId={TenantId}
+                  setLoading={setLoading}
+                  loading={loading}
+                />
+              </Grid>
+            </Paper>
+          </Grid>
+        </Grid>
+
+        <React.Fragment>
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            maxWidth="xs"
+            fullWidth
+            PaperProps={{
+              sx: {
+                borderRadius: 2,
+                boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
+              },
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                p: 2,
+                pb: 0,
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <WarningAmberIcon color="error" />
+                <Typography variant="h6" fontWeight="bold">
+                  Confirm Deletion
+                </Typography>
+              </Box>
+              <IconButton onClick={handleClose} size="small">
+                <CloseIcon />
+              </IconButton>
             </Box>
 
-            <Grid  container spacing={1}>
-                <Grid item xs={12} md={5} lg={5}>
-                    <Paper elevation={1} sx={{width: {xs: 300, lg: 'auto'}, height: {xs:'65vh', sm:'43vh', md:'43vh', lg:'46vh'}, padding: '25px', marginTop: '15px', borderRadius: '8px'}}>  
-                        {loading ? (
-                            <>
-                            <Box>
-                                <Skeleton variant="rectangular" height={140} />
-                                <Skeleton width="100%" />
-                                <Skeleton width="90%" />
-                                <Skeleton width="40%" />
-                                <Skeleton width={100} height={30} />
-                                <Skeleton width={100} height={30} />
-                            </Box>  
-                            </>
-                        ):(
-                            <>
-                            <Grid container justifyContent="center" sx={{ mb: 2, mt:'1rem'}}>
-                                <Avatar  sx={{width: 100, height: 100 , backgroundColor: 'red', fontSize:'2.9rem'}} aria-label="recipe">
-                                    {tenantInformation?.tenant?.firstname?.charAt(0)}{tenantInformation?.tenant?.lastname?.charAt(0)}
-                                </Avatar>
-                            </Grid>  
-                                
-                                <Typography variant='h5' align={'center'} gutterBottom >
-                                    {tenantInformation?.tenant?.firstname} {tenantInformation?.tenant?.lastname}
-                                </Typography>
-
-                                <Grid  container alignItems="center" justifyContent="center">
-                                
-                                    <Grid item>
-                                    <Email fontSize="small" color="action" sx={{mt:0.7,}}/>
-                                    </Grid>
-                                    <Grid item>
-                                        <Typography variant="body1" sx={{ml: 1}}>{tenantInformation?.tenant?.email}</Typography>
-                                    </Grid>
-                                
-                                    
-                                </Grid>
-                                <Grid  container alignItems="center" justifyContent="center" sx={{mt:1}}>
-                                    <Grid item>
-                                        <Phone fontSize="small" color="action" />
-                                    </Grid>
-                                    <Grid item>
-                                        <Typography variant="body1" sx={{ml: 1}}>{tenantInformation?.tenant?.contact}</Typography>
-                                    </Grid>
-                                </Grid>
-                                <Box sx={{display:'flex', justifyContent: 'center', alignContent:'center', mt:'0.9rem'}}>
-                                    
-                                    <Button variant='contained' color={'warning'} onClick={() => handleClickOpen(tenantInformation?.tenant?.id)}>
-                                        Remove
-                                    </Button>
-                                </Box>
-
-                                <Divider sx={{ my: 2 }} />
-
-                                {/* Lease Info */}
-                                <Typography variant="body1" align="center" sx={{mt:'1rem'}}>
-                                <strong>Lease Start Date:</strong> {formatDate(tenantInformation?.lease_start_date)}
-                                </Typography>
-
-                                {/* <Typography variant="body1" align="center">
-                                <strong>Lease End Date:</strong> {tenantInformation?.lease_end_date}
-                                </Typography> */}
-
-                               
-                                
-                            
-                            </>
-
-                        )}
-                        
-
-
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={5} lg={7}>
-                    <Paper elevation={3} sx={{ height: {xs:'65vh', sm:'43vh', md:'43vh', lg:'46vh'}, padding: '25px', marginTop: '15px',  borderRadius: '8px'}}>  
-                        {loading ? (
-                            <>
-                                <Box>
-                                <Skeleton width="100%" height={80} />
-                                <Skeleton width="100%" height={80} />
-                                <Skeleton width="100%" height={80} />
-                                <Skeleton width="100%" height={80} />
-                                </Box> 
-                            </>
-                        ):(
-                            <>
-                            <Grid container justifyContent="start" sx={{ mb: 1,}}>
-                                <Box>
-                                <Typography variant="h5" color={'#424242'} sx={{fontSize: {xs: '21px', sm: '23px', md: '22px', lg: '23px'}, marginTop: '0.6rem', mb: 2 }} letterSpacing={2} gutterBottom>
-                                    Rental Fee
-                                </Typography>
-                                </Box>
-                            </Grid>  
-                            <Grid container justifyContent="start"  sx={{ mb: 2, alig: 'center'}}>
-                                <Grid item xs='12' >
-                                    <Box  bgcolor={'#eeeeee'} display='flex' alignItems='center' mt={'-0.9rem'}> 
-                                        <Grid container justifyContent='space-between'>
-                                            <Grid item>
-                                                <Typography variant="body1" color={'black'} sx={{ fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'},  ml: '1.2rem', mt: 1,  }} letterSpacing={2} gutterBottom>
-                                                Total Amount:
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item>
-                                                <Typography variant="body1" color={'black'} sx={{ fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'}, mr: 1,  mt: 1,  }} letterSpacing={2} gutterBottom>
-                                                {Number(tenantInformation?.rental_fee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                </Typography>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-                                </Grid>
-                            </Grid> 
-
-                            <Grid container justifyContent="start" sx={{ mb: 1 }}>
-                                <Box>
-                                <Typography variant="h5" color={'gray'} sx={{fontSize: {xs: '21px', sm: '23px', md: '22px', lg: '23px'}, marginTop: '0.6rem', mb: 2 }} letterSpacing={2} gutterBottom>
-                                Payment
-                                </Typography>
-                                </Box>
-                                
-                            </Grid>  
-                            <Grid container justifyContent="start"  sx={{ mb: 2, alig: 'center'}}>
-                                <Grid item xs='12' >
-                                    <Box  bgcolor={'#eeeeee'} display='flex' alignItems='center' mt={'-0.9rem'}> 
-                                        <Grid container justifyContent='space-between'>
-                                            <Grid item>
-                                                <Typography variant="body1" color={'black'} sx={{ fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'},  ml: '1.2rem', mt: 1,  }} letterSpacing={2} gutterBottom>
-                                                Total Amount:
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item>
-                                                <Typography variant="body1" color={'#2e7d32'} sx={{ fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'}, mr: 1,  mt: 1,  }} letterSpacing={2} gutterBottom>
-                                                {Number(tenantInformation?.deposit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                </Typography>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-                                    <Box sx={{display:'flex', justifyContent:'space-between'}}>
-                                        <Box></Box>
-                                        <Typography variant='body1' sx={{mt:'0.1rem', fontSize:'0.9rem', color:'#424242'}}>
-                                            {formatDate(paymentInfo.date)}
-                                        </Typography>
-
-                                    </Box>
-                                </Grid>
-                            </Grid> 
-
-                            <Grid container justifyContent="start" sx={{ mb: 1 }}>
-                                <Box>
-                                <Typography variant="h5" color={'gray'} sx={{fontSize: {xs: '21px', sm: '23px', md: '22px', lg: '23px'}, marginTop: '0.6rem', mb: 2 }} letterSpacing={2} gutterBottom>
-                                Balance
-                                </Typography>
-                                </Box>
-                                
-                            </Grid>  
-                            <Grid container justifyContent="start"  sx={{ mb: 2, alig: 'center'}}>
-                                <Grid item xs='12' >
-                                    <Box  bgcolor={'#eeeeee'} display='flex' alignItems='center' mt={'-0.9rem'}> 
-                                        <Grid container justifyContent='space-between'>
-                                            <Grid item>
-                                                <Typography variant="body1" color={'black'} sx={{fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'},  ml: '1.2rem', mt: 1,  }} letterSpacing={2} gutterBottom>
-                                                Total Amount:
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item>
-                                                <Typography variant="body1" color={'#c62828'} sx={{fontSize: {xs: '15px', sm: '18px', md: '15px', lg: '18px'}, mr: 1,  mt: 1,  }} letterSpacing={2} gutterBottom>
-                                                {Number(totalBalanced)?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                </Typography>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-                                </Grid>
-                            </Grid> 
-                            {/* <Grid item xs={12}>
-                                <Typography variant='body1' color={'gray'} sx={{fontSize: '15px', mt:'1rem'}}> 
-                                    Contract Details: Tenant agrees to rent Unit A101 at ₱2,500 per month, with a lease starting January 1, 2024, and ending December 31, 2024.
-                                </Typography>
-                            </Grid> */}
-                            </>
-                        )}
-
-
-                        
-                        
-
-
-                    </Paper>
-                </Grid>
-            </Grid>
-            <Grid  container spacing={2} >
-                <Grid item xs={12} md={12} lg={12}>
-                    <Paper elevation={2} style={{height: {xs:'20vh', lg:'20vh'}, marginTop: '15px',  borderRadius: '8px' ,  padding: "1rem 0rem 0rem 0rem",  }}>  
-                        <Grid >
-                            <PaymentHistory 
-                                TenantId={TenantId}
-                                setLoading={setLoading}
-                                loading={loading}
-                            />
-                        </Grid>
-                    </Paper>
-                </Grid>
-                
-            </Grid>
-
-            <React.Fragment>
-                <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="delete-dialog-title"
-                aria-describedby="delete-dialog-description"
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to remove this tenant?
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
                 >
-                <DialogTitle id="delete-dialog-title">
-                    Confirm Deletion
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="delete-dialog-description">
-                    Are you sure you want to delete this item? This action cannot be undone.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} color="primary">
-                    Cancel
-                    </Button>
-                    <Button onClick={handleDelete} color="error" variant="contained">
-                    Delete
-                    </Button>
-                </DialogActions>
-                </Dialog>
+                  This action cannot be undone and will permanently delete the
+                  tenant&apos;s information.
+                </Typography>
+              </DialogContentText>
+            </DialogContent>
 
-                <Backdrop
-                sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
-                open={deleting}
-                >
-                <CircularProgress color="inherit" />
-                </Backdrop>
-            </React.Fragment>
-        </Box>
+            <DialogActions sx={{ p: 2, pt: 0 }}>
+              <Button onClick={handleClose} color="inherit" variant="text">
+                Cancel
+              </Button>
+              <Button
+                onClick={handleDelete}
+                color="error"
+                variant="contained"
+                startIcon={<DeleteForeverIcon />}
+                sx={{
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Delete Tenant
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </React.Fragment>
+      </Box>
     </>
-
   );
 }

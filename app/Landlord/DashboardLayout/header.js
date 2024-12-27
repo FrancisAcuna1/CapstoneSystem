@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PropTypes from 'prop-types';
-import { AppBar, Paper, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Typography, Avatar, StyledBadge, Tooltip, Breadcrumbs } from '@mui/material';
+import { AppBar, Paper, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Typography, Avatar, StyledBadge, Tooltip, Breadcrumbs, Popover } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -21,7 +21,8 @@ import { signOut } from "next-auth/react";
 import { fetchData } from 'next-auth/client/_utils';
 import useLogout from '@/app/Authentication/Logout/page';
 import NotificationsDialog from '../ComponentLayout/Labraries/NotificationsDialog';
-
+import useSWR from 'swr';
+import AdminProfileCard from '../ComponentLayout/Labraries/AdminProfileCard';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -69,28 +70,65 @@ const Search = styled('div')(({ theme }) => ({
     },
   }));
 
-//   const CustomPage = () => {
-//     return (
-//       <div>
-//         <h1>Custom Profile Page</h1>
-//         <p>This is the custom profile page</p>
-//       </div>
-//     )
-//   }
 const avatarColors = ['#1976d2', '#f44336', '#4caf50', '#ff9800', '#9c27b0', '#3f51b5', '#00bcd4', '#8bc34a'];
 
 const getRandomColor = () => {
     return avatarColors[Math.floor(Math.random() * avatarColors.length)]
 }
 
+const fetchedAdmin = async([url, token]) => {
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+    })
+    if(!response.ok){
+        throw new Error(response.statusText)
+    }
+    return response.json();
+}
+
+const fetchedTotalNotif = async([url, token]) => {
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+    })
+    if(!response.ok){
+        throw new Error(response.statusText)
+    }
+    return response.json();
+}
+
+const fetcherProfileImage = async([url, token]) => {
+    console.log(url, token)
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+    })
+    if(!response.ok){
+        throw new Error(response.statusText)
+    }
+    return response.json();
+  }
 
 function Header(props) {
     const router = useRouter();
-    const [totalNotif, setTotalNotif] = useState([]);
-    const [isNotificationsOpen, setisNotificationsOpen] = useState(false)
     const { onDrawerToggle } = props;
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+    const [isNotificationsOpen, setisNotificationsOpen] = useState(false)
+    const [userToken, setUserToken] = useState([]);
+    const [userId, setUserId] = useState([]);
+    const [totalNotif, setTotalNotif] = useState([]);
+    const [profileImage, setProfileImage] = useState([]);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -116,7 +154,51 @@ function Header(props) {
         setisNotificationsOpen(!isNotificationsOpen);
     }
 
-   
+    useEffect(() => {
+        const userDataString = localStorage.getItem("userDetails");
+        if (userDataString) {
+            const userData = JSON.parse(userDataString);
+            setUserToken(userData?.accessToken || null);
+            setUserId(userData?.user.id || null);
+        }
+    }, []);
+
+    const {data:responseTotalNotif, error: errorTotalNotif} = useSWR(
+        userToken && userId ? [`http://127.0.0.1:8000/api/total_notifications`, userToken] : null,
+        fetchedTotalNotif, {
+            refreshInterval: 1000,
+            revalidateOnFocus: false,
+            shouldRetryOnError: false,
+            errorRetryCount: 3,
+        }
+    )
+    useEffect(() => {
+        if (responseTotalNotif) {
+            setTotalNotif(responseTotalNotif?.count)
+        }
+    }, [responseTotalNotif])
+
+    const {data: responseImage, error: errorImage, isLoading: isLoadingImage} = useSWR(
+        userToken && userId ? [ `http://127.0.0.1:8000/api/profile_image/${userId}`, userToken] : null,
+        fetcherProfileImage, {
+          refreshInterval: 3000,
+          revalidateOnFocus: false,
+          shouldRetryOnError: false,
+          errorRetryCount: 3,
+        }
+      )
+    console.log(errorImage)
+        useEffect(() => {
+        if(responseImage){
+            setProfileImage(responseImage?.data);
+        }
+    }, [responseImage])
+
+    const avatarSrc = profileImage
+    ? `http://127.0.0.1:8000/ProfileImages/${profileImage.image_path}`
+    : null;
+
+
     const handleLogout = async () => {
         const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
         const userData = JSON.parse(userDataString); // parse the datastring into json 
@@ -148,60 +230,33 @@ function Header(props) {
             console.log('No access token found');
         }
     };
-
-    useEffect(() => {
-        const totalNotifications = async() => {
-            const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-            const userData = JSON.parse(userDataString); // parse the datastring into json 
-            const accessToken = userData.accessToken;
-            if(accessToken){
-                try{
-                    const response = await fetch(`http://127.0.0.1:8000/api/total_notifications`,{
-                        method:'GET',
-                        headers:{
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    })
-            
-                    const data = await response.json();
-                    if(response.ok){
-                        setTotalNotif(data.count)
-                    }else{
-                        console.log('error', response.status);
-                    }
-                }catch(error){
-                    console.error(error);
-                }
-            }else{
-                console.log('No access token found');
-            }
-        }
-        totalNotifications();
-    }, [])
       
     console.log(totalNotif);
     
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
-        <Menu
+        <Popover
+        open={isMenuOpen}
         anchorEl={anchorEl}
         anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
             vertical: 'top',
-            horizontal: 'right',
-        }}
+            horizontal: 'left',
+          }}
         id={menuId}
         keepMounted
-        transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-        }}
-        open={isMenuOpen}
         onClose={handleMenuClose}
         >
-        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={handleLogout}>Log out</MenuItem>
-        </Menu>
+            <AdminProfileCard
+            avatarSrc={avatarSrc}
+            handleLogout={handleLogout}
+            userId={userId}
+            userToken={userToken}
+            />
+        </Popover>
     );
 
     const mobileMenuId = 'primary-search-account-menu-mobile';
@@ -281,24 +336,8 @@ function Header(props) {
                 >
                      <MenuIcon sx={{ display: { lg: 'none' }, backgroundColor: '#8785d0', color: '#ebf2f0', fontSize: '30px', borderRadius: '5px', }}/>
                 </IconButton>
-               
-                <Search>
-                    <SearchIconWrapper>
-                    <SearchIcon />
-                    </SearchIconWrapper>
-                    <StyledInputBase
-                    placeholder="Search…"
-                    inputProps={{ 'aria-label': 'search' }}
-                    />
-                </Search>
-                
                 <Box sx={{ flexGrow: 1 }} />
                 <Box sx={{ display: { xs: 'none', md: 'none', lg: 'flex' } }}>
-                    <IconButton size="small" aria-label="show 4 new mails" sx={{mr: '0.1rem', "&:hover": {backgroundColor: '#d9defa'}}}>
-                        <Badge badgeContent={4} color="error">
-                            <MailOutlineIcon  sx={{color: '#212121', }}/>
-                        </Badge>
-                    </IconButton>
                     <IconButton
                     size="large"
                     aria-label="show 17 new notifications"
@@ -309,6 +348,7 @@ function Header(props) {
                         <Badge badgeContent={totalNotif} color="primary">
                             <NotificationsActiveOutlinedIcon sx={{color: '#212121',}}/>
                         </Badge>
+                        
                     </IconButton>
                     <Avatar
                         size="large"

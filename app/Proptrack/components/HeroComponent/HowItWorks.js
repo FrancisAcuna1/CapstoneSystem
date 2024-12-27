@@ -6,6 +6,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import EngineeringIcon from '@mui/icons-material/Engineering';
 import { motion } from 'framer-motion'; // Import framer-
 
 
@@ -26,9 +28,19 @@ const steps = [
       icon: <EventAvailableIcon fontSize="large" color="primary" />,
     },
     {
-      title: 'Apply Online and Manage Lease',
-      description: 'Apply for your chosen property online and use our tools to manage your lease effortlessly.',
+      title: 'Apply On-site and Manage Lease',
+      description: 'Apply for your chosen property on-site and use our tools to manage your lease effortlessly.',
       icon: <AssignmentTurnedInIcon fontSize="large" color="primary" />,
+    },
+    {
+      title: 'Customer Service with Chatbot',
+      description: 'You can interact with our chatbot to address your questions and concerns regarding your lease',
+      icon: <SmartToyIcon fontSize="large" color="primary" />,
+    },
+    {
+      title: 'Submit a Maintenance Request',
+      description: 'Easily submit a maintenance request through our platform. Simply describe the issue, and our system will guide you through the process to ensure timely resolution.',
+      icon: <EngineeringIcon fontSize="large" color="primary" />,
     },
   ];
 
@@ -38,15 +50,12 @@ export default function HowItWorksComponent() {
   return (
     <Box
       sx={(theme) => ({
-
-        width: '100%',
-        height: { xs: 'auto', sm: '85vh' },
-        // backgroundImage:
-        //   theme.palette.mode === 'light'
-        //     ? 'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(270, 100%, 94%), transparent)'
-        //     : 'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(270, 100%, 20%), transparent)',
-        // backgroundSize: '100%',
-        // backgroundRepeat: 'no-repeat',
+        width: "100%",
+        height: { xs: "auto", sm: "auto" },
+        // backgroundImage: 'url("/wave.svg")',
+        backgroundColor: theme.palette.mode === 'dark' ? '#212121' : '#f5f5f5', // Dark mode background color
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
       })}
     >
         <Container
@@ -79,7 +88,7 @@ export default function HowItWorksComponent() {
                 </Typography>
                 <Grid container spacing={4}>
                 {steps.map((step, index) => (
-                    <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Grid item xs={12} sm={6} md={4} key={index}>
                     <Card elevation={3} sx={{ height: '100%', textAlign: 'center', p: 2 }}>
                         <CardContent>
                         <Box sx={{ mb: 2 }}>{step.icon}</Box>

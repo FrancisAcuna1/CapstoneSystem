@@ -37,8 +37,8 @@ export default function Navigator(props) {
   const menuItems = [
     { text: 'Dashboard', Icon: <DashboardCustomizeOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/Home', category: 'Menu' },
     { text: 'Maintenance Request', Icon: <ConstructionOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/RequestMaintenance', category: 'Menu' },
-    { text: 'Account Balance', Icon: <AccountBalanceWalletOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/AssessmentFee', category: 'Menu' },
-    { text: 'My Account', Icon: <AccountCircleOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/Landlord/TenantInformation', category: 'Menu' }
+    { text: 'Assessment Fee', Icon: <AccountBalanceWalletOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/AssessmentFee', category: 'Menu' },
+    { text: 'My Account', Icon: <AccountCircleOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/Profile', category: 'Menu' }
   ];
 
   const chatbotMenuItem = { text: 'Chatbot', Icon: <SmartToyOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/Landlord/ExpensesTracking', category: 'Menu' };

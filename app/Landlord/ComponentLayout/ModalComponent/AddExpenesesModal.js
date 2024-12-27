@@ -44,6 +44,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
+import useSWR from "swr";
 
 const Backdrop = React.forwardRef((props, ref) => {
   const { open, ...other } = props;
@@ -171,15 +172,40 @@ const TriggerButton = styled(Button)(
   `
 );
 
+const fetcher = async([url, token]) => {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    }
+  })
+  if(!response.ok){
+    throw new Error(response.statusText)
+  }
+  return response.json()
+}
+
+const fetcherUnitList = async([url, token]) => {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    }
+  })
+  if(!response.ok){
+    throw new Error(response.statusText)
+  }
+  return response.json();
+}
+
 export default function AddExpensesTransaction({
   open,
   handleOpen,
   handleClose,
   setLoading,
   loading,
-  setSuccessful,
-  setError,
-  error,
   editItemId,
   onRefresh 
 }) {
@@ -236,6 +262,15 @@ export default function AddExpensesTransaction({
       if (!formData.startDate) {
         tempErrors.startDate = "Start date is required";
         isValid = false;
+      }
+      if (!formData.endDate) {
+        tempErrors.endDate = "End date is required";
+        isValid = false;
+
+      } else if (new Date(formData.endDate) <= new Date(formData.startDate)) {
+        tempErrors.endDate = "End date must be after start date";
+        isValid = false;
+
       }
       if (!formData.category) {
         tempErrors.category = "Transaction type is required";
@@ -325,117 +360,69 @@ export default function AddExpensesTransaction({
     }
   };
 
+  const getUserToken = () => {
+    const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
+    const userData = JSON.parse(userDataString); // parse the datastring into json
+    const accessToken = userData.accessToken;
+    return accessToken;
+  }
 
+  const token = getUserToken();
+  const {data:response, error} = useSWR(
+    token && editItemId ? [`http://127.0.0.1:8000/api/edit/${editItemId}`, token] : null,
+    fetcher, {
+      refreshInterval: 1000,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      errorRetryCount: 3,
+      onLoadingSlow: () => setLoading(true),
+    }
+  )
+  console.log(error)
+  console.log(response?.data);
   useEffect(() => {
-    const fetchDataEdit = async () => {
-      const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
-      const userData = JSON.parse(userDataString); // parse the datastring into json
-      const accessToken = userData.accessToken;
-      if (accessToken) {
-        console.log("Token:", accessToken);
-        try {
-          const response = await fetch(
-            `http://127.0.0.1:8000/api/edit/${editItemId}`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          );
-
-          const data = await response.json();
-
-          if (response.ok) {
-            console.log(data.data);
-            const value = data.data;
-            console.log(value);
-            setExpensesCategory(value.recurring === 1 ? 'recurring' : 'manual');
-            if (value.recurring === 1) {
-              setFormData({
-                unitId: value.unitId,
-                type: value.type,
-                amount: value.amount,
-                description: value.description,
-                category: value.category,
-                frequency: value.frequency,
-                type_of_bills: value.type_of_bills,
-                startDate: null,
-                endDate: null,
-                includeWeekends: true,
-              });
-            } else if (value.recurring === 0) {
-              setManualData({
-                unitId: value?.unit_id,
-                type: value?.unit_type,
-                amount: value?.amount,
-                category: value?.category,
-                type_of_bills: value?.type_of_bills,
-                description: value?.description,
-                expenseDate: dayjs(value?.expense_date),
-              })
-              if (value?.expenses_images) {
-                const existingImages = value.expenses_images.map((img) => ({
-                  id: img.id,
-                  path: img.image_path,
-                  preview: `http://127.0.0.1:8000/MaintenanceImages/${img.image_path}`, // Adjust URL as needed
-                }));
-                setSelectedImage(existingImages);
-              }
-            }
-          } else {
-            console.log(data.message); // for duplicate entry
-          }
-        } catch (error) {
-          console.error("Error", error);
-        } finally {
-          console.log(error);
-        }
+    if (response?.data) {
+      const value = response?.data || '';
+      setManualData({
+        unitId: value?.unit_id,
+        type: value?.unit_type,
+        amount: value?.amount,
+        category: value?.category,
+        type_of_bills: value?.type_of_bills,
+        description: value?.description,
+        expenseDate: dayjs(value?.expense_date),
+      })
+      if (value?.expenses_images) {
+        const existingImages = value.expenses_images.map((img) => ({
+          id: img.id,
+          path: img.image_path,
+          preview: `http://127.0.0.1:8000/MaintenanceImages/${img.image_path}`, // Adjust URL as needed
+        }));
+        setSelectedImage(existingImages);
       }
-    };
-    fetchDataEdit();
-  }, [editItemId, error]);
+      setExpensesCategory(value.recurring === 1 ? 'recurring' : 'manual');
+    }
+  }, [response])
 
+  const {data: unitResponse, error: unitError} = useSWR(
+    token && [ `http://127.0.0.1:8000/api/get_all_property`, token] || null, 
+    fetcherUnitList, {
+      refreshInterval: 1000,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      errorRetryCount: 3,
+      onLoadingSlow: () => setLoading(true),
+    }
+  )
+  console.log(unitError);
   useEffect(() => {
-    const fetchedUnitList = async () => {
-      const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
-      const userData = JSON.parse(userDataString); // parse the datastring into json
-      const accessToken = userData.accessToken;
+    if (unitResponse?.data) {
+      const value = unitResponse?.data || '';
+      setUnitList(value);
+    }
+  }, [unitResponse])
+ 
 
-      if (accessToken) {
-        try {
-          const response = await fetch(
-            `http://127.0.0.1:8000/api/get_all_property`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          );
-
-          const data = await response.json();
-
-          if (response.ok) {
-            setUnitList(data.data);
-            console.log(data.data);
-          } else {
-            console.log("Error Message", data.message);
-            console.log("ResponseError:", response.status);
-          }
-        } catch (error) {
-          console.error("Error", error);
-        }
-      } else {
-        console.log("No access token found");
-      }
-    };
-    fetchedUnitList();
-  }, []);
-
-  console.log("id", formData.unitId);
 
   const handleSubmit = async(e) => {
     e.preventDefault();
@@ -539,6 +526,7 @@ export default function AddExpensesTransaction({
         handleClose();
         onRefresh(); 
         setLoading(false);
+        setSelectedImage([]);
         if (expensesCategory === "recurring") {
           setFormData({
             unitId: "",
@@ -567,12 +555,11 @@ export default function AddExpensesTransaction({
 
         // handleClose();
       } else {
-        console.log('No access token found')
-        
+        enqueueSnackbar(data.message, {variant: 'error'}) 
+        console.log(data.error)
       }
     } catch (error) {
       console.error("Error submitting form", error);
-      setError("An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -791,9 +778,7 @@ export default function AddExpensesTransaction({
             </Typography>
             <Box onSubmit={handleSubmit} component="form" noValidate>
             
-                <Grid container spacing={2}>
-                  <Grid item xs={12}></Grid>
-                </Grid>
+     
    
                 <>
                   <ToggleButtonGroup

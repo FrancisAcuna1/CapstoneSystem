@@ -5,78 +5,88 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
+import Image from 'next/image';
 
 export default function FAQSection() {
   return (
     <Box
       sx={(theme) => ({
         width: '100%',
-        backgroundColor: theme.palette.mode === 'light' ? '#fafafa' : '#121212',
-        py: { xs: 8, sm: 12 },
-        px: 3,
+        height: { xs: 'auto', sm: '100vh' },
+        backgroundImage:
+          theme.palette.mode === 'light'
+            ? 'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(270, 100%, 94%), transparent)'
+            : 'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(270, 100%, 20%), transparent)',
+        backgroundSize: '100%',
+        backgroundRepeat: 'no-repeat',
       })}
     >
-      <Container maxWidth="md">
+      <Container
+       maxWidth="lg"
+       sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        // margin: 'auto',
+        pt: { xs: 14, sm: 20 },
+        pb: { xs: 8, sm: 12 },
+      }}
+      >
         <Stack spacing={4}>
-          {/* Header */}
-          <Box>
-            <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold' }}>
-              Questions?
-              <br />
-              We&apos;ve got answers.
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ mt: 1 }}
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography 
+              variant="h4" 
+              component="h2" 
+              sx={{ fontWeight: 'bold' }}
             >
-              Something else to ask?{' '}
-              <Link href="/contact" underline="hover">
-                Contact us
-              </Link>
+              About Us
             </Typography>
-          </Box>
-
-          {/* FAQ Section */}
-          <Box>
-            {/* Question 1 */}
-            <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>
-              What is [Your Service Name]?
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-              [Your Service Name] is a digital platform that connects renters and property managers. We provide efficient search capabilities, verified property listings, and tools for seamless communication between tenants and landlords, making renting and managing properties as easy as possible.
-            </Typography>
-          </Box>
-
-          {/* Question 2 */}
-          <Box>
-            <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>
-              Who owns [Your Service Name]?
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-              [Your Service Name] was founded by experienced property managers and developers who wanted to create a better, more efficient rental experience for all. Backed by a team of dedicated professionals, we are privately owned and continually striving to improve our services.
-            </Typography>
-          </Box>
-
-          {/* Question 3 */}
-          <Box>
-            <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>
-              Do I need to pay to use [Your Service Name]?
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-              Our platform is free for renters to browse properties, contact landlords, and schedule visits. Some advanced property management tools for landlords may have associated costs. Please contact us to learn more about our premium services.
-            </Typography>
-          </Box>
-
-          {/* Question 4 */}
-          <Box>
-            <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>
-              How do you make sure listings are legitimate?
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-              We take your security seriously. All listings go through a rigorous verification process to ensure that they are genuine. Our team reviews every listing for authenticity to protect you from scams. Look for the &quot;Verified&quot; badge on trusted properties.
-            </Typography>
+            <Box 
+              sx={{ 
+                width: '50%', // Adjust the width as needed
+                height: '3px', // Thickness of the line
+                backgroundColor: '#7e57c2', // Color of the line
+                margin: '0 auto' // Center the line
+              }} 
+            />
           </Box>
         </Stack>
+        <Stack 
+          direction="row"
+          spacing={2}
+          sx={{
+            mt: '8rem',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between' // Space out the content
+          }}
+        >
+          <Box sx={{ flex: 1, pr: 2 }}> {/* Allocate space for text */}
+            <Typography variant="h4" component="h1" letterSpacing={1} gutterBottom sx={{ fontWeight: 'bold' }}>
+            Simplifying Property Management, Prioritizing Your Experience.
+            </Typography>
+            <Typography variant="body1" color="text.secondary" letterSpacing={0.1} sx={{ mt: 2}}>
+              PropTrack is a modern property management system designed to simplify the lives of property owners, landlords, and tenants. Our platform offers seamless solutions for managing rental properties, tracking payments, handling maintenance requests, and streamlining communication between landlords and tenants. 
+            </Typography>
+            <Typography variant="body1" color="text.secondary" letterSpacing={0.1} sx={{ mt: 2 }}>
+              Our mission is to transform property management into a hassle-free experience by integrating technology, innovation, and excellent customer support. Join PropTrack today and experience the future of property management!
+            </Typography>
+          </Box>
+          <Box sx={{ flex: 1, pl: 2 }}> {/* Allocate equal space for the image */}
+            <Image 
+              src="/aboutus.jpeg"
+              width={1200} // Larger width
+              height={800} // Larger height
+              style={{
+                width: "100%", // Make the image fill the container
+                height: "auto", // Maintain aspect ratio
+                objectFit: "cover",
+                borderRadius: "10px",
+              }}
+              alt="About Us" // Add alt text for accessibility
+            />
+          </Box>
+        </Stack>
+
       </Container>
     </Box>
   );

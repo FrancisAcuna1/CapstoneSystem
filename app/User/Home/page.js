@@ -1,7 +1,7 @@
 "use client"
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from "next-auth/react"
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -14,23 +14,25 @@ import Header from '../Dashboard/header';
 import { Divider } from '@mui/material';
 // import Content from '../ComponentLayout/content';
 import dynamic from 'next/dynamic';
+import Chatbot from '@/app/ChatbotUI/chatbot';
 
 const HomeComponent = dynamic(() => import('../Component/HeroContent/HomeComponent'), {
   ssr: false
   }) 
 
 
-// function Copyright() {
-//   return (
-//     <Typography variant="body2" color="text.secondary" align="center">
-//       {'Copyright © '}
-//       <Link color="inherit" href="https://mui.com/">
-//         Your Website
-//       </Link>{' '}
-//       {new Date().getFullYear()}.
-//     </Typography>
-//   );
-// }
+function Copyright() {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center">
+      {'Copyright © '}
+      PropTrack: Integrated Property Management and Tenant Communication System {' '}
+      {/* <Link color="inherit">
+        Proptrack
+      </Link>{' '} */}
+      {new Date().getFullYear()}.
+    </Typography>
+  );
+}
 
 let theme = createTheme({
   palette: {
@@ -195,12 +197,26 @@ const drawerWidth = 256;
 
 export default function OverviewPage (){
   const router = useRouter();
-  // const [activeTab, setActiveTab] = useState('');
   const { data: session, status } = useSession();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   // this code 'isSmUp is Enable the Burger Icon for mobile view
   const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
 
+  const isMenuOpen = Boolean(anchorEl);
+  const handleProfileMenuOpen = (event) => {
+      setAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+      setMobileMoreAnchorEl(null);
+  };
+
+  const handleMenuClose = () => {
+      setAnchorEl(null);
+      handleMobileMenuClose();
+  };
   const handleDrawerToggle = () => {
   setMobileOpen(!mobileOpen);
   };
@@ -248,11 +264,17 @@ if(status === 'authenticated'){
           <Box component="main" sx={{ flex: 1, py: 2, px: 4, bgcolor: '#eaeff1' }}>
               {/* <h5>This is Overview Page</h5> */}
             <HomeComponent/>
+            <Chatbot
+              isMenuOpen={isMenuOpen}
+              anchorEl={anchorEl}
+              handleProfileMenuOpen={handleProfileMenuOpen}
+              handleMenuClose={handleMenuClose}
+            />
               {/* <CardContentHeader/> */}
               {/* <Content/> */}
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-              {/* <Copyright/> */}
+            <Copyright/>
           </Box>
           </Box>
       </Box>

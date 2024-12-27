@@ -1,17 +1,18 @@
-'use client'; // Add this at the top for Next.js client-side rendering
+'use client'; 
 
-import React, { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { TextField, Typography, Box, Fab, Button, Fade, IconButton, FormHelperText, FormControl, InputLabel,Select, MenuItem } from '@mui/material';
+import React, { useEffect, useState, useCallback} from 'react';
+import { useRouter } from 'next/navigation';
+import { TextField, Typography, Box, Fab, Button, Fade, IconButton, FormHelperText, FormControl, InputLabel,Select, MenuItem, CircularProgress } from '@mui/material';
 import { styled, css } from '@mui/system';
 import { Modal as BaseModal } from '@mui/base/Modal';
 import Image from 'next/image';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
+import { useSnackbar } from "notistack";
 import UseAxios from '@/app/hooks/UseAxios';
 import axios from "axios";
+import useSWR from 'swr';
 
 const Backdrop = React.forwardRef((props, ref) => {
   const { open, ...other } = props;
@@ -87,12 +88,27 @@ const AddButton = styled(Fab)(({ theme }) => ({
   },
 }));
 
-export default function AddApartmentModal({open, handleOpen, handleClose, error, setError, successful, setSuccessful, editproperty, setEditProperty}) {
-  const { data: session, status } = useSession();
-  const [selectedImage, setSelectedImage] = useState();
-  const [isLoading, setLoading] = useState(false);
+const fetcher = async([url, token]) => {
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  })
+  if(!response.ok){
+    throw new Error(response.statusText)
+  }
+  return response.json()
+}
+
+
+export default function AddApartmentModal({open, handleOpen, handleClose, setLoading, editproperty, setEditProperty, refreshData}) {
+  const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const editItem = editproperty;
+  const [isloading, setIsLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState();
   const [errors, setErrors] = useState({});
   const [allBarangays, setAllBarangays] = useState([])
   const [newProperty, setNewProperty] = useState({
@@ -100,6 +116,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
     barangay: '',
     municipality: 'Sorsogon City',
   });
+  
 
   console.log('id:', editItem)
   console.log('propdata:', newProperty);
@@ -146,70 +163,48 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
     fetchedBarangays();
   }, [])
 
-  useEffect(() => {
-    const fetchDataEdit =  async () => {
-      const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-      const userData = JSON.parse(userDataString); // parse the datastring into json 
-      const accessToken = userData.accessToken;
-      if(accessToken){
-        try{
-          const response = await fetch(`http://127.0.0.1:8000/api/edit_property/${editItem}}`,{
-            method: 'GET',
-            headers: {
-              "Authorization": `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-              "Accept": "application/json",
-            }
-          })
-          const data = await response.json();
-          console.log(data)
-          console.log('Response:', response.status)
+  const getUserToken = () => {
+    const userDataString = localStorage.getItem('userDetails');
+    const userData = JSON.parse(userDataString); 
+    const accessToken = userData?.accessToken;
+    return accessToken;
+  }
+  const token = getUserToken();
 
-          if(response.ok){
-            setNewProperty({
-              propertyname: data.editProperty.propertyname || '',
-              // street: data.editProperty.street,
-              barangay: data.editProperty.barangay || '',
-              municipality: data.editProperty.municipality,
-            })
-            // setSelectedImage(data?.editProperty?.image )
-            if (data.editProperty.image) {
-              setSelectedImage(data.editProperty.image);
-            }
-            console.log('Edit:', newProperty);
-            console.log('Edit:', selectedImage)
-            setSuccessful(successMessage);
-          }else{
-            setError(data.message || 'Failed to save property data.');
-            handleClose();
-          }
-         
-
-        }catch (error){
-          setLoading(false); // Set loading to false regardless of success or failure
-        }finally{
-          setLoading(false); // Set loading to false regardless of success or failure
-        }
-      }
-
+  const {data:response, error} = useSWR(
+    token && editItem ? [`http://127.0.0.1:8000/api/edit_property/${editItem}`, token] : null,
+    fetcher, {
+      refreshInterval: 1000,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      errorRetryCount: 3,
     }
-    fetchDataEdit()
-  }, [editItem, newProperty, selectedImage, handleClose, setError, setSuccessful])
+  )
+  console.log(error);
+  console.log(response?.editProperty)
+  useEffect(() => {
+    if(response){
+      setNewProperty({
+        propertyname: response.editProperty?.propertyname || '',
+        barangay: response.editProperty?.barangay || '',
+        municipality: response.editProperty?.municipality,
+      });
 
+      if (response.editProperty?.image) {
+        setSelectedImage(response.editProperty.image);
+      }
+    }
+  }, [response])
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
 
-    const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-    const userData = JSON.parse(userDataString); // parse the datastring into json 
-
+    const userDataString = localStorage.getItem('userDetails'); 
+    const userData = JSON.parse(userDataString); 
     const accessToken = userData.accessToken;
-
-    if (accessToken){
-      console.log('authenticated', status)
-      console.log("Value:", newProperty)
-      console.log('Token:', accessToken); 
+ 
+    if (accessToken){ 
       console.log({selectedImage});
 
       const method = editItem ? 'POST' : 'POST';
@@ -233,7 +228,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
         }
         if (hasErrors) {
           setErrors(newErrors);
-          setLoading(false);
+          setIsLoading(false);
           return;
         }
         formData.append('propertyname', newProperty.propertyname);
@@ -265,7 +260,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
           method,
           headers:{
               'Authorization': `Bearer ${accessToken}`, 
-              'Accept': 'application/json',
+              // 'Accept': 'application/json',
           },
           body: formData
         });
@@ -283,55 +278,24 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
             barangay: '',
             municipality: 'Sorsogon City'
           });
+          setEditProperty(null)
           setSelectedImage(null);
-          localStorage.setItem('successMessage', data.message || 'Operation successful!');
-          window.location.reload();
-          // const successMessage = data.message || 'Success!'; 
-          // setSuccessful(successMessage);
-          
+          enqueueSnackbar(data.message, {variant: 'success'});
+          // refreshData();
+          setIsLoading(false)          
         } else {
-         if(data.error)
-         {
-          localStorage.setItem('errorMessage', data.error || 'Operation Error!');
-          window.location.reload();
-         }else{
-          localStorage.setItem('errorMessage', data.message || 'Operation Error!');
-          window.location.reload();
-         }
-        
+          enqueueSnackbar(data.message, {variant: 'error'});
+          setIsLoading(false)
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError(error.message || 'An unexpected error occurred');
-        setLoading(false);
-        setSuccessful(false)
+        setIsLoading(false);
       }
     }else{
       console.error('Authentication error: Token missing or invalid');
-      setSuccessful(false)
-      setError('Authentication error: Token missing or invalid');
     }
     
   };
-
-  useEffect(() => {
-    const successMessage = localStorage.getItem('successMessage');
-    const errorMessage = localStorage.getItem('errorMessage');
-    if (successMessage) {
-      setSuccessful(successMessage);
-      setTimeout(() => {
-        localStorage.removeItem('successMessage');
-      }, 3000);
-    }
-
-    if(errorMessage){
-      setError(errorMessage);
-      setTimeout(() => {
-        localStorage.removeItem('errorMessage');
-      }, 3000);
-    }
-  
-  }, [setError, setSuccessful]);
 
   // Remove duplicates by preferring non-district entries
   const uniqueBarangays = Object.values(allBarangays.reduce((acc, current) => {
@@ -352,12 +316,6 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
     a.name.localeCompare(b.name)
   );
 
-
-  // const handleImageChange = (e) => {
-  //   if (e.target.files && e.target.files.length > 0) {
-  //     setSelectedImage(e.target.files[0]);
-  //   }
-  // };
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -382,7 +340,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5, mb: 3 }}>
-      <AddButton variant="extended" aria-label="add" onClick={handleOpen} sx={{zIndex: 0, backgroundColor: '#f78028', '&:hover': { backgroundColor: '#ffa726' } }}>
+      <AddButton variant="extended" aria-label="add" onClick={handleOpen} sx={{zIndex: 0, backgroundColor: 'primary', '&:hover': { backgroundColor: '#6f6ab2' } }}>
         <AddCircleOutlineIcon sx={{ mr: 1 }} />
         Add New Property
       </AddButton>
@@ -423,26 +381,6 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
                 error={Boolean(errors.propertyname)}
                 helperText={errors.propertyname}
               />
-              {/* <TextField 
-                required 
-                id="street"
-                label="Street" 
-                fullWidth 
-                margin="normal" 
-                name="street"
-                value={newProperty.street}
-                onChange={handleChange}
-              /> */}
-              {/* <TextField 
-                required 
-                id="barangay"
-                label="Barangay"
-                fullWidth 
-                margin="normal"
-                name="barangay"
-                value={newProperty.barangay}
-                onChange={handleChange}
-              /> */}
               <FormControl fullWidth error={Boolean(errors.apartmentstatus)}>
                 <InputLabel id="demo-simple-select-label" error={Boolean(errors.apartmentstatus)}>Barangay</InputLabel>
                 <Select
@@ -553,11 +491,11 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
                   borderRadius: '10px',
                   padding: '12px',
                   background: 'primary',
-                  '&:hover': { backgroundColor: '#ffa726' },
+                  '&:hover': { backgroundColor: '#6f6ab2' },
                   letterSpacing: '2px',
                 }}
               >
-                Submit
+                {isloading ? <CircularProgress/> : 'Submit'}
               </Button>
               <Button
                 variant="outlined"
@@ -591,7 +529,6 @@ export default function AddApartmentModal({open, handleOpen, handleClose, error,
               </Button>
 
             </Box>
-            
           </ModalContent>
         </Fade>
       </Modal>

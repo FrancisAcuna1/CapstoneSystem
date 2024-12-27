@@ -8,6 +8,8 @@ import Divider from '@mui/material/Divider';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import getLPTheme from "../components/LayoutComponent/getLPTheme";
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
+import ContactComponent from "../components/HeroComponent/FAQSComponent";
+import Footer from "../components/LayoutComponent/Footer";
 // import Chatbot from "../../component/chatbot";
 
 
@@ -66,20 +68,19 @@ export default function LandingPage() {
     <ThemeProvider theme={showCustomTheme ? defaultTheme : defaultTheme}>
       <CssBaseline />
       <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
+        <ContactComponent/>
       <Box sx={{ bgcolor: 'background.default' }}>
         <Grid container justifyContent="space-between" sx={{ padding: '0 20px' }}>
           
           <Grid item>
-          <h1>Home</h1>
 
-            {/* Add any content here */}
           </Grid>
           {/* <Grid item>
             <Chatbot />
           </Grid> */}
         </Grid>
       </Box>
-      
+      <Footer/>
     </ThemeProvider>
     );
 

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
+import {Box, LinearProgress} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Navigator from '../Dashboard/navigator';
@@ -14,6 +14,7 @@ import Header from '../Dashboard/header';
 import { Divider } from '@mui/material';
 import RequestMaintenanceComponent from '../Component/HeroContent/RequestMaintenanceComponent';
 import dynamic from 'next/dynamic';
+import Chatbot from '@/app/ChatbotUI/chatbot';
 
 
 // const CardContentHeader = dynamic(() => import('../ComponentLayout/HeroContent/HomeContent'), {
@@ -21,17 +22,18 @@ import dynamic from 'next/dynamic';
 //   }) 
 
 
-// function Copyright() {
-//   return (
-//     <Typography variant="body2" color="text.secondary" align="center">
-//       {'Copyright © '}
-//       <Link color="inherit" href="https://mui.com/">
-//         Your Website
-//       </Link>{' '}
-//       {new Date().getFullYear()}.
-//     </Typography>
-//   );
-// }
+function Copyright() {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center">
+      {'Copyright © '}
+      PropTrack: Integrated Property Management and Tenant Communication System {' '}
+      {/* <Link color="inherit">
+       Proptrack
+      </Link>{' '} */}
+      {new Date().getFullYear()}.
+    </Typography>
+  );
+}
 
 let theme = createTheme({
   palette: {
@@ -196,10 +198,26 @@ export default function OverviewPage (){
   const router = useRouter();
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(false);
-
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   // this code 'isSmUp is Enable the Burger Icon for mobile view
   const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
+
+  console.log(loading)
+  const isMenuOpen = Boolean(anchorEl);
+  const handleProfileMenuOpen = (event) => {
+      setAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+      setMobileMoreAnchorEl(null);
+  };
+
+  const handleMenuClose = () => {
+      setAnchorEl(null);
+      handleMobileMenuClose();
+  };
 
   const handleDrawerToggle = () => {
   setMobileOpen(!mobileOpen);
@@ -244,15 +262,22 @@ export default function OverviewPage (){
           <Divider />
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
+          {loading && <LinearProgress color='primary' sx={{ position: 'fixed',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4.99, borderRadius: '4px 4px 0 0' }} />}
           <Box component="main" sx={{ flex: 1, py: 2, px: 4, bgcolor: '#eaeff1' }}>
               {/* <h5>This is Request Maintenance Page</h5> */}
               <RequestMaintenanceComponent
                 setLoading={setLoading}
                 loading={loading}
               />
+              <Chatbot
+              isMenuOpen={isMenuOpen}
+              anchorEl={anchorEl}
+              handleProfileMenuOpen={handleProfileMenuOpen}
+              handleMenuClose={handleMenuClose}
+              />
           </Box>
-          <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-              {/* <Copyright/> */}
+          <Box component="footer" sx={{ p: 3, bgcolor: '#eaeff1' }}>
+              <Copyright/>
           </Box>
           </Box>
       </Box>

@@ -15,23 +15,25 @@ import { Divider } from '@mui/material';
 // import Content from '../ComponentLayout/content';
 import dynamic from 'next/dynamic';
 import AssessmentFeeComponent from '../Component/HeroContent/AssessmentComponent';
+import Chatbot from '@/app/ChatbotUI/chatbot';
 
 const HomeComponent = dynamic(() => import('../Component/HeroContent/HomeComponent'), {
   ssr: false
   }) 
 
 
-// function Copyright() {
-//   return (
-//     <Typography variant="body2" color="text.secondary" align="center">
-//       {'Copyright © '}
-//       <Link color="inherit" href="https://mui.com/">
-//         Your Website
-//       </Link>{' '}
-//       {new Date().getFullYear()}.
-//     </Typography>
-//   );
-// }
+function Copyright() {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center">
+      {'Copyright © '}
+      PropTrack: Integrated Property Management and Tenant Communication System {' '}
+      {/* <Link color="inherit">
+        Proptrack
+      </Link>{' '} */}
+      {new Date().getFullYear()}.
+    </Typography>
+  );
+}
 
 let theme = createTheme({
     palette: {
@@ -195,12 +197,27 @@ const drawerWidth = 256;
 
 export default function OverviewPage (){
   const router = useRouter();
-  // const [activeTab, setActiveTab] = useState('');
   const { data: session, status } = useSession();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [loading, setLoading] = useState(false);
   // this code 'isSmUp is Enable the Burger Icon for mobile view
   const isSmUp = useMediaQuery(theme.breakpoints.up( 'lg',));
+
+  const isMenuOpen = Boolean(anchorEl);
+  const handleProfileMenuOpen = (event) => {
+      setAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+      setMobileMoreAnchorEl(null);
+  };
+
+  const handleMenuClose = () => {
+      setAnchorEl(null);
+      handleMobileMenuClose();
+  };
 
   const handleDrawerToggle = () => {
   setMobileOpen(!mobileOpen);
@@ -253,12 +270,15 @@ export default function OverviewPage (){
                 setLoading={setLoading}
                 loading={loading}
               />
-              {/* <HomeComponent/> */}
-                {/* <CardContentHeader/> */}
-                {/* <Content/> */}
+              <Chatbot
+              isMenuOpen={isMenuOpen}
+              anchorEl={anchorEl}
+              handleProfileMenuOpen={handleProfileMenuOpen}
+              handleMenuClose={handleMenuClose}
+              />
             </Box>
             <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-                {/* <Copyright/> */}
+              <Copyright/>
             </Box>
             </Box>
         </Box>

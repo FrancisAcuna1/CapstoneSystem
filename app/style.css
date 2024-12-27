@@ -378,4 +378,24 @@ button{
     height: 'auto';
 }
 
-  
+.event-content {
+    display: flex;
+    flex-direction: column; /* or row depending on your layout */
+    padding: 5px;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.event-title {
+font-weight: bold;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+
+.event-status {
+font-size: 0.9em;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}

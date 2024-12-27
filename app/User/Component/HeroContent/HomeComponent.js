@@ -1,6 +1,7 @@
 "use client"
 import { Container, Paper, Typography,Box, Grid, Button, Link} from '@mui/material';
 import * as React from 'react';
+import { useState } from 'react';
 import '/app/style.css';
 import GroupOutlinedIcon from "@mui/icons-material/Group";
 import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
@@ -13,6 +14,9 @@ import EngineeringIcon from '@mui/icons-material/Engineering';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import Sample from '../FormComponent/Sample';
+import UserProfile from '../Libraries/ProfileCard';
+import Chatbot from '@/app/ChatbotUI/chatbot';
 
 
 
@@ -36,6 +40,13 @@ import Image from 'next/image';
 
 
 export default function CardContent (){
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => {
+        setOpen(true);
+    }
+    const handleClose = () => {
+        setOpen(false);
+    }
     return (
         <>
             <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
@@ -98,7 +109,10 @@ export default function CardContent (){
                             </Box>
                            
                         </Paper>
-                    </Grid>  
+                    </Grid>
+                    <Grid>
+                        <Chatbot/>
+                    </Grid>
                 </Grid>
 
 

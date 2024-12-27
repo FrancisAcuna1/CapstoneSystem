@@ -1,5 +1,6 @@
 "use client"
 import React from "react";
+import { useState } from "react";
 import AppAppBar from "../components/LayoutComponent/Appbar";
 import Hero from "../components/HeroComponent/Hero";
 import PropTypes from 'prop-types';
@@ -51,6 +52,7 @@ import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 
 export default function LandingPage() {
     const [mode, setMode] = React.useState('light');
+    const [activeTab, setActiveTab] = useState('/');
     const [showCustomTheme, setShowCustomTheme] = React.useState(true);
     const defaultTheme = createTheme({ palette: { mode } });
   
@@ -65,12 +67,11 @@ export default function LandingPage() {
     return (
     <ThemeProvider theme={showCustomTheme ? defaultTheme : defaultTheme}>
       <CssBaseline />
-      <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
+      <AppAppBar mode={mode} toggleColorMode={toggleColorMode} activeTab={activeTab} setActiveTab={setActiveTab}/>
       <Box sx={{ bgcolor: 'background.default' }}>
         <Grid container justifyContent="space-between" sx={{ padding: '0 20px' }}>
           
           <Grid item>
-      <h1>Sample PAge</h1>
 
             {/* Add any content here */}
           </Grid>

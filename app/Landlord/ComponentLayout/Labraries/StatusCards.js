@@ -1,200 +1,249 @@
-'use client'
-import React, {useState, useEffect} from 'react';
-import { Card, CardContent, Typography, IconButton, Grid, Box, Paper, Skeleton } from '@mui/material';
-import { styled } from '@mui/system';
-import Image from 'next/image';
-import '/app/style.css';
-
-
-const ValueTypography = styled(Typography)(({ theme }) => ({
-    fontWeight: 'semi-bold',
-    color: theme.palette.text.primary,
-    fontFamily: 'Poppins, sans-serif',
-   
+"use client";
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  IconButton,
+  Grid,
+  Box,
+  Paper,
+  Skeleton,
+  useTheme,
+  Fade,
+  Tooltip,
+} from "@mui/material";
+import { styled } from "@mui/system";
+import Image from "next/image";
+import "/app/style.css";
+import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
+import PendingActionsOutlinedIcon from "@mui/icons-material/PendingActionsOutlined";
+import LoopOutlinedIcon from "@mui/icons-material/LoopOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import useSWR from "swr";
+const StyledCard = styled(Card)(({ theme, color }) => ({
+    height: '100%',
+    background: `linear-gradient(135deg, ${color}08 0%, ${theme.palette.background.paper} 100%)`,
+    transition: 'all 0.3s ease-in-out',
+    border: '1px solid',
+    borderColor: `${color}30`,
+    '&:hover': {
+      transform: 'translateY(-4px)',
+      boxShadow: `0 8px 24px ${color}20`,
+      borderColor: `${color}40`,
+    },
 }));
+const IconWrapper = styled(Box)(({ theme, color }) => ({
+  backgroundColor: `${color}15`,
+  borderRadius: "12px",
+  padding: theme.spacing(1.5),
+  height: "46px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  transition: "all 0.3s ease-in-out",
+  "&:hover": {
+    backgroundColor: `${color}25`,
+  },
+}));
+const ValueChangeIndicator = styled(Box)(({ theme, positive }) => ({
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '4px 8px',
+    borderRadius: '6px',
+    backgroundColor: positive ? theme.palette.success.light + '20' : theme.palette.error.light + '20',
+    color: positive ? theme.palette.success.main : theme.palette.error.main,
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    marginLeft: theme.spacing(1),
+  }));
+const fetcher = async ([url, token]) => {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+  return response.json();
+};
 
-export default function StatusCards({loading, setLoading}) {
+export default function StatusCards({ loading, setLoading }) {
     const [countStatus, setCountStatus] = useState([]);
+    const [hoveredCard, setHoveredCard] = useState(null);
+    const theme = useTheme();
     console.log(countStatus);
-    
-    useEffect(() => {
-        const fetchedStatusCount = async() => {
-            const userDataString = localStorage.getItem('userDetails');
-            const userData = JSON.parse(userDataString);
-            const accessToken = userData?.accessToken;
-            setLoading(true);
 
-            if(accessToken){
-                const response = await fetch(`http://127.0.0.1:8000/api/count_status`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-type': 'application/json'
-                    }
-                })
-                const data = await response.json();
-                console.log(data)
-                if(response.ok){
-                    setCountStatus(data);
-                    setLoading(false);
-                }else{
-                    console.log('Error', data.error)
-                    setLoading(false);
-                }
-            }else{
-                console.log('No access token found!')
-                setLoading(false);
-            }
+    const getUseToken = () => {
+        const userDataString = localStorage.getItem("userDetails");
+        const userData = JSON.parse(userDataString);
+        const accessToken = userData?.accessToken;
+        return accessToken;
+    };
+    const token = getUseToken();
+    const {
+        data: response,
+        error,
+        isLoading,
+    } = useSWR(
+        (token && [`http://127.0.0.1:8000/api/count_status`, token]) || null,
+        fetcher,
+        {
+        refreshInterval: 5000,
+        revalidateOnFocus: false,
+        shouldRetryOnError: false,
+        errorRetryCount: 3,
+        onLoadingSlow: () => setLoading(true),
         }
-        fetchedStatusCount();
-    }, [setLoading])
+    );
+    useEffect(() => {
+        if (response) {
+        setCountStatus(response);
+        setLoading(false);
+        } else if (isLoading) {
+        setLoading(true);
+        }
+    }, [response, isLoading, setLoading]);
 
-
-
-
+    const cards = [
+        {
+        title: "Completed",
+        count: countStatus?.completed || 0,
+        icon: AssignmentTurnedInOutlinedIcon,
+        color: '#388e3c',
+        tooltip: "Total number of completed maintenance!",
+        },
+        {
+        title: "To do",
+        count: countStatus?.todo || 0,
+        icon: PendingActionsOutlinedIcon,
+        color: theme.palette.secondary.main,
+        tooltip: "Total number of todo maintenance!",
+        },
+        {
+        title: "In Progress",
+        count: countStatus?.inprogress || 0,
+        icon: LoopOutlinedIcon,
+        color: theme.palette.primary.main,
+        tooltip: "Total number of in progress or on going maintenance!",
+        },
+    ];
 
     return (
         <Box>
-            <Grid container spacing={2} justifyContent="center">
-                <Grid item xs={12} sm={4}>
-                    <Paper 
-                        sx={{display: 'flex',
-                        alignItems: 'center',
-                        // justifyContent: 'center',
-                        minHeight: '150px',
-                        borderRadius: '12px',
-                        padding: '25px',
-                        backgroundColor: '#c8e6c9',
-                        color: '#1b5e20',
+        <Grid container spacing={2} justifyContent="center">
+            {cards.map((card, index) => (
+            <Grid key={index} item xs={12} sm={6} md={4} lg={4}>
+                <StyledCard
+                color={card.color}
+                onMouseEnter={() => setHoveredCard(index)}
+                onMouseLeave={() => setHoveredCard(null)}
+                >
+                <CardContent
+                    sx={{
+                   
+                    height: "100%",
+                    p: 3,
+                    }}
+                >
+                    {loading ? (
+                    <>
+                        <Box>
+                        <Skeleton
+                            variant="rectangular"
+                            animation="wave"
+                            height={55}
+                        />
+                        <Skeleton width={100} animation="wave" height={30} />
+                        <Skeleton width={100} animation="wave" height={30} />
+                        </Box>
+                    </>
+                    ) : (
+                    <Box>
+                        <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            mb: 3,
                         }}
-                    >{loading ? (
-                        <Box width="100%">
-                            <Skeleton animation="wave" variant="rectangular" height={55} />
-                            <Skeleton animation="wave" width="100%" height={30} />
-                            <Skeleton animation="wave" width="100%" height={30} />
-                        </Box>  
-                        ):(
-                        <>
-                        <Grid container justifyContent={'space-between'}>
-                            
-                           
-                            <Grid item >
-                                <ValueTypography variant='h3' sx={{ml:2,  mt:{xs:'0.1rem', sm:'0.2rem', md: '0.8rem', lg: '0rem'}, fontSize: {xs:'2.8rem', sm: '2.8rem', md: '1.2rem', lg:'3.5rem'}, }}>
-                                    {countStatus.completed}
-                                </ValueTypography>
-                                <Typography variant='body1' sx={{fontSize:{xs:'20px', sm:'20px', md:'23px', lg:'24px' }, fontWeight: 500, ml: 2}}>
-                                  Completed
+                        >
+                        <Box>
+                            <Box
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                mb: 0.5,
+                            }}
+                            >
+                            <Typography
+                                variant="h6"
+                                component="div"
+                                sx={{
+                                fontWeight: 600,
+                                color: "#263238",
+                                mr: 1,
+                                fontSize: {
+                                    xs: "20px",
+                                    sm: "16px",
+                                    md: "18px",
+                                    lg: "20px",
+                                },
+                                }}
+                            >
+                                {card.title}
+                            </Typography>
+                            <Tooltip title={card.tooltip} arrow>
+                                <IconButton size="small" sx={{ opacity: 0.6 }}>
+                                <InfoOutlinedIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                            </Box>
+                        </Box>
+                        <IconWrapper color={card.color}>
+                            <card.icon
+                            fontSize="large"
+                            sx={{ color: card.color }}
+                            />
+                        </IconWrapper>
+                        </Box>
+                        <Box sx={{ position: "relative", minHeight: "65px" }}>
+                        <Fade in={!loading}>
+                            <Box>
+                            <Typography
+                                variant="h4"
+                                component="div"
+                                sx={{
+                                fontWeight: 700,
+                                color: card.color,
+                                mb: 1,
+                                mt: -2,
+                                }}
+                            >
+                                {card.count}
+                            </Typography>
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                                <Typography
+                                variant="body2"
+                                sx={{
+                                    color: theme.palette.text.secondary,
+                                    mt: 3,
+                                }}
+                                >
                                 </Typography>
-                            </Grid>
-                            <Grid item >
-                                <Image
-                                    src={'/doneIcon.png'}
-                                     alt="DoneIcon"
-                                    // className='DoneIcon'
-                                    width={100}  // Replace with your desired width
-                                    height={95} // Replace with your desired height
-                                />
-                            </Grid>
-                            
-                        </Grid>
-                        </>
-                        )}
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <Paper 
-                        sx={{display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        minHeight: '150px',
-                        borderRadius: '12px',
-                        padding: '25px',
-                         backgroundColor: '#fff3e0',
-                        color: '#f57f17'
-                        // backgroundColor: '#e3f2fd',
-                        // color: '#0d47a1',
-                        }}
-                    >  
-                    {loading ? (
-                    <Box width="100%">
-                        <Skeleton animation="wave" variant="rectangular" height={55} />
-                        <Skeleton animation="wave" width="100%" height={30} />
-                        <Skeleton animation="wave" width="100%" height={30} />
-                    </Box>  
-                    ):(
-                    <>
-                    <Grid container justifyContent={'space-between'}>
-                        <Grid item >
-                            <ValueTypography variant='h3' sx={{ml:2,  mt:{xs:'0.1rem', sm:'0.2rem', md: '0.8rem', lg: '0rem'}, fontSize: {xs:'2.8rem', sm: '2.8rem', md: '1.2rem', lg:'3.5rem'}, }}>
-                            {countStatus.todo}
-                            </ValueTypography>
-                            <Typography variant='body1' sx={{fontSize:{xs:'20px', sm:'20px', md:'23px', lg:'24px' }, fontWeight: 500, ml: 2}}>
-                                To do
-                            </Typography>
-                        </Grid>
-                        <Grid item >
-                            <Image
-                                src={'/TodoIcon.png'}
-                                className='StatsIcon'
-                                    alt="TodoIcon"
-                                width={100}  // Replace with your desired width
-                                height={95} // Replace with your desired height
-                            />
-                        </Grid>
-                    </Grid>
-                    </>
+                            </Box>
+                            </Box>
+                        </Fade>
+                        </Box>
+                    </Box>
                     )}
-                        
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <Paper 
-                        sx={{display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        minHeight: '150px',
-                        borderRadius: '12px',
-                        padding: '25px',
-                       
-                        backgroundColor: '#ede7f6',
-                        color: '#512da8',
-                        }}
-                    >
-                    {loading ? (
-                    <Box width="100%">
-                        <Skeleton animation="wave" variant="rectangular" height={55} />
-                        <Skeleton animation="wave" width="100%" height={30} />
-                        <Skeleton animation="wave" width="100%" height={30} />
-                    </Box>  
-                    ):(
-                    <>
-                    <Grid container justifyContent={'space-between'}>
-                        <Grid item >
-                            <ValueTypography variant='h3' sx={{ml:2,  mt:{xs:'0.1rem', sm:'0.2rem', md: '0.8rem', lg: '0rem'}, fontSize: {xs:'2.8rem', sm: '2.8rem', md: '1.2rem', lg:'3.5rem'}, }}>
-                            {countStatus.inprogress}
-                            </ValueTypography>
-                            <Typography variant='body1' sx={{fontSize:{xs:'20px', sm:'20px', md:'23px', lg:'24px' }, fontWeight: 500, ml: 2}}>
-                                In Progress
-                            </Typography>
-                        </Grid>
-                        <Grid item >
-                            <Image
-                                src={'/3D rep.png'}
-                                    alt="3Drep logo"
-                                // className='DoneIcon'
-                                width={90}  // Replace with your desired width
-                                height={95} // Replace with your desired height
-                            />
-                        </Grid>
-                    </Grid>
-                    </>
-                    )} 
-                    </Paper>
-                </Grid>
+                </CardContent>
+                </StyledCard>
             </Grid>
+            ))}
+        </Grid>
         </Box>
-    )
-  
-};
-
-
+    );
+}

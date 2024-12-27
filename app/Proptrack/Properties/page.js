@@ -1,13 +1,14 @@
 'use client';
-import React, { useEffect } from "react";
-import {CssBaseline, Grid, Divider, ToggleButtonGroup, ToggleButton, Box, Typography} from '@mui/material';
-import PropertyCard from "../components/HeroComponent/PropertyCard";
+import React, { useState } from "react";
+import {CssBaseline, Grid, Divider, ToggleButtonGroup, ToggleButton, Box, Typography, LinearProgress} from '@mui/material';
+import PropertyCard from "../components/HeroComponent/PropertyComponent";
 import AppAppBar from "../components/LayoutComponent/Appbar";
 import Hero from "../components/HeroComponent/Hero";
 import PropTypes from 'prop-types';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import getLPTheme from "../components/LayoutComponent/getLPTheme";
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
+import Footer from "../components/LayoutComponent/Footer";
 // import dynamic from "next/dynamic";
 // const Layout = dynamic(() => import('../../Proptack-website/components/Appbar'), {
 //     ssr: false
@@ -49,8 +50,10 @@ const properties = [
 
 
 export default function Properties() {
-  const [mode, setMode] = React.useState('light');
-  const [showCustomTheme, setShowCustomTheme] = React.useState(true);
+  const [mode, setMode] = useState('light');
+  const [activeTab, setActiveTab] = useState('/');
+  const [loading, setLoading] = useState(false);
+  const [showCustomTheme, setShowCustomTheme] = useState(true);
   const defaultTheme = createTheme({ palette: { mode } });
 
   const toggleColorMode = () => {
@@ -62,23 +65,12 @@ export default function Properties() {
   };
   
 
-
-
-
-
   return (
     <ThemeProvider theme={showCustomTheme ? defaultTheme : defaultTheme}>
       <CssBaseline />
-      <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
-      <PropertyCard/>
-      {/* <Grid container spacing={4}>
-        {properties.map((property) => (
-          <Grid item xs={12} sm={6} md={4} key={property.id}>
-            <PropertyCard property={property} />
-          </Grid>
-        ))}
-      </Grid> */}
-     
+      <AppAppBar mode={mode} toggleColorMode={toggleColorMode} activeTab={activeTab} setActiveTab={setActiveTab}/>
+      {loading && <LinearProgress sx={{ color:"#673ab7", position: 'absolute',  zIndex: 0, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
+      <PropertyCard loading={loading} setLoading={setLoading}/>
       <Box sx={{ bgcolor: 'background.default' }}>
         <Grid container justifyContent="space-between" sx={{ padding: '0 20px' }}>
           <Grid item>
@@ -90,7 +82,7 @@ export default function Properties() {
         </Grid>
        
       </Box>
-      
+      <Footer/>
     </ThemeProvider>
    
   );

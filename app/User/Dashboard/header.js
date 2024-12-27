@@ -2,11 +2,8 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { AppBar, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Avatar,} from '@mui/material';
+import { AppBar, InputBase, Menu, MenuItem, Badge, Box, IconButton, Toolbar, Avatar, Popover} from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import HelpIcon from '@mui/icons-material/Help';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
@@ -15,7 +12,9 @@ import MuiAppBar  from '@mui/material/AppBar';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import { signOut } from "next-auth/react";
-
+import useSWR from 'swr';
+import NotificationsDialog from '../Component/Libraries/NotificationDialog';
+import UserProfile from '../Component/Libraries/ProfileCard';
 
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
@@ -64,65 +63,134 @@ const Search = styled('div')(({ theme }) => ({
     },
   }));
 
+  const fetcherTotalNotif = async([url, token]) => {
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    if(!response.ok){
+        throw new Error(response.statusText);
+    }
+    return response.json();
+  }
 
-  
+  const fetcherTenantInformation = async([url, token]) => {
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json', 
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    if(!response.ok){
+        throw new Error(response.statusText);
+    }
+    return response.json();
+  }
+
+  const fetcherProfileImage = async([url, token]) => {
+    console.log(url, token)
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+    })
+    if(!response.ok){
+        throw new Error(response.statusText)
+    }
+    return response.json();
+  }
 
 function Header(props) {
     const { onDrawerToggle } = props;
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [totalNotif, setTotalNotif] = useState([]);
+    const [userToken, setUserToken] = useState([]);
+    const [userId, setUserId] = useState([]);
+    const [isNotificationsOpen, setisNotificationsOpen] = useState(false)
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
     const [tenantInformation, setTenantInformation] = useState([]);
-
+    const [profileImage, setProfileImage] = useState([]);
+    
     useEffect(() => {
-        const fetchedData = async () => {
-        //   setLoading(true); // Start loading
-          const userDataString = localStorage.getItem('userDetails');
-    
-          if (userDataString) {
-            try {
-              const userData = JSON.parse(userDataString); // Parse JSON
-              const accessToken = userData.accessToken; // Access token
-              const userId = userData.user.id; // User ID
-              
-              if (accessToken) {
-                console.log('User ID:', userId); // Debugging line
-                const response = await fetch(`http://127.0.0.1:8000/api/tenant_information/${userId}`, {
-                  method: 'GET',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
-                  }
-                });
-    
-                const data = await response.json();
-    
-                console.log('API Response:', data); // Debugging line
-    
-                if(response.ok){
-                    console.log(data)
-                    setTenantInformation(data.data)
-                    // setLoading(false)
-                }else{
-                    console.log('Error:', response.status)
-                    // setLoading(false)
-                }
-              }
-            } catch (error) {
-              console.error('Error fetching payment details:', error); // Error logging
-            }
-          } else {
-            console.error('No user data found in local storage.'); // Handling missing user data
-          }
-        //   setLoading(false); // Stop loading
-        };
-        
-        fetchedData();
-      }, []);
+        const userDataString = localStorage.getItem("userDetails");
+        if (userDataString) {
+            const userData = JSON.parse(userDataString);
+            setUserToken(userData?.accessToken || null);
+            setUserId(userData?.user.id || null);
+        }
+    }, []);
 
-      console.log(tenantInformation)
+    const {data:responseTotalNotif, error: errorTotalNotif} = useSWR(
+        userToken && userId ? [`http://127.0.0.1:8000/api/total_notifications`, userToken] : null,
+        fetcherTotalNotif, {
+            refreshInterval: 1000,
+            revalidateOnFocus: false,
+            shouldRetryOnError: false,
+            errorRetryCount: 3,
+        }
+    )
+    useEffect(() => {
+        if (responseTotalNotif) {
+            setTotalNotif(responseTotalNotif?.count)
+        }
+    }, [responseTotalNotif])
+
+    const {data:responseTenantInfo, error: errorTenantInfo} = useSWR(
+        userToken && userId ? [`http://127.0.0.1:8000/api/tenant_information/${userId}`, userToken] : null,
+        fetcherTenantInformation, {
+            refreshInterval: 1000,
+            revalidateOnFocus: false,
+            shouldRetryOnError: false,
+            errorRetryCount: 3,
+        }
+    )
+    useEffect(() => {
+        if (responseTenantInfo) {
+            setTenantInformation(responseTenantInfo.data)
+        }
+    }, [responseTenantInfo])
+
+    const {data: responseImage, error: errorImage, isLoading: isLoadingImage} = useSWR(
+        userToken && userId ? [ `http://127.0.0.1:8000/api/profile_image/${userId}`, userToken] : null,
+        fetcherProfileImage, {
+          refreshInterval: 3000,
+          revalidateOnFocus: false,
+          shouldRetryOnError: false,
+          errorRetryCount: 3,
+        }
+      )
+    console.log(errorImage)
+        useEffect(() => {
+        if(responseImage){
+            setProfileImage(responseImage?.data);
+        }
+    }, [responseImage])
+
+    const avatarSrc = profileImage
+    ? `http://127.0.0.1:8000/ProfileImages/${profileImage.image_path}`
+    : null;
+
+    console.log(tenantInformation)
+    console.log(totalNotif)
+    console.log(profileImage)
+    console.log(avatarSrc)
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+    // const handleOpenProfle = () => {
+    //     setIsProfileOpen(!isProfileOpen);
+    // }
+    const handleClick = () => {
+        setisNotificationsOpen(!isNotificationsOpen);
+    }
 
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -174,16 +242,7 @@ function Header(props) {
             console.log('No access token found');
         }
     };
-    // const handleLogout = async () => {
-    //     await signOut({ redirect: false });
-    //     localStorage.removeItem('avatarColor')
-    //     localStorage.removeItem('userDetails'); // Clear user data
-    //     sessionStorage.clear(); // Clear token
-    //     // Redirect to login page
-    //     window.location.href = '/';
-    // };
 
-        
     const avatarColors = ['#1976d2', '#f44336', '#4caf50', '#ff9800', '#9c27b0', '#3f51b5', '#00bcd4', '#8bc34a', '#8785d0', '#a55555',];
 
     const getRandomColor = () => {
@@ -210,24 +269,27 @@ function Header(props) {
 
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
-        <Menu
+        <Popover
+        open={isMenuOpen}
         anchorEl={anchorEl}
         anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
             vertical: 'top',
-            horizontal: 'right',
-        }}
+            horizontal: 'left',
+          }}
         id={menuId}
         keepMounted
-        transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-        }}
-        open={isMenuOpen}
         onClose={handleMenuClose}
         >
-        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={handleLogout}>Log out</MenuItem>
-        </Menu>
+            <UserProfile
+            avatarSrc={avatarSrc}
+            tenantInformation={tenantInformation}
+            handleLogout={handleLogout}
+            />
+        </Popover>
     );
 
     const mobileMenuId = 'primary-search-account-menu-mobile';
@@ -248,21 +310,14 @@ function Header(props) {
         onClose={handleMobileMenuClose}
         >
         <MenuItem>
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-            <Badge badgeContent={4} color="error">
-                <MailOutlineIcon />
-            </Badge>
-            </IconButton>
-            <p>Messages</p>
-        </MenuItem>
-        <MenuItem>
             <IconButton
             size="large"
             aria-label="show 17 new notifications"
             color="inherit"
+            onClick={() => handleClick()}
             >
-            <Badge badgeContent={17} color="error">
-                <NotificationsActiveOutlinedIcon />
+             <Badge badgeContent={totalNotif} color="primary">
+                <NotificationsActiveOutlinedIcon sx={{color: '#212121',}}/>
             </Badge>
             </IconButton>
             <p>Notifications</p>
@@ -306,7 +361,7 @@ function Header(props) {
                      <MenuIcon sx={{ display: { lg: 'none' }, backgroundColor: '#8785d0', color: '#ebf2f0', fontSize: '30px', borderRadius: '5px', }}/>
                 </IconButton>
                
-                <Search>
+                {/* <Search>
                     <SearchIconWrapper>
                     <SearchIcon />
                     </SearchIconWrapper>
@@ -315,25 +370,28 @@ function Header(props) {
                     inputProps={{ 'aria-label': 'search' }}
                     />
                 </Search>
-                
+                 */}
                 <Box sx={{ flexGrow: 1 }} />
                 <Box sx={{ display: { xs: 'none', md: 'none', lg: 'flex' } }}>
-                    <IconButton size="small" aria-label="show 4 new mails" sx={{mr: '0.1rem', "&:hover": {backgroundColor: '#d9defa'}}}>
+                    {/* <IconButton size="small" aria-label="show 4 new mails" sx={{mr: '0.1rem', "&:hover": {backgroundColor: '#d9defa'}}}>
                         <Badge badgeContent={4} color="error">
                             <MailOutlineIcon  sx={{color: '#212121', }}/>
                         </Badge>
-                    </IconButton>
+                    </IconButton> */}
                     <IconButton
                     size="large"
                     aria-label="show 17 new notifications"
                     color="inherit"
-                    sx={{mr: '0.3rem', "&:hover": {backgroundColor: '#d9defa'}}}
+                    sx={{mr: '-0.3rem', "&:hover": {backgroundColor: '#d9defa'}}}
+                    onClick={() => handleClick()}
                     >
-                        <Badge badgeContent={17} color="primary">
+                        <Badge badgeContent={totalNotif} color="primary">
                             <NotificationsActiveOutlinedIcon sx={{color: '#212121',}}/>
                         </Badge>
+                        
                     </IconButton>
-                    <Avatar
+                    {avatarSrc ? (
+                        <Avatar
                         size="large"
                         edge="end"
                         aria-label="account of current user"
@@ -342,11 +400,24 @@ function Header(props) {
                         onClick={handleProfileMenuOpen}
                         color="inherit"
                         sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px', backgroundColor: avatarBackgroundColor, }}
-                        
-                        // src="/user.png"
-                    >
-                         {tenantInformation?.firstname?.charAt(0)}{tenantInformation?.lastname?.charAt(0)}
-                    </Avatar>
+                        src={avatarSrc}
+                        >
+                           
+                        </Avatar>
+                    ):(
+                        <Avatar
+                        size="large"
+                        edge="end"
+                        aria-label="account of current user"
+                        aria-controls={menuId}
+                        aria-haspopup="true"
+                        onClick={handleProfileMenuOpen}
+                        color="inherit"
+                        sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px', backgroundColor: avatarBackgroundColor, }}
+                        >
+                            {tenantInformation?.firstname?.charAt(0)}{tenantInformation?.lastname?.charAt(0)}
+                        </Avatar>
+                    )}
                 </Box>
                 <Box sx={{ display: { xs: 'flex', md: 'flex', lg: 'none'} }}>
                     <IconButton
@@ -366,6 +437,17 @@ function Header(props) {
             </AppBar>
             {renderMenu}
             {renderMobileMenu}
+            <Box
+            sx={{
+                position: 'fixed', // Changed to fixed for sticky positioning
+                top: '64px', // Adjust this value based on your navbar height
+                right: '20px',
+                zIndex: 1200,
+                width:{xs:'315px', sm:'400px', md:'auto', lg:'auto'}
+            }}
+            >
+            {isNotificationsOpen && <NotificationsDialog />}
+            </Box>
         </React.Fragment>
     );
 }

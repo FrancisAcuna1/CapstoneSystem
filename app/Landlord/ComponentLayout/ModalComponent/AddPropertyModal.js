@@ -1,31 +1,12 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import {
-  TextField,
-  Typography,
-  Box,
-  Fab,
-  Button,
-  Fade,
-  FormHelperText,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Grid,
-  Autocomplete,
-  Checkbox,
-  IconButton,
-  Tooltip,
-  Divider,
-} from "@mui/material";
+import { TextField, Typography, Box, Fab, Button, Fade, FormHelperText, FormControl, InputLabel, Select, MenuItem, Grid, Autocomplete, Checkbox, IconButton, Tooltip, Divider, CircularProgress,} from "@mui/material";
 import { styled, useTheme, css } from "@mui/system";
 import { Modal as BaseModal } from "@mui/base/Modal";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
+// import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+// import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
@@ -34,6 +15,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 import Image from "next/image";
+import { useSnackbar } from "notistack";
 
 const Backdrop = React.forwardRef((props, ref) => {
   const { open, ...other } = props;
@@ -156,16 +138,17 @@ export default function AddPropertyType({
   setEditItem,
   setSelectedProperty,
   selectedProperty,
+  onRefresh
 }) {
-  const { data: session, status } = useSession();
+  const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [numRooms, setNumRooms] = useState(1); // Default to 1 room
+  const [numRooms, setNumRooms] = useState(1); 
   const [rooms, setRooms] = useState([
     {
       beds: [{ price: "", status: "" }],
     },
-  ]); // Default to 1 bed in the first room
+  ]);
   // const [rooms, setRooms] = useState([{ room_number: 1, number_of_beds: 1 }]);
   const [selectedImage, setSelectedImage] = useState([]);
   const [deleteImage, setDeleteImage] = useState([]);
@@ -190,9 +173,6 @@ export default function AddPropertyType({
   const [newboardinghouse, setNewBoardinghouse] = useState({
     propertyid: propsid,
     boardinghousename: "",
-    // rentalfee: '',
-    // payorname:'none',
-    // boardinghousestatus:'',
     buildingno: "",
     street: "",
     barangay: propAddress.barangay,
@@ -206,14 +186,11 @@ export default function AddPropertyType({
   console.log("Image:", selectedImage);
   console.log("Edit Apartment Value:", newApartment);
   console.log("Edit Boarding House Value:", newboardinghouse);
-  console.log("image:", selectedImage);
   console.log("delete:", deleteImage);
   console.log("rooms:", rooms);
 
   const handleChangeApartment = (e) => {
     const { name, value } = e.target;
-
-    // Clear error when field is modified
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -223,6 +200,7 @@ export default function AddPropertyType({
 
     setNewApartment({
       ...newApartment,
+      municipality: 'Sorosgon City',
       [name]: value || "",
     });
   };
@@ -230,7 +208,6 @@ export default function AddPropertyType({
   const handleChangeBoardinghouse = (e) => {
     const { name, value } = e.target;
 
-    // Clear error when field is modified
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -240,6 +217,7 @@ export default function AddPropertyType({
 
     setNewBoardinghouse({
       ...newboardinghouse,
+      municipality: 'Sorosgon City',
       [name]: value || "",
     });
   };
@@ -300,7 +278,7 @@ export default function AddPropertyType({
   useEffect(() => {
     const fetchDataEdit = async () => {
       if (!editItem || !selectedProperty) {
-        return; // Make sure both `editItem` and `selectedProperty` are available.
+        return;
       }
       const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
       const userData = JSON.parse(userDataString); // parse the datastring into json
@@ -327,6 +305,7 @@ export default function AddPropertyType({
           console.log(response.status);
 
           if (response.ok) {
+            console.log(data)
             if (selectedProperty === "Apartment") {
               setNewApartment({
                 propertyid: data?.apartment?.property_id,
@@ -349,7 +328,7 @@ export default function AddPropertyType({
                 })) || [];
               setSelectedInclusions(inclusionsArray);
               // setSelectedImage(data?.boardinghouse?.images);
-              if (data?.apartment?.images) {
+              if (data?.apartment?.images || '') {
                 const existingImages = data.apartment.images.map((img) => ({
                   id: img.id,
                   path: img.image_path,
@@ -364,8 +343,6 @@ export default function AddPropertyType({
                 boardinghousename: data?.boardinghouse?.boarding_house_name,
                 numberofrooms: data?.boardinghouse?.number_of_rooms,
                 capacity: data?.boardinghouse?.capacity,
-                // rentalfee: data?.boardinghouse?.rental_fee,
-                // payorname: data?.boardinghouse?.payor_name,
                 boardinghousestatus: data?.boardinghouse?.status,
                 buildingno: data?.boardinghouse?.building_no,
                 street: data?.boardinghouse?.street,
@@ -402,7 +379,6 @@ export default function AddPropertyType({
                 })) || [];
 
               setRooms(roomsArray);
-              console.log(rooms);
 
               const inclusionsArray =
                 data?.boardinghouse?.inclusions?.map((item) => ({
@@ -412,21 +388,20 @@ export default function AddPropertyType({
                 })) || [];
               setSelectedInclusions(inclusionsArray);
               console.log("Processed inclusions:", inclusionsArray);
+              setNumRooms(data?.boardinghouse?.number_of_rooms)
             }
           } else {
             console.error("Error fetching property details:", data.message);
-            setError(data.message);
           }
         } catch (error) {
-          console.log("Error:", error);
-          setError(error.message);
+          console.log("Error:", error);;
         } finally {
           console.log("finally");
         }
       }
     };
     fetchDataEdit();
-  }, [editItem, selectedProperty, rooms, setError, setSelectedProperty]);
+  }, [editItem, selectedProperty, setSelectedProperty,]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -437,8 +412,45 @@ export default function AddPropertyType({
     const accessToken = userData.accessToken;
     console.log("Token:", accessToken);
 
+    const determinePropertyStatus = (originalStatus, rooms) => {
+      // Count total beds and available beds
+      const totalBeds = rooms.reduce(
+        (acc, room) => acc + (room.number_of_beds || 0),
+        0
+      );
+  
+      const availableBeds = rooms.reduce(
+        (acc, room) => 
+          acc + room.beds.filter((bed) => bed.status === "Available").length,
+        0
+      );
+  
+      const occupiedBeds = rooms.reduce(
+        (acc, room) => 
+          acc + room.beds.filter((bed) => bed.status === "Occupied").length,
+        0
+      );
+  
+      // If there are no beds at all
+      if (totalBeds === 0) {
+        return "Available";
+      }
+  
+      // If all beds are occupied
+      if (occupiedBeds === totalBeds) {
+        return "Occupied";
+      }
+  
+      // If there are some available beds
+      if (availableBeds > 0) {
+        return "Available";
+      }
+  
+      // Fallback to the original status if something unexpected happens
+      return originalStatus;
+    };
+
     if (accessToken) {
-      console.log("authenticated", status);
       console.log("Value:", newApartment);
       console.log("Value:", newboardinghouse);
       console.log("rooms:", rooms);
@@ -448,6 +460,11 @@ export default function AddPropertyType({
         const formData = new FormData();
         let hasErrors = false;
         let newErrors = {};
+
+        const updatedStatus = determinePropertyStatus(
+          newboardinghouse.boardinghousestatus, 
+          rooms
+        );
 
         if (selectedProperty === "Apartment") {
           if (!newApartment.apartmentname?.trim()) {
@@ -486,6 +503,13 @@ export default function AddPropertyType({
           if (!selectedImage || selectedImage.length === 0) {
             hasErrors = true;
             newErrors.images = "At least one image is required";
+          }else {
+            // Check if the file size exceeds the limit (3050 KB = 3.05 MB)
+            const maxSize = 3050 * 1024; // Convert 3050 KB to bytes
+            if (selectedImage[0].size > maxSize) {
+              hasErrors = true;
+              newErrors.images = "Image size should not exceed 3MB";
+            }
           }
 
           formData.append("propertyid", propsid);
@@ -540,6 +564,7 @@ export default function AddPropertyType({
             );
             formData.append("inclusion", inclusionsJson);
           }
+
         } else if (selectedProperty === "Boarding House") {
           if (!newboardinghouse.boardinghousename?.trim()) {
             newErrors.boardinghousename = "Property name is required";
@@ -577,6 +602,20 @@ export default function AddPropertyType({
           if (!selectedImage || selectedImage.length === 0) {
             hasErrors = true;
             newErrors.images = "At least one image is required";
+          }else {
+            // Check if the file is an image and check the type
+            // const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+            // if (!validImageTypes.includes(selectedImage[0].type)) {
+            //   hasErrors = true;
+            //   newErrors.images = "Invalid image type. Only jpeg, png, jpg, or gif are allowed";
+            // }
+        
+            // Check if the file size exceeds the limit (3050 KB = 3.05 MB)
+            const maxSize = 3050 * 1024; // Convert 3050 KB to bytes
+            if (selectedImage[0].size > maxSize) {
+              hasErrors = true;
+              newErrors.images = "Image size should not exceed 3MB";
+            }
           }
 
           // Validate rooms and beds
@@ -612,7 +651,8 @@ export default function AddPropertyType({
             newboardinghouse.boardinghousename
           );
           formData.append("capacity", totalcapacity);
-          formData.append("status", "Available");
+          // formData.append("status", newboardinghouse.boardinghousestatus);
+          formData.append("status", updatedStatus);
           formData.append("property_type", selectedProperty);
           formData.append("buildingno", newboardinghouse.buildingno);
           formData.append("street", newboardinghouse.street);
@@ -627,6 +667,7 @@ export default function AddPropertyType({
               }
             });
           }
+          
 
           if (deleteImage && deleteImage.length > 0) {
             formData.append("deleted_images", JSON.stringify(deleteImage));
@@ -725,61 +766,35 @@ export default function AddPropertyType({
           handleClose();
           setNewApartment({});
           setNewBoardinghouse({});
-          localStorage.setItem(
-            "successMessage",
-            data.message || "Operation successful!"
-          );
-          window.location.reload();
+          setEditItem(null);
+          onRefresh();
+          setSelectedImage(null);
+          setSelectedInclusions([])
+          setErrors({})
+          setRooms([{beds: [{ price: "", status: "" }],}])
+          setSelectedProperty('')
+          enqueueSnackbar(data.message, {variant: 'success'});
+          setLoading(false)
         } else {
-          if (data.error) {
-            handleClose();
-            localStorage.setItem(
-              "errorMessage",
-              data.error || "Operation Error!"
-            );
-            window.location.reload();
-          } else {
-            localStorage.setItem(
-              "errorMessage",
-              data.message || "Operation Error!"
-            );
-            window.location.reload();
-            handleClose();
-          }
+          // handleClose();
+          // setSelectedProperty('')
+          // setSelectedImage(null);
+          // setSelectedInclusions([])
+          // setNewApartment({});
+          // setNewBoardinghouse({});
+          // setRooms([{beds: [{ price: "", status: "" }],}])
+          // setEditItem(null);
+          setLoading(false)
+          enqueueSnackbar(data.message, {variant: 'error'});
         }
       } catch (error) {
         console.error("An error occurred:", error);
         setLoading(false);
-        // setError(error.message);
-        // setSuccessful(false)
       }
     } else {
       console.error("Authentication error: Token missing or invalid");
-      setSuccessful(false);
-      setError("Authentication error: Token missing or invalid");
     }
   };
-
-  const alertMessage = useCallback(() => {
-    const successMessage = localStorage.getItem("successMessage");
-    const errorMessage = localStorage.getItem("errorMessage");
-    if (successMessage) {
-      setSuccessful(successMessage);
-      setTimeout(() => {
-        localStorage.removeItem("successMessage");
-      }, 3000);
-    }
-    if (errorMessage) {
-      setError(errorMessage);
-      setTimeout(() => {
-        localStorage.removeItem("errorMessage");
-      }, 3000);
-    }
-  }, [setSuccessful, setError]);
-
-  useEffect(() => {
-    alertMessage()
-  }, [alertMessage]);
 
   useEffect(() => {
     const fetchedInclusionData = async () => {
@@ -826,30 +841,6 @@ export default function AddPropertyType({
     fetchedInclusionData();
   }, [setError]);
 
- 
-  // useEffect(() => {
-  //   const handleKeyPress = (e) => {
-  //     if (e.key === "Enter") {
-  //       e.preventDefault(); // Prevent default behavior if needed
-  //       // Trigger the submit function
-  //       handleSubmit(e);
-  //     }
-  //   };
-
-  //   window.addEventListener("keypress", handleKeyPress);
-
-  //   return () => {
-  //     window.removeEventListener("keypress", handleKeyPress);
-  //   };
-  // }, [handleSubmit]);
-
-
-
-  // const handleImageChange = (e) => {
-  //   if (e.target.files && e.target.files.length > 0) {
-  //     setSelectedImage(e.target.files[0]);
-  //   }
-  // }; //this code is working for one image only
 
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -861,14 +852,13 @@ export default function AddPropertyType({
         preview: URL.createObjectURL(file),
       }));
       setSelectedImage((prevImages) => {
-        // Ensure prevImages is always an array using nullish coalescing
         // const currentImages = prevImages ?? [];
         const currentImages = Array.isArray(prevImages) ? prevImages : [];
         return [...currentImages, ...newPreviews];
       });
-      // setSelectedImage((prevImages) => [...prevImages, ...newPreviews]);
+   
     }
-    // Clear image-related errors
+ 
     setErrors((prevErrors) => {
       const updatedErrors = { ...prevErrors };
       delete updatedErrors.images;
@@ -919,47 +909,76 @@ export default function AddPropertyType({
   };
 
   const handleNumRoomsChange = (e) => {
-    const newNumRooms = Math.min(parseInt(e.target.value, 0), 10);
+    const newNumRooms = Math.min(parseInt(e.target.value, 10), 10);
+  
+    // Check if any room has an occupied bed before decreasing numRooms
+    const roomsWithOccupiedBeds = rooms.some((room) =>
+      room.beds.some((bed) => bed.status === "Occupied")
+    );
+  
+      // If we are decreasing the number of rooms
+    if (newNumRooms < numRooms) {
+      // Filter out rooms with occupied beds
+      const roomsWithOccupiedBeds = rooms.filter((room) =>
+        room.beds.some((bed) => bed.status === "Occupied")
+      );
+
+      // If there are rooms with occupied beds, we can't decrease the room count
+      if (roomsWithOccupiedBeds.length > 0 && newNumRooms < roomsWithOccupiedBeds.length) {
+        enqueueSnackbar("Cannot decrease the number of rooms with occupied beds", { variant: "error" });
+        return; // Prevent reducing the number of rooms if there are occupied beds
+      }
+    }
+  
+    // If no occupied beds, proceed with updating the number of rooms
     setNumRooms(newNumRooms);
-
-    // Adjust the number of room objects with room_number and default number_of_beds
-    const newRooms = Array.from({ length: newNumRooms }, (_, index) => ({
-      room_number: index + 1,
-      number_of_beds: 1, // Set an initial value for number_of_beds
-      beds: [{ bed_number: 1, price: "", status: "" }],
-      // beds: 1  // Default value
-    }));
-    setRooms(newRooms);
-
+    setRooms((prevRooms) => {
+      const currentRooms = [...prevRooms];
+  
+      if (newNumRooms > currentRooms.length) {
+        // Add new rooms
+        const additionalRooms = Array.from(
+          { length: newNumRooms - currentRooms.length },
+          (_, index) => ({
+            room_number: currentRooms.length + index + 1,
+            number_of_beds: 1,
+            beds: [{ bed_number: 1, price: "", status: "" }],
+          })
+        );
+        return [...currentRooms, ...additionalRooms];
+      } else if (newNumRooms < currentRooms.length) {
+        // Remove rooms, but ensure that rooms with occupied beds are never removed
+        const roomsWithOccupiedBeds = currentRooms.filter((room) =>
+          room.beds.some((bed) => bed.status === "Occupied")
+        );
+  
+        // If there are more rooms than newNumRooms, we will slice off the non-occupied rooms.
+        const availableRoomsToRemove = currentRooms.filter((room) =>
+          !room.beds.some((bed) => bed.status === "Occupied")
+        );
+  
+        // Take the rooms that have occupied beds and add as many non-occupied rooms as possible
+        const remainingRooms = [
+          ...roomsWithOccupiedBeds,
+          ...availableRoomsToRemove.slice(0, newNumRooms - roomsWithOccupiedBeds.length),
+        ];
+  
+        return remainingRooms;
+      }
+  
+      // No change in room count
+      return currentRooms;
+    });
+  
     // Clear the error message when there's a valid value
     setErrors((prevErrors) => {
       const updatedErrors = { ...prevErrors };
-      delete updatedErrors.numRooms; // Remove the error completely instead of setting to empty string
+      delete updatedErrors.numRooms;
       return updatedErrors;
     });
   };
+  
 
-  //this code is working
-  // const handleBedCountChange = (roomIndex, count) => {
-  //   setRooms((prevRooms) => {
-  //     const updatedRooms = [...prevRooms];
-  //     const room = updatedRooms[roomIndex];
-  //     const bedCount = count === '' ? 0 : Math.min(Math.max(parseInt(count, 10), 1), 5);
-
-  //     const updatedBeds = Array.from({ length: bedCount }, (_, i) => ({
-  //       bed_number: i + 1,
-  //       price: '',
-  //       status: ''
-  //     }));
-
-  //     updatedRooms[roomIndex] = {
-  //       ...updatedRooms[roomIndex],
-  //       number_of_beds: bedCount, // Update number_of_beds
-  //       beds: updatedBeds
-  //     };
-  //     return updatedRooms;
-  //   });
-  // };
   const handleBedCountChange = (roomIndex, count) => {
     setRooms((prevRooms) => {
       const updatedRooms = [...prevRooms];
@@ -1113,7 +1132,7 @@ export default function AddPropertyType({
         sx={{ zIndex: 0 }}
       >
         <AddCircleOutlineIcon sx={{ mr: 1 }} />
-        Add New Rental Units
+        Add Rental Units
       </AddButton>
       <Modal
         aria-labelledby="transition-modal-title"
@@ -1161,9 +1180,10 @@ export default function AddPropertyType({
                 fontWeight: 560,
                 letterSpacing: 1,
                 textTransform: "uppercase",
+                mb:3
               }}
             >
-              Add Property
+              {editItem ? 'Edit Unit Information' : 'Add Rental Unit'}
             </Typography>
             <Box component="form" onSubmit={handleSubmit} noValidate>
               <FormControl fullWidth margin="normal" sx={{ mt: "-0.1rem" }}>
@@ -1178,8 +1198,8 @@ export default function AddPropertyType({
                   onChange={handleChange}
                 >
                   {/* <MenuItem >clear</MenuItem> */}
-                  <MenuItem value="Apartment">Apartment</MenuItem>
-                  <MenuItem value="Boarding House">Boarding House</MenuItem>
+                  <MenuItem disabled={editItem && selectedProperty === 'Boarding House'} value="Apartment">Apartment</MenuItem>
+                  <MenuItem disabled={editItem && selectedProperty === 'Apartment'} value="Boarding House">Boarding House</MenuItem>
                 </Select>
               </FormControl>
 
@@ -1219,9 +1239,9 @@ export default function AddPropertyType({
                       required
                       type="text"
                       id="apartment-name"
-                      label="Property Name"
+                      label="Unit Name"
                       name="apartmentname"
-                      value={newApartment.apartmentname}
+                      value={newApartment.apartmentname || ''}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1237,7 +1257,7 @@ export default function AddPropertyType({
                       id="no-of-rooms"
                       label="No. of Rooms"
                       name="numberofrooms"
-                      value={newApartment.numberofrooms}
+                      value={newApartment.numberofrooms || ''}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1263,7 +1283,7 @@ export default function AddPropertyType({
                       id="rental-fee"
                       label="Rental Fee"
                       name="rentalfee"
-                      value={newApartment.rentalfee}
+                      value={newApartment.rentalfee || ''}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1289,7 +1309,7 @@ export default function AddPropertyType({
                       id="capacity"
                       label="Capacity"
                       name="capacity"
-                      value={newApartment.capacity}
+                      value={newApartment.capacity || ''}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1314,7 +1334,7 @@ export default function AddPropertyType({
                       id="payor"
                       label="Payor Name"
                       name="payorname"
-                      value={newApartment.payorname}
+                      value={newApartment.payorname || ''}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1332,6 +1352,7 @@ export default function AddPropertyType({
                       required
                       fullWidth
                       error={Boolean(errors.apartmentstatus)}
+                      disabled={editItem && newApartment.apartmentstatus === "Occupied"}
                     >
                       <InputLabel
                         error={Boolean(errors.apartmentstatus)}
@@ -1343,15 +1364,18 @@ export default function AddPropertyType({
                         required
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        value={newApartment.apartmentstatus}
+                        value={newApartment.apartmentstatus || ''}
                         name="apartmentstatus"
                         label="Status"
                         error={Boolean(errors.apartmentstatus)}
                         onChange={handleChangeApartment}
                       >
                         <MenuItem value="Available">Available</MenuItem>
-                        {/* <MenuItem value={20}>Twenty</MenuItem>
-                        <MenuItem value={30}>Thirty</MenuItem> */}
+                        {editItem && newApartment.apartmentstatus === "Occupied" && (
+                          <MenuItem value="Occupied" disabled>
+                            Occupied
+                          </MenuItem>
+                        )}
                       </Select>
                       {errors.apartmentstatus && (
                         <FormHelperText
@@ -1391,7 +1415,7 @@ export default function AddPropertyType({
                       id="building-no"
                       label="Building No."
                       name="buildingno"
-                      value={newApartment.buildingno}
+                      value={newApartment.buildingno || ''}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1406,7 +1430,7 @@ export default function AddPropertyType({
                       id="street"
                       label="Street"
                       name="street"
-                      value={newApartment.street}
+                      value={newApartment.street || ''}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1754,7 +1778,7 @@ export default function AddPropertyType({
                       id="property-name"
                       label="Property Name"
                       name="boardinghousename"
-                      value={newboardinghouse.boardinghousename}
+                      value={newboardinghouse.boardinghousename || ''}
                       onChange={handleChangeBoardinghouse}
                       margin="normal"
                       fullWidth
@@ -1821,7 +1845,7 @@ export default function AddPropertyType({
                       type="number"
                       name="numRooms"
                       value={numRooms}
-                      onChange={handleNumRoomsChange}
+                      onChange={handleNumRoomsChange || ''}
                       inputProps={{ min: 1 }}
                       variant="outlined"
                       fullWidth
@@ -1949,20 +1973,6 @@ export default function AddPropertyType({
                                     />
                                     {/* </Grid> */}
                                     <Grid item xs={5}>
-                                      {/* <FormControl fullWidth sx={{ mb: 1 }}>
-                                    <InputLabel>Bed Type</InputLabel>
-                                    <Select
-                                      value={bed.price || ''}
-                                      onChange={(e) => handleBedTypeChange(roomIndex, bedIndex, e.target.value)}
-                                      label="Bed Type"
-                                      disabled={bed.status.toLowerCase() === 'occupied'}
-                                     
-                                    >
-                                      <MenuItem value="single">Single</MenuItem>
-                                      <MenuItem value="double">Double</MenuItem>
-                                      <MenuItem value="bunk">Bunk</MenuItem>
-                                    </Select>
-                                  </FormControl> */}
                                       <TextField
                                         name="price"
                                         label="Price"
@@ -1982,7 +1992,7 @@ export default function AddPropertyType({
                                             e.preventDefault();
                                           }
                                         }}
-                                        value={bed.price}
+                                        value={bed.price || ''}
                                         onChange={(e) =>
                                           handleBedPrice(
                                             roomIndex,
@@ -2035,7 +2045,7 @@ export default function AddPropertyType({
                                               }
                                               label="Bed Status"
                                             >
-                                              <MenuItem value="available">
+                                              <MenuItem value="Available">
                                                 Available
                                               </MenuItem>
                                               {/* <MenuItem value="occupied">Occupied</MenuItem>  */}
@@ -2112,7 +2122,7 @@ export default function AddPropertyType({
                       id="building-no"
                       label="Building No."
                       name="buildingno"
-                      value={newboardinghouse.buildingno}
+                      value={newboardinghouse.buildingno || ''}
                       onChange={handleChangeBoardinghouse}
                       margin="normal"
                       fullWidth
@@ -2126,7 +2136,7 @@ export default function AddPropertyType({
                       id="street"
                       label="Street"
                       name="street"
-                      value={newboardinghouse.street}
+                      value={newboardinghouse.street || ''}
                       onChange={handleChangeBoardinghouse}
                       margin="normal"
                       fullWidth
@@ -2411,6 +2421,7 @@ export default function AddPropertyType({
                               </Box>
                             ))}
                           </Box>
+                          
                         ) : (
                           <Typography
                             variant="body1"
@@ -2463,7 +2474,7 @@ export default function AddPropertyType({
                   letterSpacing: "2px",
                 }}
               >
-                Submit
+                {isLoading ? <CircularProgress sx={{color:'white'}}/>  : 'Submit'}
               </Button>
               <Button
                 variant="outlined"

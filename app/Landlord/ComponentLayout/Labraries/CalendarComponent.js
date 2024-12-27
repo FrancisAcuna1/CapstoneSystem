@@ -15,7 +15,7 @@ import dynamic from 'next/dynamic';
 //   ssr: false
 // }) 
 
-const CalendarComponent = ({ open, handleOpen, handleClose, setError, setSuccessful, setLoading, loading, handleEventClick}) => {
+const CalendarComponent = ({setLoading, loading, handleEventClick, refreshTrigger}) => {
   const [events, setEvents] = useState([]);
   const [initialDateSelection, setInitialDateSelection] = useState(null);
   const [view, setView] = useState('month');
@@ -37,6 +37,7 @@ const CalendarComponent = ({ open, handleOpen, handleClose, setError, setSuccess
           });
           const data = await response.json();
           if(response.ok){
+            console.log(data.data)
             // Transform the data to match FullCalendar's event object format
             const transformedEvents = data.data.map(schedule => {
               // Parse start and end dates
@@ -45,10 +46,14 @@ const CalendarComponent = ({ open, handleOpen, handleClose, setError, setSuccess
               
               // Add one day to end date for full day display in FullCalendar
               const adjustedEndDate = endDate.add(1, 'day');
-
+              const maintenanceRequest = schedule.maintenance_request || {};
+              console.log(maintenanceRequest)
+              const task = maintenanceRequest.reported_issue || maintenanceRequest.other_issue || schedule.maintenance_task || 'No issue reported';
+              const description = maintenanceRequest.issue_description || schedule.description || 'No description';
+              console.log(task)
               return {
                 id: schedule.id,
-                title: `${schedule.schedule_title} - ${schedule.maintenance_request.reported_issue}`,
+                title: `${schedule.schedule_title} - ${task}`,
                 start: startDate.format('YYYY-MM-DD'),
                 end: adjustedEndDate.format('YYYY-MM-DD'), // Add one day for full range display
                 allDay: true, // Set as all-day event
@@ -56,7 +61,7 @@ const CalendarComponent = ({ open, handleOpen, handleClose, setError, setSuccess
                 textColor: schedule.text_color,
                 extendedProps: {
                   status: schedule.status,
-                  issueDescription: schedule.maintenance_request.issue_description,
+                  issueDescription: description,
                   originalStartDate: startDate.format('YYYY-MM-DD'),
                   originalEndDate: endDate.format('YYYY-MM-DD')
                 }
@@ -78,18 +83,22 @@ const CalendarComponent = ({ open, handleOpen, handleClose, setError, setSuccess
       }
     }
     fetchedScheduled();
-  }, [setLoading]);
+  }, [setLoading, refreshTrigger]);
+ 
 
   // Custom event render function
   const renderEventContent = (eventInfo) => {
     
     return (
-      <div className="event-content" style={{ padding: '4px' }}>
-        <div style={{ fontWeight: 'bold' }}>{eventInfo.event.title}</div>
-        <div style={{ fontSize: '0.9em' }}>
-          Status: {eventInfo.event.extendedProps.status}
-        </div>
+      <div className="event-content">
+      <div className="event-title">
+        {eventInfo.event.title}
       </div>
+      <div className="event-status">
+        Status: {eventInfo.event.extendedProps.status}
+      </div>
+    </div>
+ 
     );
   };
 

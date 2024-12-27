@@ -1,14 +1,24 @@
 'use client';
 import React, { useState, useEffect} from 'react';
-import { Box, Stepper, Step, StepLabel, Button, Typography, TextField, Grid, FormHelperText, FormControl, MenuItem, Autocomplete, CircularProgress,} from '@mui/material';
+import { Box, Stepper, Step, StepLabel, Button, Typography, TextField, Grid, FormHelperText, FormControl, MenuItem, Autocomplete, CircularProgress, Tooltip, IconButton} from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import Swal from 'sweetalert2'; 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-
+import { styled, alpha, useTheme, css } from '@mui/system';
+import { useSnackbar } from 'notistack';
 // const steps = ['Tenant Information', 'Account Creation', 'Unit Details'];
+const GeneralTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))({
+    '& .MuiTooltip-tooltip': {
+      backgroundColor: '#263238', // Background color of the tooltip
+      color: '#ffffff', // Text color
+      borderRadius: '4px',
+    },
+});
 
 // Municipality codes for Sorsogon
 const SORSOGON_MUNICIPALITIES = [
@@ -30,8 +40,10 @@ const SORSOGON_MUNICIPALITIES = [
 ];
 
 const TenantRegistrationForm = ({details, setSuccessful, setError , loading, setLoading}) => {
+    const {enqueueSnackbar} = useSnackbar();
     const [contact, setContact] = useState('');
     const [activeStep, setActiveStep] = useState(0);
+    const [isExpanded, setIsExpanded] = useState(false);
     const [errors, setErrors] = useState({});
     const [allBarangays, setAllBarangays] = useState([]);
     const [municipalityCode, setMunicipalityCode] = useState('');
@@ -55,6 +67,7 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
     barangay: '',
     municipality: '',
     rentalfee: rentalFeeValue,
+    initial_payment: '',
     advancepayment:'',
     prepaidrentperiod:'',//this is the #of months for advance payment
     deposit: '',
@@ -72,6 +85,11 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
     console.log(ApartmentID) // for apartment name
     console.log(Status)
     console.log(rentalFeeValue)
+
+  
+    const handleClick = () => {
+        setIsExpanded(!isExpanded);
+    };
 
     const validateForm = () => {
         let tempErrors = {};
@@ -140,13 +158,15 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
             tempErrors.deposit = 'Deposit Amount is required';
             isValid = false;
         }
-        if(!formData.advancepayment){
-            tempErrors.advancepayment = 'Advance Payment Amount is required';
-            isValid = false;
-        }
-        if(!formData.prepaidrentperiod){
-            tempErrors.prepaidrentperiod = 'Months of Advance Payment is required';
-            isValid = false;
+        if (isExpanded) {
+            if (!formData.advancepayment) {
+                tempErrors.advancepayment = 'Advance Payment Amount is required';
+                isValid = false;
+            }
+            if (!formData.prepaidrentperiod) {
+                tempErrors.prepaidrentperiod = 'Months of Advance Payment is required';
+                isValid = false;
+            }
         }
 
         // data
@@ -217,12 +237,14 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
         const userData = JSON.parse(userDataString); // parse the datastring into json 
         const accessToken = userData.accessToken;
 
+        const updatedPrepaidRentPeriod = (formData.prepaidrentperiod || 0) + 1;
+
         const formattedFormData = {
             ...formData,
+            prepaidrentperiod: updatedPrepaidRentPeriod,
             startDate: dayjs(formData.startDate).format('MM/DD/YYYY'),
-            // endDate: dayjs(formData.endDate).format('MM/DD/YYYY'),
         };
-        
+        console.log(formattedFormData)
         if(accessToken){
             setLoading(true);
             try{
@@ -249,6 +271,7 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });
+                    setLoading(false)
                 }else{
                     setLoading(false);
                     if(data.error)
@@ -259,8 +282,16 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                         // setError(data.error)
                     
                     }else{
-                        console.log(data.message); // for duplicate entry
-                        setError(data.message);
+                        if (response.status === 422) {
+                            const validationErrors = data.message; // Assuming Laravel validation response
+                            Object.keys(validationErrors).forEach((field) => {
+                                console.log(`${field}: ${validationErrors[field].join(', ')}`);
+                                // Optionally, display errors for each field in your UI
+                                enqueueSnackbar(`${validationErrors[field].join(', ')}`, { variant: 'error' });
+                            });
+                        } else {
+                            enqueueSnackbar(data.message || 'An unexpected error occurred.', { variant: "error" });
+                        }
                     }
                 }
             }catch(error){
@@ -268,18 +299,6 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
             }
         }
     }
-
-    useEffect(() => {
-        const errorMessage = localStorage.getItem('errorMessage');
-    
-        if(errorMessage){
-          setError(errorMessage);
-          setTimeout(() => {
-            localStorage.removeItem('errorMessage');
-          }, 3000);
-        }
-      
-    }, [setError]);
     
     useEffect(() => {
         if (propDetails?.apartment) {
@@ -293,20 +312,30 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
         }
     },[propDetails, Property_Type, ApartmentID, rentalFeeValue])
 
-   useEffect(() => {
-    if(formData.prepaidrentperiod && formData.rentalfee){
-        const CalculateAdvancePayment = formData.prepaidrentperiod * formData.rentalfee
+    useEffect(() => {
+        if(formData.prepaidrentperiod && formData.rentalfee){
+            const CalculateAdvancePayment = formData.prepaidrentperiod * formData.rentalfee
+            setFormData(prevState => ({
+                ...prevState,
+                advancepayment: CalculateAdvancePayment,
+            }));
+            
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                advancepayment: '',
+            }))
+        } 
+    },[formData.prepaidrentperiod, formData.rentalfee]);
+
+    useEffect(() => {
+        if (formData.rentalfee && !formData.initial_payment) {
+        // Set initial payment to rental fee if it's not already set
         setFormData(prevState => ({
             ...prevState,
-            advancepayment: CalculateAdvancePayment
+            initial_payment: formData.rentalfee, // Assuming initial payment is same as rental fee
         }));
-        
-        setErrors(prevErrors => ({
-            ...prevErrors,
-            advancepayment: '',
-        }))
-    }
-   },[formData.prepaidrentperiod, formData.rentalfee]);
+        }
+    }, [formData.rentalfee, formData.initial_payment, setFormData]);
 
     // Handle municipality change
     const handleMunicipalityChange = (event) => {
@@ -468,7 +497,6 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                 value={formData.middlename}
                 onChange={handleChange}
                 fullWidth
-                required
                 sx={{
                     '& .MuiOutlinedInput-root': {
                         borderRadius: '10px', // Adjust the border-radius as needed
@@ -784,26 +812,103 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                 helperText={errors.rentalfee}
                 />
             </Grid>
-            <Grid item xs={12} sm={4} sx={{mt:2}}>
-            <TextField
-            label="Months of Advance Payment"
-            name="prepaidrentperiod"
-            select
-            value={formData.prepaidrentperiod}
-            onChange={handleChange}
-            fullWidth
-            required
-            error={Boolean(errors.prepaidrentperiod)} // Add error prop
-            helperText={errors.prepaidrentperiod}
-            >
-                {[1, 2, 3, 4, 5, 6].map((month) => (
-                <MenuItem key={month} value={month}>
-                    {month}
-                </MenuItem>
-                ))}
-            </TextField>
+            <Grid item xs={12} sm={6}  sx={{mt:'0.9rem'}}>
+                <TextField
+                name="initial_payment"
+                label="Initial Payment"
+                type='number'
+                value={formData.initial_payment}
+                onChange={handleChange}
+                fullWidth
+                required
+                aria-readonly
+                error={Boolean(errors.deposit)} // Add error prop
+                helperText={
+                    errors.deposit 
+                    ? errors.deposit 
+                    : 'Initial payment is usually the first month’s rent.' // Add explanation note
+                }
+                InputProps={{
+                    inputProps: { 
+                        min: 1,  // Set minimum value to 1
+                        step: "1" // Allow only whole numbers
+                    },
+                    readOnly: true
+                }}
+                onKeyDown={(e) => {
+                // Prevent 'e', 'E', '+', and '-' from being entered
+                if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-') {
+                    e.preventDefault();
+                }
+                }}
+                
+                />
             </Grid>
-            <Grid item xs={12} sm={4} sx={{mt:'0.9rem'}}>
+            <Grid item xs={12} sm={6}  sx={{mt:'0.9rem'}}>
+                <TextField
+                name="deposit"
+                label="Payment Deposit Amount"
+                type='number'
+                value={formData.deposit}
+                onChange={handleChange}
+                fullWidth
+                required
+                aria-readonly
+                error={Boolean(errors.deposit)} // Add error prop
+                helperText={errors.deposit}
+                InputProps={{
+                    inputProps: { 
+                        min: 1,  // Set minimum value to 1
+                        step: "1" // Allow only whole numbers
+                    }
+                }}
+                onKeyDown={(e) => {
+                // Prevent 'e', 'E', '+', and '-' from being entered
+                if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-') {
+                    e.preventDefault();
+                }
+                }}
+                
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <GeneralTooltip title="Show the fields of Advance payment">
+                    <IconButton>
+                        <InfoOutlinedIcon sx={{color:'#607d8b'}}/>
+                    </IconButton>
+                </GeneralTooltip>
+                <Button
+                    variant="text"
+                    color="primary"
+                    onClick={handleClick}
+                    style={{ textDecoration: 'underline', fontWeight: 500, marginLeft:'-10px' }}
+                >
+                    {isExpanded ? 'Show less...' : 'Show more...'}
+                </Button>
+                
+            </Grid>
+            {isExpanded && (
+            <>
+            <Grid item xs={12} sm={6} sx={{mt:1}}>
+                <TextField
+                label="Months of Advance Payment"
+                name="prepaidrentperiod"
+                select
+                value={formData.prepaidrentperiod}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={Boolean(errors.prepaidrentperiod)} // Add error prop
+                helperText={errors.prepaidrentperiod}
+                >
+                    {[1, 2, 3, 4, 5, 6].map((month) => (
+                    <MenuItem key={month} value={month}>
+                        {month}
+                    </MenuItem>
+                    ))}
+                </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6} sx={{mt:'0.5rem'}}>
                 <TextField
                 name="advancepayment"
                 label="Advance Payment Amount"
@@ -831,33 +936,10 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                 }}
                 />
             </Grid>
-            <Grid item xs={12} sm={4}  sx={{mt:'0.9rem'}}>
-                <TextField
-                name="deposit"
-                label="Payment Deposit Amount"
-                type='number'
-                value={formData.deposit}
-                onChange={handleChange}
-                fullWidth
-                required
-                aria-readonly
-                error={Boolean(errors.deposit)} // Add error prop
-                helperText={errors.deposit}
-                InputProps={{
-                    inputProps: { 
-                        min: 1,  // Set minimum value to 1
-                        step: "1" // Allow only whole numbers
-                    }
-                }}
-                onKeyDown={(e) => {
-                // Prevent 'e', 'E', '+', and '-' from being entered
-                if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-') {
-                    e.preventDefault();
-                }
-                }}
-                
-                />
-            </Grid>
+            </>
+            )}
+            
+            
             <Grid item xs={12} sm={4}>
             <Button
                 variant="outlined"
@@ -891,6 +973,7 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                         barangay: '',
                         municipality: '',
                         rentalfee: rentalFeeValue,
+                        initial_payment: '',
                         deposit: '',
                         startDate: null,
                         advancepayment: '',

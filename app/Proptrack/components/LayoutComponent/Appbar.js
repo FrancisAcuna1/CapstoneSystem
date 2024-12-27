@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/navigation.js';
 import { Box, Grid } from '@mui/material';
@@ -30,7 +31,7 @@ const logonameStyle = {
   marginLeft: '-3.5rem',
 };
 
-function AppAppBar({ mode, toggleColorMode }) {
+function AppAppBar({ mode, toggleColorMode}) {
   const [mounted, setMounted] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
@@ -113,30 +114,51 @@ function AppAppBar({ mode, toggleColorMode }) {
             {/* Adjusted Navbar Items to Right Side */}
             <Box sx={{ display: { xs: 'none', md: 'flex' }, ml: 'auto', gap: 2 }}>
               <Link href="/" passHref   style={{ textDecoration: 'none' }}>
-                <MenuItem component="a" sx={{ py: '6px', px: '12px'}}>
+                <MenuItem component="a" sx={{ py: '6px', px: '5px',}}  >
                   <Typography variant="body2" color="text.primary" letterSpacing={1}>
                     Home
                   </Typography>
                 </MenuItem>
               </Link>
               <Link href="/Proptrack/Properties" passHref style={{ textDecoration: 'none' }}>
-                <MenuItem component="a" sx={{ py: '6px', px: '12px' }}>
+                <MenuItem
+                  component="a"
+                  sx={{
+                    py: '6px',
+                    px: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
                   <Typography variant="body2" color="text.primary" letterSpacing={1}>
                     Properties
                   </Typography>
                 </MenuItem>
               </Link>
               <Link href="/Proptrack/AboutUs" passHref style={{ textDecoration: 'none' }}>
-                <MenuItem component="a" sx={{ py: '6px', px: '12px' }}>
+                <MenuItem
+                  component="a"
+                  sx={{
+                    py: '6px',
+                    px: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
                   <Typography variant="body2" color="text.primary" letterSpacing={1}>
                     About Us
                   </Typography>
                 </MenuItem>
               </Link>
-              <Link href="/Proptrack/Contact" passHref style={{ textDecoration: 'none' }}>
-                <MenuItem component="a" sx={{ py: '6px', px: '12px' }}>
+              <Link href="/Proptrack/FAQS" passHref style={{ textDecoration: 'none' }}>
+                <MenuItem
+                  component="a"
+                  sx={{
+                    py: '6px',
+                    px: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
                   <Typography variant="body2" color="text.primary" letterSpacing={1}>
-                    Contact
+                    FAQ&apos;S
                   </Typography>
                 </MenuItem>
               </Link>
@@ -152,7 +174,7 @@ function AppAppBar({ mode, toggleColorMode }) {
             >
               <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
               <Button
-                sx={{ color: '#9575cd' }}
+                sx={{ color: '#fafafa',background: 'linear-gradient(360deg, hsla(270, 100%, 87%, 1) 9%, hsla(267, 74%, 55%, 1) 89%)', borderRadius:2}}
                 variant="text"
                 size="small"
                 component="a"
@@ -217,7 +239,7 @@ function AppAppBar({ mode, toggleColorMode }) {
                   <Link href="/Proptrack/Contact" passHref style={{ textDecoration: 'none' }}>
                     <MenuItem component="a" sx={{ py: '6px', px: '12px' }}>
                       <Typography variant="body2" color="text.primary" letterSpacing={1}>
-                        Contact
+                        Contact Us
                       </Typography>
                     </MenuItem>
                   </Link>

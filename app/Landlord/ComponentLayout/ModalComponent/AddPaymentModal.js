@@ -12,7 +12,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
-
+import useSWR from "swr";
+import { useSnackbar } from "notistack";
 
 
 
@@ -141,8 +142,23 @@ const Backdrop = React.forwardRef((props, ref) => {
     `,
   );
 
+  const fetcher = async ([url, token]) => {
+    const response = await fetch(url ,{
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        }
+    })
+    if(!response.ok){
+        throw new Error(response.statusText);
+    }
+    return response.json();
+  }
 
-export default function AddPaymentTransaction({open, handleOpen, handleClose, setLoading, setSuccessful, setError, error, isEdit, editPayment, setEditPayment}){
+
+export default function AddPaymentTransaction({open, handleOpen, handleClose, setLoading, setSuccessful, isEdit, editPayment, setEditPayment}){
+    const { enqueueSnackbar } = useSnackbar();
     const [errors, setErrors] = useState({});
     const [tenantlist, setTenantList] = useState([]);
     const [paymentData, setPaymentData] = useState({
@@ -153,12 +169,12 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
         status: 'Paid'
     })
 
-    console.log('tenant:', tenantlist);
-    
+    console.log('tenant:', tenantlist)
     console.log('ID:', editPayment)
     console.log('payment:', paymentData)
     console.log('editId:', editPayment)
     console.log('edit is status:', isEdit);
+
     const validateForm = () => {
         let tempErrors = {};
         let isValid = true;
@@ -186,7 +202,7 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
         }
 
         setErrors(tempErrors);
-        return isValid;
+        return isValid; 
        
     }
 
@@ -204,53 +220,36 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
         }));
     }
 
-
-
-    useEffect(() => {
-        const fetchDataEdit = async () => {
-        const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-        const userData = JSON.parse(userDataString); // parse the datastring into json 
+    const getUserToken = () => {
+        const userDataString = localStorage.getItem('userDetails');
+        const userData = JSON.parse(userDataString); 
         const accessToken = userData.accessToken;
-        if(accessToken){
-            console.log('Token:', accessToken)
-            try{
+        return accessToken;
+    }
+    const token = getUserToken();
 
-            const response = await fetch(`http://127.0.0.1:8000/api/editpayment/${editPayment}`,{
-                method: 'GET',
-                headers: {
-                'Content-Type': 'application/json',  
-                'Authorization': `Bearer ${accessToken}`,
-                }
-            })
-
-            const data = await response.json();
-
-            if(response.ok){
-                console.log(data.data)
-                const editData = data.data[0]
-                // Set payment data
-                setPaymentData({
-                    tenant_id: editData.tenant_id || '',
-                    amount:  editData.amount ? parseFloat(editData.amount).toFixed(0) : '', 
-                    payment_date: dayjs(editData.date) || null,
-                    transaction_type: editData?.transaction_type || '',
-                    status: editData.status || 'Paid'
-                });
-                // setAddEquipment(data)
-            }else{
-                console.log(data.message); // for duplicate entry
-                setError(data.message);
-            }
-
-            }catch(error){
-            console.error('Error', error);
-            }finally{
-            console.log(error);
-            }
+    const {data: response, error} = useSWR(
+        editPayment && [`http://127.0.0.1:8000/api/editpayment/${editPayment}`, token] || null,
+        fetcher, {
+            refreshInterval: 1000,
+            revalidateOnFocus: false,
+            shouldRetryOnError: false,
+            errorRetryCount: 3,
         }
+    )
+    console.log(error)
+    useEffect(() => {
+        if (response?.data) {
+            const editData = response?.data[0] || '';
+            setPaymentData({
+                tenant_id: editData.tenant_id || '',
+                amount:  editData.amount ? parseFloat(editData.amount).toFixed(0) : '', 
+                payment_date: dayjs(editData.date) || null,
+                transaction_type: editData?.transaction_type || '',
+                status: editData.status || 'Paid'
+            });
         }
-        fetchDataEdit();
-    }, [editPayment, setError, error, setPaymentData])
+    }, [response])
 
     useEffect(() => {
         const fetchedTenantList = async() => {
@@ -319,7 +318,6 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
                 headers:{
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`, 
-                    'Accept': 'application/json',
                 },
                 body: JSON.stringify(formattedFormData)
                 })
@@ -329,26 +327,19 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
                 if(response.ok){
                     setLoading(false);
                     handleClose()
-                    setPaymentData({})
-                    localStorage.setItem('successMessage', data.message || 'Operation Sucess!');
-                    window.location.reload();
-                    // const successMessage = data.message || 'Success!'; 
-                    // setSuccessful(successMessage);
+                    setPaymentData({
+                        tenant_id:'',
+                        amount: '', 
+                        payment_date: null,
+                        transaction_type: '',
+                        status: 'Paid'
+                    })
+                    enqueueSnackbar(data.message, { variant: "success" });
                 }else{
                     setLoading(false);
-                    if(data.error)
-                    {
-                        handleClose();
-                        console.log(data.error)
-                        localStorage.setItem('errorMessage', data.message || 'Operation Error!');
-                        window.location.reload();
-                        // setError(data.error)
-                    
-                    }else{
-                        console.log(data.error); // for duplicate entry
-                        setError(data.message);
-                        handleClose();
-                    }
+                    handleClose();
+                    console.log(data.error)
+                    enqueueSnackbar(data.message, { variant: "error" });
                 }
 
             }catch(error){
@@ -376,26 +367,6 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
         }
 
     }
-
-  useEffect(() => {
-    const successMessage = localStorage.getItem('successMessage');
-    const errorMessage = localStorage.getItem('errorMessage')
-    if (successMessage) {
-      setSuccessful(successMessage);
-      setTimeout(() => {
-        localStorage.removeItem('successMessage');
-      }, 3000);
-    }
-
-    if(errorMessage){
-      setError(errorMessage);
-      setTimeout(() => {
-        localStorage.removeItem('errorMessage');
-      }, 3000);
-    }
-
-  
-  }, [setSuccessful, setError]);
 
     const handleTenant = (selectedTenant) => {
         if (selectedTenant) {
@@ -445,7 +416,13 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
             onClose={() => {
                 handleClose()
                 setErrors({})
-                setPaymentData({})
+                setPaymentData({
+                    tenant_id:'',
+                    amount: '', 
+                    payment_date: null,
+                    transaction_type: '',
+                    status: 'Paid'
+                })
             }}
             closeAfterTransition
             slots={{ backdrop: StyledBackdrop }}
@@ -509,15 +486,16 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
                         {[
                         'Advance Payment',
                         'Rental Fee',
+                        'Intial Payment',
                         'Penalties', 
-                        'Extra Amenties', 
+                        'Extra Amenities', 
                         'Damage Compensation', 
                         'Replacement Fee'
                         ]
                         .filter(type => 
                         isEdit === true || 
                         type !== 'Advance Payment' && 
-                        type !== 'Rental Fee'
+                        type !== 'Rental Fee' && type !== 'Intial Payment'
                         )
                         .map(type => (
                         <MenuItem key={type} value={type}>
@@ -582,39 +560,6 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
                         
                         />
                     </Grid>
-                    {/* <Grid item xs={12} sm={4} sx={{mt:'1rem'}}>
-                        <FormControl fullWidth error={Boolean(errors.status)}>
-                            <InputLabel id="demo-simple-select-label" error={Boolean(errors.status)}>Status</InputLabel>
-                            <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            name="status"
-                            value={paymentData.status}
-                            label="Status"
-                            onChange={handleChange}
-                            error={Boolean(errors.status)}
-                            helperText={errors.status}
-                            >
-                            <MenuItem value='Paid'>Paid</MenuItem>
-                            <MenuItem value='Partially Paid'>Partially Paid</MenuItem>
-                            <MenuItem value=''></MenuItem>
-                        
-                            </Select>
-                            {errors.status && (
-                            <FormHelperText 
-                            error 
-                            sx={{
-                                marginLeft: '14px',
-                                marginRight: '14px',
-                                fontSize: '0.75rem',
-                            }}
-                            >
-                            {errors.status}
-                            </FormHelperText>
-                            )}
-                        </FormControl>
-                    </Grid> */}
-
                 </Grid>
                 <Button 
                     variant='contained'
@@ -643,7 +588,13 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
                 onClick={() => {
                     handleClose()
                     setErrors({})
-                    setPaymentData({})
+                    setPaymentData({
+                        tenant_id:'',
+                        amount: '', 
+                        payment_date: null,
+                        transaction_type: '',
+                        status: 'Paid'
+                    })
                 }}
                 >
                     Cancel

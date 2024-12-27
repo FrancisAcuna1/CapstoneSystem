@@ -32,18 +32,15 @@ import {
   MenuItem,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { styled, alpha, useTheme, css } from "@mui/system";
+import { styled, alpha, useTheme, css, fontSize } from "@mui/system";
 import { Modal as BaseModal } from "@mui/base/Modal";
 import TuneIcon from "@mui/icons-material/Tune";
-import CheckCircleOutlineSharpIcon from "@mui/icons-material/CheckCircleOutlineSharp";
-import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
-import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import Checkbox from "@mui/material/Checkbox";
 import NorthIcon from "@mui/icons-material/North";
 import SouthIcon from "@mui/icons-material/South";
-import CloudDownloadOutlinedIcon from "@mui/icons-material/CloudDownloadOutlined";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import * as XLSX from "xlsx";
 import { format, parseISO } from "date-fns";
 import RecurringDialog from "../Labraries/RecurringDialog";
@@ -52,15 +49,16 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import EditRecurringModal from "../ModalComponent/EditRecurringModal";
 import AddExpensesTransaction from "../ModalComponent/AddExpenesesModal";
 import ViewExpensesDialog from "../Labraries/ViewExpensesDialog";
+import Swal from "sweetalert2";
+import useSWR from "swr";
+import WarningAlreadyPaid from "../Labraries/WarningIsPaidDialog";
+import WarningNonRecurring from "../Labraries/WarningNonRecurringDialog";
+import NoResultUI from "../Labraries/NoResults";
+
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
-
-  // backgroundColor: alpha(theme.palette.common.black, 0.1), // Semi-transparent background
-  // '&:hover': {
-  //   backgroundColor: alpha(theme.palette.common.black, 0.15),
-  // },
   marginRight: theme.spacing(2),
   marginLeft: 0,
   width: "100%",
@@ -161,6 +159,25 @@ const GeneralTooltip = styled(({ className, ...props }) => (
   },
 });
 
+const fetcherExpense = async([url, token, selectedMonth, selectedYear]) => {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      month: selectedMonth,
+      year: selectedYear,
+    }),
+  })
+  if(!response.ok){
+    throw new Error(response.statusText);
+  }
+  return response.json();
+}
+
 export default function ExpensesTable({
   openRecurringModal,
   setOpenRecurringModal,
@@ -189,10 +206,12 @@ export default function ExpensesTable({
   const [page, setPage] = React.useState(0);
   const [selectedItem, setSelectedItem] = useState([]); //for check box
   const [selectedRecurringItem, setSelectedRecurringItem] = useState([]);
+  const [selectedToPaid, setSelectedToPaid] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: "name",direction: "asc",});
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [recurringDetails, setRecurringDetails] = useState([]);
-  // const [editItemId, setEditItemId] = useState([]); //for recurring data to edit;
+  const [warningOpen1, setWarningOpen1] = useState(false);
+  const [warningOpen2, setWarningOpen2] = useState(false);
   const [viewExpensesId, setViewExpensesId] = useState([]);
   const categories = ["all", "maintenance fee", "utility bill", "recurring"];
 
@@ -200,19 +219,22 @@ export default function ExpensesTable({
   console.log(selectedCategory);
   console.log(selectedMonth)
 
-  const handleClickOpen = () => {
-  setOpenDialog(true);
-  }; // for recurring dialog
-
-  const handleClose = () => {
-  setOpenDialog(false);
-  }; // for recurring dialog
+ 
 
   const handleCategoryChange = (category) => {
       setSelectedCategory(category);
       setAnchorEl(null);
   };
 
+  const handleClickOpen = () => {
+    setOpenDialog(true);
+  }; // for recurring dialog
+  
+  const handleClose = () => {
+    setOpenDialog(false);
+  }; // for recurring dialog
+ 
+  
   // filter
   const handleMenuOpen = (event) => {
       setAnchorEl(event.currentTarget);
@@ -246,55 +268,133 @@ export default function ExpensesTable({
       setIsEditing(true);
   }
 
-  const fetchedData = useCallback(async () => {
+
+  const getUserToken = () => {
+    const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
+    const userData = JSON.parse(userDataString); // parse the datastring into json
+    const accessToken = userData.accessToken;
+    return accessToken;
+  }
+  const token = getUserToken();
+  const endpoint = selectedCategory === 'all'
+    ? "http://127.0.0.1:8000/api/get_all_expenses"
+    : `http://127.0.0.1:8000/api/filter_expenses/${selectedCategory}`;
+
+  console.log(token)
+  const {data: response, error, mutate, isLoading} = useSWR(
+    token && selectedMonth && selectedYear ? [endpoint, token, selectedMonth, selectedYear] : null,
+    fetcherExpense, {
+      refreshInterval: 1000,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      errorRetryCount: 3,
+      onLoadingSlow: () => setLoading(true),
+    }
+  )
+  console.log(error);
+  console.log(response?.data);
+  useEffect(() => {
+    if (response?.data) {
+      setRecurringDetails(response?.data);
+      setLoading(false);
+    }else if(isLoading){
+      setLoading(true);
+    }
+  }, [response, isLoading, setLoading])
+
+
+  console.log(selectedItem)
+  const handleSave = async (e) => {
+    e.preventDefault();
     const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
     const userData = JSON.parse(userDataString); // parse the datastring into json
     const accessToken = userData.accessToken;
 
     if (accessToken) {
-      console.log(accessToken);
-      try {
-        setLoading(true);
-        const url =
-          selectedCategory === "all"
-            ? "http://127.0.0.1:8000/api/get_all_expenses"
-            : `http://127.0.0.1:8000/api/filter_expenses/${selectedCategory}`;
+    let success = true;
+    let hasRecurringPaid  = false;
+    let hasNonRecurring = false;
 
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            month: selectedMonth,
-            year: selectedYear,
-          }),
-        });
-
-        const data = await response.json();
-        console.log("Data fetched:", data);
-
-        if (response.ok) {
-          setRecurringDetails(data.data);
-          console.log("Data fetched:", data.data);
-        } else {
-          console.log("Error:", response.status);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.log(error);
-        setLoading(false);
-      } finally {
-        setLoading(false);
+    for (const recurringId of selectedItem) {
+      console.log(`Checking ID ${recurringId}`);
+      const selectedExpense = recurringDetails.find(
+        (item) => item.id === recurringId
+      );
+      console.log(selectedExpense)
+  
+      // Check if the item is non-recurring or already paid
+      if (!selectedExpense) continue;
+      const isRecurring = selectedExpense.recurring === 1;
+      const isPaid = selectedExpense.status === "Paid";
+  
+      if (!isRecurring) {
+        hasNonRecurring = true;
+      }
+      if (isRecurring && isPaid) {
+        hasRecurringPaid = true;
+      }
+      if(isPaid){
+        hasRecurringPaid = true;
       }
     }
-  }, [selectedCategory, selectedMonth, selectedYear, setLoading]);
 
-  useEffect(() => {
-    fetchedData();
-  }, [fetchedData, setError, setLoading, refreshTrigger, selectedCategory]);
+    // Set warnings based on conditions
+    if (hasNonRecurring && !hasRecurringPaid) {
+      setWarningOpen1(true); // Warning for non-recurring items selected
+      return;
+    }
+
+    if (hasRecurringPaid) {
+      setWarningOpen2(true); // Warning for already paid recurring items
+      return;
+    }
+
+    if (hasNonRecurring && hasRecurringPaid){
+      setWarningOpen1(true);
+      return
+    }
+
+
+    for (const recurringId of selectedItem) {
+      console.log(`Marking ID ${recurringId} as paid`);
+      setLoading(true);
+      try {
+      const response = await fetch(
+          `http://127.0.0.1:8000/api/markaspaid/${recurringId}`,
+          {
+          method: "PUT",
+          headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+          },
+          }
+      );
+      console.log(response);
+      const data = await response.json();
+      if (!response.ok) {
+          console.log(data.error);
+          enqueueSnackbar(data.message, { variant: "error" });
+          window.location.reload();
+          setSelectedItem([]);
+          setLoading(false);
+      }
+      } catch (error) {
+      console.log("Error", error);
+      }
+    }
+    if (success) {
+        Swal.fire({
+        icon: "success",
+        title: "Payments Processed",
+        text: "All selected tenant payments have been recorded successfully.",
+        confirmButtonText: "OK",
+        });
+        setSelectedItem([]);
+    }
+    } else {
+    console.log("No token Found!");
+    }
+  };
 
   console.log(selectedItem)
   const handleDelete = async(e) => {
@@ -305,61 +405,40 @@ export default function ExpensesTable({
     const accessToken = userData.accessToken;
 
     if(accessToken){
-        let success = true;
-        let data 
-        for(const deleteId of selectedItem){
-            try{
-                const response = await fetch(`http://127.0.0.1:8000/api/delete_expenses/${deleteId}`,{
-                    method: "DELETE",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`,
-                    }
-                })
-                data = await response.json();
-                console.log(data);
-                if(!response.ok){
-                    console.log(data.error);
-                    // localStorage.setItem('errorMessage', data.message || 'Operation Error!');
-                    enqueueSnackbar(data.message, {variant: 'error'})
-                    setSelectedItem([]);
-                    handleClose();
-                    handleDialogClose();
-                    success = false
-                }
-            }catch(error){
-                console.log(error);
+      let success = true;
+      let data 
+      for(const deleteId of selectedItem){
+        try{
+          const response = await fetch(`http://127.0.0.1:8000/api/delete_expenses/${deleteId}`,{
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
             }
-        }
-        if(success){
-            // localStorage.setItem('successMessage', data.message || 'Operation Error!');
-            enqueueSnackbar('Successfully Expenses Deleted!', {variant: 'success'})
-            fetchedData()
+          })
+          data = await response.json();
+          console.log(data);
+          if(!response.ok){
+            console.log(data.error);
+            enqueueSnackbar(data.message, {variant: 'error'})
             setSelectedItem([]);
             handleClose();
-            setLoading(false);
-            handleDialogClose()
+            handleDialogClose();
+            success = false
+          }
+        }catch(error){
+          console.log(error);
         }
+      }
+      if(success){
+        enqueueSnackbar('Successfully Expenses Deleted!', {variant: 'success'})
+        setSelectedItem([]);
+        handleClose();
+        setLoading(false);
+        handleDialogClose()
+      }
     }
   }
-
-  useEffect(() => {
-    const successMessage = localStorage.getItem("successMessage");
-    const errorMessage = localStorage.getItem("errorMessage");
-    if (successMessage) {
-      setSuccessful(successMessage);
-      setTimeout(() => {
-        localStorage.removeItem("successMessage");
-      }, 3000);
-    }
-
-    if (errorMessage) {
-      setError(errorMessage);
-      setTimeout(() => {
-        localStorage.removeItem("errorMessage");
-      }, 3000);
-    }
-  }, [setSuccessful, setError]);
 
   const formatDate = (dateString) => {
     if (!dateString) {
@@ -382,9 +461,6 @@ export default function ExpensesTable({
     }
     setSortConfig({ key: columnKey, direction });
   };
-
-  // Function to sort data
-  // Handle sorting
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -414,22 +490,41 @@ export default function ExpensesTable({
     setSelectedItem(newSelected);
   };
 
-  const handleExportToExcel = () => {
-    const exportData = recurringDetails.map((payment) => ({
-      "Tenant Name": `${payment.tenant.firstname} ${payment.tenant.lastname}`,
-      "Rented Unit":
-        payment.tenant.rental_agreement[0].rented_unit.apartment_name,
-      Amount: payment.amount,
-      Date: payment.date,
-      "Transaction Type": payment.transaction_type,
-      Status: payment.status,
-    }));
+  const handleCheckToPaid = (event, id) => {
+    const selectedIndex = selectedToPaid.indexOf(id);
+    let newSelected = [];
 
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Payments");
-    XLSX.writeFile(wb, "payment_transactions.xlsx");
-  };
+    if (selectedIndex === -1) {
+    newSelected = newSelected.concat(selectedToPaid, id);
+    } else if (selectedIndex === 0) {
+    newSelected = newSelected.concat(selectedToPaid.slice(1));
+    } else if (selectedIndex === selectedToPaid.length - 1) {
+    newSelected = newSelected.concat(selectedToPaid.slice(0, -1));
+    } else if (selectedIndex > 0) {
+    newSelected = newSelected.concat(
+        selectedToPaid.slice(0, selectedIndex),
+        selectedToPaid.slice(selectedIndex + 1)
+    );
+    }
+    setSelectedToPaid(newSelected);
+};
+
+  // const handleExportToExcel = () => {
+  //   const exportData = recurringDetails.map((payment) => ({
+  //     "Tenant Name": `${payment.tenant.firstname} ${payment.tenant.lastname}`,
+  //     "Rented Unit":
+  //       payment.tenant.rental_agreement[0].rented_unit.apartment_name,
+  //     Amount: payment.amount,
+  //     Date: payment.date,
+  //     "Transaction Type": payment.transaction_type,
+  //     Status: payment.status,
+  //   }));
+
+  //   const ws = XLSX.utils.json_to_sheet(exportData);
+  //   const wb = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(wb, ws, "Payments");
+  //   XLSX.writeFile(wb, "payment_transactions.xlsx");
+  // };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -477,7 +572,7 @@ export default function ExpensesTable({
 
     // Group recurring expenses by unit, category, and type_of_bills
     const groupedRecurring = recurring.reduce((acc, expense) => {
-      const key = `${expense.unit_id}-${expense.category}-${expense.type_of_bills}`;
+      const key = `${expense.unit_id}-${expense.unit_type}-${expense.category}-${expense.type_of_bills}-${expense.description}`;
       if (!acc[key]) {
         acc[key] = [];
       }
@@ -613,17 +708,38 @@ export default function ExpensesTable({
     const otherExpenses = recurringDetails.filter(
       (expense) =>
         expense.unit_id === item.unit_id &&
+        expense.unit_type === item.unit_type &&
         expense.category === item.category &&
+        expense.description === item.description &&
         expense.type_of_bills === item.type_of_bills &&
-        // expense.description === expense.description &&
         expense.id !== item.id
     );
+    console.log(otherExpenses)
     setSelectedRecurringItem({ ...item, otherExpenses });
     setOpenDialog(true);
   };
 
-  console.log(selectedRecurringItem)
+  useEffect(() => {
+    if (selectedRecurringItem) {
+      const otherExpenses = recurringDetails.filter(
+        (expense) =>
+          expense.unit_id === selectedRecurringItem.unit_id &&
+          expense.unit_type === selectedRecurringItem.unit_type && 
+          expense.category === selectedRecurringItem.category &&
+          expense.description === selectedRecurringItem.description &&
+          expense.type_of_bills === selectedRecurringItem.type_of_bills &&
+          expense.id !== selectedRecurringItem.id
+      );
 
+      console.log(otherExpenses)
+      setSelectedRecurringItem((prev) => ({
+        ...prev,
+        otherExpenses,
+      }));
+    }
+  }, [recurringDetails])
+
+  console.log(selectedRecurringItem)
   return (
     <Box sx={{ maxWidth: 1400, margin: "auto", overflowX: "auto" }}>
       <Paper
@@ -635,6 +751,8 @@ export default function ExpensesTable({
             md: 1000,
             lg: 1490,
             borderRadius: "12px",
+            borderTop: '4px solid', 
+            borderTopColor: '#7e57c2'
           },
         }}
       >
@@ -655,7 +773,7 @@ export default function ExpensesTable({
               <Typography
                 sx={{
                   color: "#263238",
-                  flex: "1 1 100%",
+                  flex: "1 70%",
                   mt: "1rem",
                   mb: "0.4rem",
                   fontSize: { xs: "18px", sm: "18px", md: "18px", lg: "18px" },
@@ -685,6 +803,7 @@ export default function ExpensesTable({
               </Typography>
             )}
             {selectedItem.length > 0 ? (
+              <>
               <CustomTooltip title="Delete">
                 <IconButton
                   onClick={handleDialogOpen}
@@ -696,11 +815,37 @@ export default function ExpensesTable({
                   }}
                 >
                   <DeleteForeverOutlinedIcon
-                    fontSize="medium"
-                    sx={{ color: "#e57373", "&:hover": { color: "#fafafa" } }}
+                    sx={{ color: "#e57373", "&:hover": { color: "#fafafa" }, fontSize: '28px' }}
                   />
                 </IconButton>
               </CustomTooltip>
+              <Button
+                variant="contained"
+                size="small" // Keep size as small
+                sx={{ 
+                  ml:0.8,
+                  mr: 2, 
+                  mt: 2, 
+                  mb: 0.5,
+                  backgroundColor: '#4CAF50',
+                  borderRadius: '8px', // Slightly smaller border radius
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  padding: '4px 8px', // Reduced padding for a smaller button
+                  boxShadow: '0 2px 5px rgba(76, 175, 80, 0.3)', // Reduced shadow for a smaller button
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: '#45a049',
+                    transform: 'translateY(-1px)', // Reduced hover effect
+                    boxShadow: '0 4px 8px rgba(76, 175, 80, 0.4)', // Reduced shadow on hover
+                  },
+                }}
+                onClick={handleSave}
+              >
+                <CheckCircleIcon sx={{ color: 'white', fontSize: 20, mr: 1 }} /> {/* Reduced icon size */}
+                Mark as Paid
+              </Button>
+            </>
             ) : (
               <Box
                 sx={{
@@ -860,6 +1005,9 @@ export default function ExpensesTable({
                       <SouthIcon fontSize="extrasmall" />
                     ))}
                 </StyledTableCell>
+                <StyledTableCell align="center" >
+                  Paid{""}
+                </StyledTableCell>
                 <StyledTableCell onClick={() => handleSort('recurring')}>
                   Recurring{" "}
                   {sortConfig.key === "recurring" &&
@@ -890,8 +1038,8 @@ export default function ExpensesTable({
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedRecurringExpenses &&
-                paginatedRecurringExpenses.map((item, index) => {
+              {paginatedRecurringExpenses.length > 0 ?
+                (paginatedRecurringExpenses.map((item, index) => {
                   const isSelected = selectedItem.includes(item.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
@@ -933,6 +1081,9 @@ export default function ExpensesTable({
                         }}
                       >
                         {item.description}
+                      </StyledTablebody>
+                      <StyledTablebody>
+                       {item.status === "Not paid" ? 'Not Paid' : 'Paid'}
                       </StyledTablebody>
                       <StyledTablebody>
                         <Chip
@@ -984,14 +1135,6 @@ export default function ExpensesTable({
                         />
                       </StyledTablebody>
                       <TableCell align="center">
-                        {/* <Button
-                          variant="outlined"
-                          onClick={() => {
-                            handleViewClick(item);
-                          }}
-                        >
-                          view
-                        </Button> */}
                         <ViewToolTip title="View">
                           <IconButton
                             onClick={() => {
@@ -1050,18 +1193,42 @@ export default function ExpensesTable({
                       </TableCell>
                     </StyledTableRow>
                   );
-                })}
+                })):(
+                  <StyledTableRow>
+                    <TableCell 
+                      colSpan={12} 
+                      sx={{ 
+                      p: 0, // Remove padding
+                      backgroundColor: "transparent", // Remove background
+                      borderBottom: "none", // Optional: Remove table row bottom border
+                      }}
+                  >
+                      <Box
+                      sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          height: "100%",
+                          minHeight: "300px",
+                          textAlign: "center",
+                      }}
+                      >
+                        <NoResultUI/>
+                      </Box>
+                    </TableCell>
+                  </StyledTableRow>
+                )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 15, 25]}
-          component="div"
-          count={filteredAndSortedData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+        rowsPerPageOptions={[5, 10, 15, 25]}
+        component="div"
+        count={filteredAndSortedData.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
       <Dialog
@@ -1086,6 +1253,14 @@ export default function ExpensesTable({
           </Button>
         </DialogActions>
       </Dialog>
+      <WarningAlreadyPaid
+        open={warningOpen2}
+        setWarningOpen2={setWarningOpen2}
+      />
+      <WarningNonRecurring
+        open={warningOpen1}
+        setWarningOpen1={setWarningOpen1}
+      />
       <SnackbarProvider maxSnack={3}>
         <RecurringDialog
           openDialog={openDialog}
@@ -1096,14 +1271,12 @@ export default function ExpensesTable({
           setLoading={setLoading}
           setSuccessful={setSuccessful}
           setError={setError}
-          refreshData={fetchedData}
-          // setOpen={setOpen}
-          // Open={Open}
           editItemId={editItemId}
           setEditItemId={setEditItemId}
           openRecurringModal={openRecurringModal}
           setOpenRecurringModal={setOpenRecurringModal}
           handleCloseModal={handleCloseModal}
+          mutate={mutate}
         />
       </SnackbarProvider>
       <Box  sx={{display: 'none'}}>
@@ -1118,7 +1291,8 @@ export default function ExpensesTable({
         openRecurringModal={openRecurringModal}
         setOpenRecurringModal={setOpenRecurringModal}
         handleCloseModal={handleCloseModal}
-        refreshData={fetchedData}
+        mutate={mutate}
+        // refreshData={fetchedData}
         />
         <ViewExpensesDialog
         handleOpen={handleViewExpenses}

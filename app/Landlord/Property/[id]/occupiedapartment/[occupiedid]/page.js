@@ -252,7 +252,7 @@ export default function OccupiedTenantPage (){
           <Divider />
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
-          {loading && <LinearProgress sx={{ color:"#673ab7", position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
+          {loading && <LinearProgress color='primary' sx={{ position: 'fixed',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4.99, borderRadius: '4px 4px 0 0' }} />}
           <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
              <OccupiedTenantInformation
               apartmentId={apartmentId}

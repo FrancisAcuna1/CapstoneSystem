@@ -1,10 +1,9 @@
 "use client"
 import React from "react";
 import { useState, useEffect, useCallback } from "react";
-// import Chart from "react-apexcharts";
+import useSWR from "swr";
 import dynamic from 'next/dynamic';
 const ChartNoSSR = dynamic(() => import('react-apexcharts'), { ssr: false });
-
 
 export default function IncomeChart ({selectedMonth, selectedYear,}){
    const [income, setIncome] = useState({
@@ -23,22 +22,14 @@ export default function IncomeChart ({selectedMonth, selectedYear,}){
                 position: "bottom",
                 horizontalAlign: "left",
             }
-        },
-        series: [
-            {
-                name: "Series-1",
-                data: [],
-            }, 
-        ],
-        
-        
+        }, 
+        series: [{ name: "Income", data: new Array(12).fill(0) }],       
     })
 
     console.log(selectedMonth);
     console.log(selectedYear);
     console.log(income)
     // Sample data - replace with your actual data
-
 
     const fetchIncome = useCallback( async (selectedYear) => {
         const userDataString = localStorage.getItem('userDetails');
@@ -97,10 +88,6 @@ export default function IncomeChart ({selectedMonth, selectedYear,}){
     useEffect(() => {
         fetchIncome(selectedYear);
     }, [fetchIncome,selectedYear]);
-
-
-
-
 
     return (
         <>

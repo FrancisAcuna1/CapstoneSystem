@@ -1,112 +1,150 @@
-'use client'
-import React, { useState, useEffect } from "react"
-import { Paper, Box, Grid, CardHeader, Card, CardContent, Typography, IconButton, CardActions, Stack, Avatar, Divider, AppBar, Toolbar} from "@mui/material"
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+"use client";
+import React, { useState, useEffect, useCallback, memo } from "react";
+import {
+  Paper,
+  Box,
+  Toolbar,
+  Typography,
+  Divider,
+  Avatar,
+  IconButton,
+  CardContent,
+  Skeleton,
+} from "@mui/material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-// const TenantInfo = [
-    
-//     {id: 1, name: 'John Doe', contact: '09369223915', role: 'Tenant'},
-//     {id: 2, name: 'Jane Jalmasco', contact: '09369223915', role: 'Tenant'},
-//     {id: 3, name: 'Mark Domasig', contact: '09369223915', role: 'Tenant'},
-//     {id: 4, name: 'clark Mangampo', contact: '09369223915', role: 'Tenant'},
-//     {id: 5, name: 'Izer Idol', contact: '09369223915', role: 'Tenant'},
-//     {id: 6, name: 'Teressa Pura', contact: '09369223915', role: 'Tenant'},
-//     {id: 7, name: 'Edwin Embile', contact: '09369223915', role: 'Tenant'},
-//     {id: 8, name: 'Edmar Sanched', contact: '09369223915', role: 'Tenant'},
-//     {id: 9, name: 'Rica Estives', contact: '09369223915', role: 'Tenant'},
-//     {id: 10, name: 'April Mae Jebulan', contact: '09369223915', role: 'Tenant'},
+const avatarColors = [
+  "#1976d2",
+  "#f44336",
+  "#4caf50",
+  "#ff9800",
+  "#9c27b0",
+  "#3f51b5",
+  "#00bcd4",
+  "#8bc34a",
+];
 
-// ]
+const getRandomColor = () =>
+  avatarColors[Math.floor(Math.random() * avatarColors.length)];
 
-const avatarColors = ['#1976d2', '#f44336', '#4caf50', '#ff9800', '#9c27b0', '#3f51b5', '#00bcd4', '#8bc34a'];
+const TenantCard = memo(({ tenant }) => (
+  <CardContent
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      mt: "-0.5rem",
+      mb: "-0.5rem",
+    }}
+  >
+    <div style={{ display: "flex", alignItems: "center" }}>
+      <Avatar sx={{ bgcolor: getRandomColor(), marginRight: 2 }}>
+        {tenant.firstname.charAt(0).toUpperCase()}
+      </Avatar>
+      <div>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: "bold", fontSize: "16px", color: "#333" }}
+        >
+          {tenant.firstname} {tenant.lastname}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {tenant.contact}
+        </Typography>
+      </div>
+    </div>
+    <IconButton aria-label="more">
+      <MoreHorizIcon color="inherit" />
+    </IconButton>
+  </CardContent>
+));
 
-const getRandomColor = () => {
-    return avatarColors[Math.floor(Math.random() * avatarColors.length)]
-}
+TenantCard.displayName = "TenantCard";
 
-export default function TenantCardInfor({setLoading, loading}){
-    const [tenantList, setTenantList] = useState([]);
+export default function TenantCardInfor({ setLoading, loading }) {
+  const [tenantList, setTenantList] = useState([]);
 
-    useEffect(() => {
-        const fetchedData = async() => {
-            setLoading(true)
-            const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-            const userData = JSON.parse(userDataString); // parse the datastring into json 
-            const accessToken = userData.accessToken;
+  const fetchTenantData = useCallback(async () => {
+    const userDataString = localStorage.getItem("userDetails");
+    if (!userDataString) return;
 
-            try{
-                if(accessToken){
-                    const response = await fetch('http://127.0.0.1:8000/api/all_tenant',{
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    })
-                    const data = await response.json();
-                    console.log(data);
-                    if(response.ok){
-                        setTenantList(data.data)
-                    }else{
-                        console.log('error', response.status)
-                        setLoading(false)
-                    }
-                }
-            }catch(error){
-                console.log(error);
-                setLoading(false)
-            }
-        }
-        fetchedData();
-    }, [setLoading])
+    const { accessToken } = JSON.parse(userDataString);
+    if (!accessToken) return;
 
+    setLoading(true);
+    const controller = new AbortController();
 
-    return(
-        <Paper sx={{mt: '2rem', }}>
-         
-                <Toolbar>
-                    <Typography variant="h6" letterSpacing={2} component="div" sx={{ flexGrow: 1, color:'#263238', mt:'0.9rem', mb: '0.8rem' }}>
-                        Tenant List
-                    </Typography>
-                </Toolbar>
-                <Divider/>
-            <Box  sx={{ maxWidth: { xs: 'auto',  lg: 800 },  height: { xs: '24vh', sm:'16vh', md:'14vh', lg: '48vh' },  padding: "0rem 0.9rem 3.5rem 0.9rem",   justifyContent: 'center',  lignItems: 'center',  overflowY: 'scroll'}}
-            >   
-            {tenantList.map((tenant) => (
-                <React.Fragment key={tenant.id}>
-                  
-                    <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt:'-0.5rem', mb: '-0.5rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Avatar sx={{ bgcolor: getRandomColor(), marginRight: 2 }}>
-                                {tenant.firstname.charAt(0).toUpperCase()} 
-                            </Avatar>
-                            <div>
-                                <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', fontSize:'16px', color: '#333' }}>
-                                    {tenant.firstname} {tenant.lastname}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {tenant.contact}
-                                </Typography>
-                            </div>
-                        </div>
-                        <IconButton aria-label="delete">
-                            <MoreHorizIcon color="inherit" />
-                        </IconButton>
-                    </CardContent>
-                    <Divider />
-                </React.Fragment>
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/all_tenant", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        console.error("Error:", response.status);
+        return;
+      }
+
+      const data = await response.json();
+      setTenantList(data.data || []);
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        console.error("Fetch error:", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+
+    return () => controller.abort();
+  }, [setLoading]);
+
+  useEffect(() => {
+    fetchTenantData();
+  }, [fetchTenantData]);
+
+  return (
+    <Paper sx={{ mt: "2rem" }}>
+      <Toolbar>
+        <Typography
+          variant="h6"
+          letterSpacing={2}
+          sx={{ flexGrow: 1, color: "#263238", mt: "0.9rem", mb: "0.8rem" }}
+        >
+          Tenant List
+        </Typography>
+      </Toolbar>
+      <Divider />
+      <Box
+        sx={{
+          maxWidth: { xs: "auto", lg: 800 },
+          height: { xs: "45vh", sm: "45vh", md: "45vh", lg: "48vh" },
+          p: "0.9rem",
+          overflowX: 'hidden',
+          overflowY: 'auto', // Allows vertical scrolling
+          '&::-webkit-scrollbar': { display: 'none' }, // Hides scrollbar in WebKit-based browsers (Chrome, Edge, Safari)
+          '-ms-overflow-style': 'none', // Hides scrollbar in IE and Edge
+        }}
+      >
+        {loading
+          ? Array.from(new Array(4)).map((_, index) => (
+              <Skeleton
+                key={index}
+                animation="wave"
+                height={80}
+                sx={{ mb: 2 }}
+              />
+            ))
+          : tenantList.map((tenant) => (
+              <React.Fragment key={tenant.id}>
+                <TenantCard tenant={tenant} />
+                <Divider />
+              </React.Fragment>
             ))}
-           
-            
-                
-               
-         
-           
-            
-        </Box>
-
-        </Paper>
-       
-    )
+      </Box>
+    </Paper>
+  );
 }

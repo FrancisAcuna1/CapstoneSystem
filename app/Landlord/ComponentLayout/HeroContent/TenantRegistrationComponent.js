@@ -152,12 +152,12 @@ export default function TenantRegistrationComponent({propsId, apartmentId, loadi
 
     return(
         <Box sx={{ maxWidth: 1400,  margin: 'auto', }}>
-            <SnackbarProvider maxSnack={3}>
+            {/* <SnackbarProvider maxSnack={3}>
                 <ErrorSnackbar
                     error={error}
                     setError={setError}          
                 />
-            </SnackbarProvider>
+            </SnackbarProvider> */}
             <Typography variant="h5" letterSpacing={3} sx={{marginLeft: '5px', fontSize: {xs:'18px', sm:'18px', md:'24px', lg:'24px'}, fontWeight: 'bold',  mt:5}}>
                 Details -  {details.apartment && details.apartment.apartment_name}
             </Typography>
@@ -171,7 +171,7 @@ export default function TenantRegistrationComponent({propsId, apartmentId, loadi
                         Property
                     </Link>
                     <Link letterSpacing={2} underline="hover" color="inherit" href={`/Landlord/Property/${propsID}`}>
-                        List of Properties
+                        List of Rental Units
                     </Link>
                     <Typography letterSpacing={2} color="text.primary"  sx={{ fontSize: { xs: '14px', sm: '15px', md: '15px' } }}>Apartment Details</Typography>
                 </Breadcrumbs>
@@ -182,7 +182,14 @@ export default function TenantRegistrationComponent({propsId, apartmentId, loadi
 
             <Grid  container spacing={1} sx={{maxWidth: 1400, mt: '10rem', display:'flex', justifyContent:' center',  margin: 'auto'}}>
                 <Grid item xs={12} md={5} lg={5} sx={{ }}>
-                    <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '8px'}}>  
+                    <Paper elevation={3}
+                        sx={{
+                            padding: '25px',
+                            marginTop: '20px',
+                            borderRadius: '10px',
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+                          }}
+                    >  
                     {loading ?
                     (
                         <Box>
@@ -238,43 +245,99 @@ export default function TenantRegistrationComponent({propsId, apartmentId, loadi
                         </Box>
                         {details && details.apartment && (
                             <>
-                            <Typography variant='h6' letterSpacing={1.2} gutterBottom sx={{textTransform: 'uppercase', fontWeight: 550, mt: 4}}>
-                            {details.apartment.apartment_name}
+                            <Typography
+                                variant="h5"
+                                letterSpacing={1.5}
+                                gutterBottom
+                                sx={{
+                                textTransform: 'uppercase',
+                                fontWeight: 'bold',
+                                color: '#333',
+                                mt: 6,
+                                }}
+                            >
+                                {details.apartment.apartment_name}
                             </Typography>
-                            <Typography variant='body2' letterSpacing={1.2} gutterBottom sx={{textTransform: 'uppercase', fontWeight: 500, }}>
-                            Bdlg no.{details.apartment.building_no}.  {details.apartment.street}.st.,  Brgy.{details.apartment.barangay},  {details.apartment.municipality}.
+                            <Typography
+                                variant="body1"
+                                letterSpacing={1.2}
+                                gutterBottom
+                                sx={{ color: '#555', mb: 2 }}
+                            >
+                                Bldg No. {details.apartment.building_no}, {details.apartment.street} St., 
+                                Brgy. {details.apartment.barangay}, {details.apartment.municipality}.
                             </Typography>
-                            <Typography variant='body2' letterSpacing={1.2} gutterBottom sx={{ fontWeight: 500, }}>
-                            <strong>Rental Fee:</strong> {details.apartment.rental_fee}
-                            </Typography>
-                            <Typography variant='body2' letterSpacing={1.2} gutterBottom sx={{ fontWeight: 500, }}>
-                            <strong>Rooms: </strong> {details.apartment.number_of_rooms}
-                            </Typography>
-                            <Typography variant='body2' color={'green'} letterSpacing={1.2} gutterBottom sx={{ fontWeight: 500, }}>
-                            <strong style={{color:'black'}}>Status:</strong> {details.apartment.status}
-                            </Typography>
-                            <Typography variant='body2' letterSpacing={1.2} gutterBottom sx={{ fontWeight: 500, }}>
-                            <strong>Capacity:</strong> {details.apartment.capacity}
-                            </Typography> 
-                            <Box sx={{display:'flex', justifyContent:'start'}}>
-                            <Typography variant='body2' letterSpacing={1.2} gutterBottom sx={{mr:'0.5rem', fontWeight: 500, }}>
-                            <strong>Inclusions:</strong>
-                            </Typography>
-                            {details.apartment.inclusions && details.apartment.inclusions.length > 0 ? (
-                            details.apartment.inclusions.map((item, index) => (
-                                <Typography key={item.index} variant='body2' letterSpacing={2} gutterBottom sx={{ display: 'inline', fontWeight: 500, mr:'0.2rem'}}>
-                                    {item.equipment.name}- {item.quantity} {index < details.apartment.inclusions.length - 1 && '|'}
-                                </Typography>
-                            ))
-                            ):(
-                            <>
-                            <Typography variant='body2' letterSpacing={2} gutterBottom sx={{ fontWeight: 500, }}>
-                                No Included Inclusion 
-                            </Typography>
-                            </>
-                            )}
-                            </Box>
 
+                            <Typography
+                                variant="body2"
+                                gutterBottom
+                                sx={{ fontWeight: 500, color: '#757575' }}
+                            >
+                                <strong>Rental Fee:</strong> {details.apartment.rental_fee}
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                gutterBottom
+                                sx={{ fontWeight: 500, color: '#757575' }}
+                            >
+                                <strong>Rooms:</strong> {details.apartment.number_of_rooms}
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                gutterBottom
+                                sx={{ fontWeight: 500, color: 'green' }}
+                            >
+                                <strong style={{ color: '#000' }}>Status:</strong>{' '}
+                                {details.apartment.status}
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                gutterBottom
+                                sx={{ fontWeight: 500, color: '#757575' }}
+                            >
+                                <strong>Capacity:</strong> {details.apartment.capacity}
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', alignItems: 'start', mt: 3 }}>
+                                <Typography
+                                variant="body2"
+                                gutterBottom
+                                sx={{ fontWeight: 600, color: '#333', mr: 1 }}
+                                >
+                                <strong>Inclusions:</strong>
+                                </Typography>
+
+                                <Grid container spacing={1}>
+                                {details.apartment.inclusions &&
+                                details.apartment.inclusions.length > 0 ? (
+                                    details.apartment.inclusions.map((item, index) => (
+                                    <Grid item key={index} xs="auto">
+                                        <Typography
+                                        variant="body2"
+                                        sx={{
+                                            fontWeight: 500,
+                                            color: '#555',
+                                            backgroundColor: '#e8f0fe',
+                                            padding: '4px 8px',
+                                            borderRadius: '8px',
+                                        }}
+                                        >
+                                        {item.equipment?.name || ''} - {item?.quantity || ''}
+                                        </Typography>
+                                    </Grid>
+                                    ))
+                                ) : (
+                                    <Grid item>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{ fontWeight: 500, color: '#757575' }}
+                                    >
+                                        No Included Inclusions
+                                    </Typography>
+                                    </Grid>
+                                )}
+                                </Grid>
+                            </Box>
                             </>
                         )}
                         
@@ -291,6 +354,7 @@ export default function TenantRegistrationComponent({propsId, apartmentId, loadi
                 </Grid>
                 <Grid item xs={12} md={7} lg={7}>
                     <Paper elevation={3} style={{ padding: '25px', marginTop: '15px', borderRadius: '8px'}}>  
+                        <SnackbarProvider maxSnack={3}>
                         <TenantRegistrationForm
                             details={details}
                             setDetails={setDetails}
@@ -301,6 +365,7 @@ export default function TenantRegistrationComponent({propsId, apartmentId, loadi
                             successful={successful}
                             setSuccessful={setSuccessful}
                         />
+                        </SnackbarProvider>
                     </Paper>
                 </Grid>
                 

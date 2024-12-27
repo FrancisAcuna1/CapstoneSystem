@@ -1,19 +1,27 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import {Box, Stepper, Step, StepLabel, Button, Typography, TextField, Grid, FormHelperText, FormControl, InputLabel, Select, CircularProgress, FormControlLabel, Autocomplete, Checkbox, MenuItem} from '@mui/material';
+import {Box, Stepper, Step, StepLabel, Button, Typography, TextField, Grid, FormHelperText, FormControl, InputLabel, Select, CircularProgress, FormControlLabel, Autocomplete, Checkbox, MenuItem, IconButton, Tooltip} from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import Swal from 'sweetalert2'; 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { CloseFullscreen, CloseOutlined } from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
+import { styled, alpha, useTheme, css } from '@mui/system';
+// const steps = ['Tenant Information', 'Account Creation', 'Unit Details'];
+const GeneralTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))({
+    '& .MuiTooltip-tooltip': {
+      backgroundColor: '#263238', // Background color of the tooltip
+      color: '#ffffff', // Text color
+      borderRadius: '4px',
+    },
+});
+// const steps = ['Tenant Information', 'Account Creation', 'Unit Details'];
 
-const steps = ['Tenant Information', 'Account Creation', 'Unit Details'];
-
-// const rooms = [
-//     { id: 1, name: "Room 101", totalBeds: 3, occupiedBeds: 0 },
-//     { id: 2, name: "Room 102", totalBeds: 2, occupiedBeds: 1 },
-// ]
 
 // Municipality codes for Sorsogon
 const SORSOGON_MUNICIPALITIES = [
@@ -34,7 +42,8 @@ const SORSOGON_MUNICIPALITIES = [
     { code: '056216000', name: 'Sorsogon City' }
 ];
 
-const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, setError, setSuccessful}) => {
+const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, setError, setSuccessful, handleCloseDrawer}) => {
+    const {enqueueSnackbar} = useSnackbar();
     const [contact, setContact] = useState('');
     const [activeStep, setActiveStep] = useState(0);
     const [rooms, setRooms] = useState([]);
@@ -45,6 +54,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
     const [numOfBeds, setNumOfBeds] = useState(1); //for selected bed
     const [wantPrivacy, setWantPrivacy] = useState(false);
     const [errors, setErrors] = useState({});
+    const [isExpanded, setIsExpanded] = useState(false);
     const [allBarangays, setAllBarangays] = useState([]);
     const [municipalityCode, setMunicipalityCode] = useState('');
     const propsDetails = details;
@@ -72,6 +82,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
         barangay: '',
         municipality: '',
         rentalfee: '',
+        initial_payment: '',
         advancepayment:'',
         prepaidrentperiod:'',//this is the #of months for advance payment
         deposit: '',
@@ -85,7 +96,12 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
     console.log(formData)
     console.log(allBarangays)
     console.log('code:', municipalityCode);
-    
+
+
+    const handleClick = () => {
+        setIsExpanded(!isExpanded);
+    };
+
     const validateForm = () => {
         let tempErrors = {};
         let isValid = true;
@@ -153,18 +169,25 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
             tempErrors.deposit = 'Deposit Amount is required';
             isValid = false;
         } 
-        if(!formData.advancepayment){
-            tempErrors.advancepayment = 'Advance Payment Amount is required';
-            isValid = false;
-        } 
-        if(!formData.prepaidrentperiod){
-            tempErrors.prepaidrentperiod = 'Months of Advance Payment is required';
-            isValid = false;
-        } 
         if (!formData.rentalfee){
             tempErrors.rentalfee = 'Rentalfee is required';
             isValid = false;
         }
+        if (!formData.initial_payment){
+            tempErrors.initial_payment = 'Initial Payment is required';
+            isValid = false;
+        }
+        if (isExpanded) {
+            if (!formData.advancepayment) {
+                tempErrors.advancepayment = 'Advance Payment Amount is required';
+                isValid = false;
+            }
+            if (!formData.prepaidrentperiod) {
+                tempErrors.prepaidrentperiod = 'Months of Advance Payment is required';
+                isValid = false;
+            }
+        }
+        
 
         // Rooms
         if(!formData.roomid){
@@ -237,6 +260,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
         fetchedDataAddress();
     },[municipalityCode, setAllBarangays])
 
+    console.log((formData.prepaidrentperiod || 0) + 1)
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -244,14 +268,14 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
         if (!validateForm()) {
             return; // Stop submission if validation fails
         }
-       
-
         const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
         const userData = JSON.parse(userDataString); // parse the datastring into json 
         const accessToken = userData.accessToken;
 
+        const updatedPrepaidRentPeriod = (formData.prepaidrentperiod || 0) + 1;
         const formattedFormData = {
             ...formData,
+            prepaidrentperiod: updatedPrepaidRentPeriod,
             startDate: dayjs(formData.startDate).format('MM/DD/YYYY'),
             // endDate: dayjs(formData.endDate).format('MM/DD/YYYY'),
         };
@@ -273,26 +297,30 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                 if(response.ok){
                     console.log(data);
                     setFormData('')
-                    localStorage.setItem('successMessage', data.message || 'Operation Sucess!');
-                    window.history.back();
+                    handleCloseDrawer();
+                    ResetForm();
+                    // localStorage.setItem('successMessage', data.message || 'Operation Sucess!');
+                    // window.history.back();
                     Swal.fire({
                         title: 'Success!',
                         text: 'Tenant Registered Successfully!',
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });
+                    setLoading(false)
                 }else{
                     setLoading(false);
-                    if(data.error)
-                    {
-                        console.log(data.error)
-                        localStorage.setItem('errorMessage', data.message || 'Operation Error!');
-                        window.location.reload();
-                        // setError(data.error)
-                    
-                    }else{
-                        console.log(data.message); // for duplicate entry
-                        setError(data.message);
+                    console.log(data.message); // for duplicate entry
+                    // enqueueSnackbar(data.message, { variant: "error" });
+                    if (response.status === 422) {
+                        const validationErrors = data.message; // Assuming Laravel validation response
+                        Object.keys(validationErrors).forEach((field) => {
+                            console.log(`${field}: ${validationErrors[field].join(', ')}`);
+                            // Optionally, display errors for each field in your UI
+                            enqueueSnackbar(`${field}: ${validationErrors[field].join(', ')}`, { variant: 'error' });
+                        });
+                    } else {
+                        enqueueSnackbar(data.message || 'An unexpected error occurred.', { variant: "error" });
                     }
                 }
             }catch(error){
@@ -302,25 +330,36 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
         }
     }
 
-    
-    useEffect(() => {
-        const successMessage = localStorage.getItem('successMessage');
-        const errorMessage = localStorage.getItem('errorMessage');
-        if (successMessage) {
-        setSuccessful(successMessage);
-        setTimeout(() => {
-            localStorage.removeItem('successMessage');
-        }, 3000);
-        }
-
-        if(errorMessage){
-        setError(errorMessage);
-        setTimeout(() => {
-            localStorage.removeItem('errorMessage');
-        }, 3000);
-        }
-    })
-
+    const ResetForm = () => {
+        setErrors({})
+        setSelectedRoom('')
+        setBedsAvailable('')
+        setAvailableBeds([])
+        setFormData({
+            firstname: '',
+            middlename: '',
+            lastname: '',
+            contact: '',
+            email: '',
+            user_type: 'User',
+            status: 'Active',
+            username: '',
+            password: '',
+            street: '',
+            barangay: '',
+            municipality: '',
+            rentalfee: '',
+            prepaidrentperiod: '',
+            advancepayment: '',
+            deposit: '',
+            startDate: null,
+            // endDate: null,
+            rented_unit_type: Property_Type,
+            rented_unit_id: BoardinghouseID,
+            Newstatus: 'Available',
+        });
+        setContact('')
+    }
     useEffect(() => {
         if (propsDetails && propsDetails.boardinghouse) {
             setRooms(propsDetails.boardinghouse.rooms || []);
@@ -372,6 +411,18 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
           
         }
        },[formData.prepaidrentperiod, formData.rentalfee]);
+
+       
+    useEffect(() => {
+        if (formData.rentalfee && !formData.initial_payment) {
+        // Set initial payment to rental fee if it's not already set
+        setFormData(prevState => ({
+            ...prevState,
+            initial_payment: formData.rentalfee, // Assuming initial payment is same as rental fee
+        }));
+        }
+    }, [formData.rentalfee, formData.initial_payment, setFormData]);
+
     // const handleRoomChange = (e) => {
     //     const roomId = e.target.value;
     //     const selectedRoom = rooms.find((r) => r.id === roomId);
@@ -496,6 +547,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
             ...prevFormData,
             bedId: selectedBeds,
             rentalfee: selectedBedID ? selectedBedID.price : '',
+            
         }));
 
         // Clear error message for bedId
@@ -512,18 +564,20 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
         setWantPrivacy(checked);
         if (checked) {        
             const totalRentalFee = availableBeds.reduce((sum, bed) => sum + bed.price, 0);
-            const availableBedNumbers = availableBeds.map(bed => bed.bed_number);
+            const availableBedNumbers = availableBeds.map(bed => bed.id);
             setFormData(prev => ({
                 ...prev,
                 bedId: availableBedNumbers,
-                rentalfee: totalRentalFee
+                rentalfee: totalRentalFee,
+                initial_payment: totalRentalFee
             }));
         } else {
             setFormData(prev => ({
                 ...prev,
                 bedId: '',
                 rentalfee: '',
-                advancepayment:''
+                advancepayment:'',
+                initial_payment: '',
             }));
         }
     };
@@ -618,10 +672,64 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
     <Box sx={{ width: '100%' }} onSubmit={handleSubmit} component="form"  noValidate>
         <Grid container spacing={2}>
             <Grid item xs={12} sm={12}>
+                <Box sx={{
+                    display:'flex', 
+                    justifyContent: 'space-between',
+                    }}
+                >
                 <Typography variant='h6' letterSpacing={2} sx={{fontWeight:600, fontSize:{xs:'18px', sm:'22px', md:'22px', lg:'22px'}}} gutterBottom>
                    TENANT REGISTRATION FORM
                 </Typography>
+                <IconButton 
+                onClick={() => {
+                    handleCloseDrawer()
+                    setErrors({})
+                    setSelectedRoom('')
+                    setBedsAvailable('')
+                    setAvailableBeds([])
+                    setFormData({
+                        firstname: '',
+                        middlename: '',
+                        lastname: '',
+                        contact: '',
+                        email: '',
+                        user_type: 'User',
+                        status: 'Active',
+                        username: '',
+                        password: '',
+                        street: '',
+                        barangay: '',
+                        municipality: '',
+                        rentalfee: '',
+                        initial_payment:'',
+                        prepaidrentperiod: '',
+                        advancepayment: '',
+                        deposit: '',
+                        startDate: null,
+                        // endDate: null,
+                        rented_unit_type: Property_Type,
+                        rented_unit_id: BoardinghouseID,
+                        Newstatus: 'Available',
+                    });
+                    setContact('')
+                }}
+                sx={{
+                    "&:hover": { backgroundColor: "#263238" },
+                    height: "35px",
+                    width: "35px",
+                }}
+                >
+                    <CloseOutlined
+                     sx={{
+                        transition: "transform 0.3s ease-in-out",
+                        "&:hover": { transform: "rotate(90deg)", color: "#fefefe" },
+                    }}
+                    />
+                </IconButton>
+                </Box>
+                
             </Grid>
+
             <Grid item xs={12}>
                 <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', mt:'0.2rem',  mb:'-0.1rem', fontSize: '14px', color: '#424242'}}>
                     <InfoOutlinedIcon fontSize="small" sx={{ mr: 1,}} />
@@ -658,7 +766,6 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                 value={formData.middlename}
                 onChange={handleChange}
                 fullWidth
-                required
                 sx={{
                     '& .MuiOutlinedInput-root': {
                         borderRadius: '10px', // Adjust the border-radius as needed
@@ -1073,7 +1180,82 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                 }}
                 />
             </Grid>
-            <Grid item xs={12} sm={4} sx={{mt:2}}>
+            <Grid item xs={12} sm={6} sx={{mt:'1rem'}}>
+                <TextField
+                name="initial_payment"
+                label="Initial Payment"
+                type='number'
+                value={formData.initial_payment}
+                onChange={handleChange}
+                fullWidth
+                required
+                aria-readonly
+                error={Boolean(errors.deposit)} // Add error prop
+                helperText={
+                    errors.deposit 
+                    ? errors.deposit 
+                    : 'Initial payment is usually the first month&apos;s rent.' // Add explanation note
+                }
+                InputProps={{
+                    inputProps: { 
+                        min: 1,  // Set minimum value to 1
+                        step: "1" // Allow only whole numbers
+                    },
+                    readOnly: true
+                }}
+                onKeyDown={(e) => {
+                // Prevent 'e', 'E', '+', and '-' from being entered
+                if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-') {
+                    e.preventDefault();
+                }
+                }}
+                />
+            </Grid>
+            <Grid item xs={12} sm={6} sx={{mt:'1rem'}}>
+                <TextField
+                name="deposit"
+                label="Payment Deposit"
+                type='number'
+                value={formData.deposit}
+                onChange={handleChange}
+                fullWidth
+                required
+                aria-readonly
+                error={Boolean(errors.deposit)} // Add error prop
+                helperText={errors.deposit}
+                InputProps={{
+                    inputProps: { 
+                        min: 1,  // Set minimum value to 1
+                        step: "1" // Allow only whole numbers
+                    }
+                }}
+                onKeyDown={(e) => {
+                // Prevent 'e', 'E', '+', and '-' from being entered
+                if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-') {
+                    e.preventDefault();
+                }
+                }}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <GeneralTooltip title="Show the fields of Advance payment">
+                    <IconButton>
+                        <InfoOutlinedIcon sx={{color:'#607d8b'}}/>
+                    </IconButton>
+                </GeneralTooltip>
+                <Button
+                    variant="text"
+                    color="primary"
+                    onClick={handleClick}
+                    style={{ textDecoration: 'underline', fontWeight: 500, marginLeft:'-10px' }}
+                >
+                    {isExpanded ? 'Show less...' : 'Show more...'}
+                </Button>
+                
+            </Grid>
+            {isExpanded && (
+            <>
+            <Grid item xs={12} sm={6} sx={{mt:2}}>
                 <TextField
                 label="Months of Advance Payment"
                 name="prepaidrentperiod"
@@ -1092,7 +1274,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                     ))}
                 </TextField>
             </Grid>
-            <Grid item xs={12} sm={4} sx={{mt:'1rem'}}>
+            <Grid item xs={12} sm={6} sx={{mt:'1rem'}}>
                 <TextField
                 name="advancepayment"
                 label="Advance Payment Amount"
@@ -1120,32 +1302,8 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                 }}
                 />
             </Grid>
-            <Grid item xs={12} sm={4} sx={{mt:'1rem'}}>
-                <TextField
-                name="deposit"
-                label="Payment Deposit"
-                type='number'
-                value={formData.deposit}
-                onChange={handleChange}
-                fullWidth
-                required
-                aria-readonly
-                error={Boolean(errors.deposit)} // Add error prop
-                helperText={errors.deposit}
-                InputProps={{
-                    inputProps: { 
-                        min: 1,  // Set minimum value to 1
-                        step: "1" // Allow only whole numbers
-                    }
-                }}
-                onKeyDown={(e) => {
-                // Prevent 'e', 'E', '+', and '-' from being entered
-                if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-') {
-                    e.preventDefault();
-                }
-                }}
-                />
-            </Grid>
+            </>
+            )}
             
             
             <Grid item xs={12} sm={4} >
@@ -1166,6 +1324,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                     },
                 }}
                 onClick={() => {
+                    handleCloseDrawer()
                     setErrors({})
                     setSelectedRoom('')
                     setBedsAvailable('')
@@ -1184,19 +1343,19 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                         barangay: '',
                         municipality: '',
                         rentalfee: '',
+                        initial_payment:'',
                         prepaidrentperiod: '',
                         advancepayment: '',
                         deposit: '',
                         startDate: null,
-                        // endDate: null,
                         rented_unit_type: Property_Type,
                         rented_unit_id: BoardinghouseID,
-                        Newstatus: 'Occupied',
+                        Newstatus: 'Available',
                     });
                     setContact('')
                 }}
             >
-                Clear
+                Close
             </Button>
             </Grid>
             <Grid item xs={12} sm={8}>

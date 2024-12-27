@@ -9,6 +9,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import getLPTheme from "../components/LayoutComponent/getLPTheme";
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 import AboutUsComponent from "../components/HeroComponent/AboutusComponent";
+import Footer from "../components/LayoutComponent/Footer";
 // import Chatbot from "../../component/chatbot";
 
 
@@ -82,7 +83,7 @@ export default function AboutUsPage() {
           </Grid> */}
         </Grid>
       </Box>
-      
+      <Footer/>
     </ThemeProvider>
     );
 

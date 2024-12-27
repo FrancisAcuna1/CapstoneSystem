@@ -1,9 +1,10 @@
 "use client"
 import React from "react";
+import { useState } from "react";
 import AppAppBar from "../components/LayoutComponent/Appbar";
 import Hero from "../components/HeroComponent/Hero";
 import PropTypes from 'prop-types';
-import {CssBaseline, ToggleButtonGroup, ToggleButton, Box, Grid, Typography} from '@mui/material';
+import {CssBaseline, ToggleButtonGroup, ToggleButton, Box, Grid, Typography, LinearProgress} from '@mui/material';
 import Divider from '@mui/material/Divider';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import getLPTheme from "../components/LayoutComponent/getLPTheme";
@@ -54,6 +55,7 @@ import HowItWorksComponent from "../components/HeroComponent/HowItWorks";
 
 export default function LandingPage() {
     const [mode, setMode] = React.useState('light');
+    const [loading, setLoading] = useState(false);
     const [showCustomTheme, setShowCustomTheme] = React.useState(true);
     const defaultTheme = createTheme({ palette: { mode } });
   
@@ -68,9 +70,9 @@ export default function LandingPage() {
     return (
     <ThemeProvider theme={showCustomTheme ? defaultTheme : defaultTheme}>
       <CssBaseline />
-      <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
+      {loading && <LinearProgress sx={{ color:"#673ab7", position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
+      <AppAppBar mode={mode} toggleColorMode={toggleColorMode}/>
       <Hero />
-      <FeatureComponent/>
       <HowItWorksComponent/>
       <Box sx={{ bgcolor: 'background.default' }}>
         <Grid container justifyContent="space-between" sx={{ padding: '0 20px' }}>

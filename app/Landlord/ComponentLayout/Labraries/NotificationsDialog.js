@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DialogContent, useMediaQuery, useTheme, Divider, Grid, Button, Box, Paper, Dialog, DialogTitle, Avatar, Typography, Stack, IconButton, CircularProgress} from '@mui/material';
 import { format, parseISO, formatDistance } from 'date-fns';
 
@@ -14,50 +14,53 @@ const NotificationsDialog = ({ open}) => {
     console.log('Data:', unreadNotification);
     
 
-    useEffect(() => {
-        const fetchedNotifications = async() => {
-            const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
-            const userData = JSON.parse(userDataString); // parse the datastring into json 
-            const accessToken = userData.accessToken;
-            setLoading(true);
 
-            if(accessToken){
-                try{
-                    const response = await fetch(`http://127.0.0.1:8000/api/getnotifications`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json',
-                        }
-                    })
-                    const data = await response.json();
-                    if(response.ok){
-                        console.log('Data', data.notifications);
-                        setUndreadNotification(data.notifications);
-                        setLoading(false);
-                    }else{
-                        console.log('Error', response.statusText);
-                        console.log('Error',  error.message);
-                        setLoading(false);
-                        
-                    }
-                }catch(error){
-                    console.error('Error', error);
-                    setLoading(false);
-                }
-            }else{
-                console.log('No token found')
-                setLoading(false);
-            }
-        }
-        fetchedNotifications();
-    }, [])
-
-    const handleMarkAsRead = async(id) => {
+    const fetchedNotifications = useCallback(async() => {
         const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
         const userData = JSON.parse(userDataString); // parse the datastring into json 
         const accessToken = userData.accessToken;
         setLoading(true);
+
+        if(accessToken){
+            try{
+                const response = await fetch(`http://127.0.0.1:8000/api/getnotifications`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    }
+                })
+                const data = await response.json();
+                if(response.ok){
+                    console.log('Data', data.notifications);
+                    setUndreadNotification(data.notifications);
+                    setLoading(false);
+                }else{
+                    console.log('Error', response.statusText);
+                    console.log('Error',  error.message);
+                    setLoading(false);
+                    
+                }
+            }catch(error){
+                console.error('Error', error);
+                setLoading(false);
+            }
+            finally {
+                setLoading(false);
+            }
+        }else{
+            console.log('No token found')
+            setLoading(false);
+        }
+    }, [])
+
+
+       
+    const handleMarkAsRead = async(id) => {
+        const userDataString = localStorage.getItem('userDetails'); // get the user data from local storage
+        const userData = JSON.parse(userDataString); // parse the datastring into json 
+        const accessToken = userData.accessToken;
+        // setLoading(true);
         if(accessToken){
             try{
                 const response = await fetch(`http://127.0.0.1:8000/api/notifications/${id}/read`,{
@@ -70,7 +73,10 @@ const NotificationsDialog = ({ open}) => {
                 const data = await response.json()
                 if(response.ok){
                     console.log('Data', data);
-                    setLoading(false)
+                    // setLoading(false)
+                    setUndreadNotification(prevNotifications => 
+                        prevNotifications.filter(notification => notification.id !== id)
+                    );
                 }else{
                     console.log('Error', response.status);
                     console.log('Error', error.message);
@@ -83,6 +89,15 @@ const NotificationsDialog = ({ open}) => {
             
         }
     }
+
+     // Initial fetch and periodic refresh
+    useEffect(() => {
+        // Initial fetch
+        fetchedNotifications();
+        const intervalId = setInterval(fetchedNotifications, 60000); // 1 minute
+        return () => clearInterval(intervalId);
+    }, [fetchedNotifications]);
+    
     console.log(unreadNotification?.notifiable_type);
 
     const calculateDuration = (created_at) => {
@@ -157,13 +172,10 @@ const NotificationsDialog = ({ open}) => {
                     sx={{ 
                         color: '#424242', 
                         maxWidth: '300px', 
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        // display: '-webkit-box',
-                        // WebkitLineClamp: 2,
-                        // WebkitBoxOrient: 'vertical',
-                        
+                        overflow: 'hidden', 
+                        display: '-webkit-box', 
+                        WebkitBoxOrient: 'vertical', 
+                        WebkitLineClamp: 2, // Limit to 2 lines
                       
                     }}
                     >
