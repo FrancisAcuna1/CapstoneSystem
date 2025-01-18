@@ -396,7 +396,7 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
         if (accessToken) {
         setLoading(true);
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/resend-otp", {
+            const response = await fetch("http://127.0.0.1:8000/api/resend_otp", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -949,6 +949,15 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
                     >
                         Verify OTP
                     </Button>
+                    </Box>
+                    <Box sx={{display:'flex', justifyContent:'center', mt:2}}>
+                        <Button
+                            variant="text"
+                            color="primary"
+                            onClick={handleResendOTP}
+                        >
+                        Resend OTP
+                        </Button>
                     </Box>
                 </Box>
                 </SectionPaper>

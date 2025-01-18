@@ -106,7 +106,7 @@ export default function IncomeBreackdownComponent({selectedMonth, selectedYear, 
             </Box>
     
             {/* Content */}
-            <Box px={3} pb={3}>
+            <Box px={3} pb={2}>
                 {/* Income Categories with Icons */}
                 <Box sx={{ mb: 4 }}>
                     <Box
@@ -267,57 +267,7 @@ export default function IncomeBreackdownComponent({selectedMonth, selectedYear, 
                 </Box>
     
             {/* Calculation Breakdown */}
-                <Divider />
                 <Box sx={{ py: 2 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
-                    >
-                        <Typography variant="body1" color="text.secondary">
-                        Initial Payment
-                        </Typography>
-                        <Typography variant="body1" fontWeight="500">
-                        ₱ {formatCurrency(income?.total_income?.initial_payment || '0.00')}
-                        </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
-                    >
-                        <Typography variant="body1" color="text.secondary">
-                        Rental Fee
-                        </Typography>
-                        <Typography variant="body1" fontWeight="500">
-                        ₱ {formatCurrency(income?.total_income?.rental_fee || '0.00')}
-                        </Typography>
-                    </Box>
-
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
-                    >
-                        <Typography variant="body1" color="text.secondary">
-                        Advance Payment
-                        </Typography>
-                        <Typography variant="body1" fontWeight="500">
-                        ₱ {formatCurrency(income?.total_income?.advance_payment || '0.00')}
-                        </Typography>
-                    </Box>
-
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
-                    >
-                        <Typography variant="body1" color="text.secondary">
-                        Security Deposit
-                        </Typography>
-                        <Typography variant="body1" fontWeight="500">
-                        ₱ {formatCurrency(income?.total_income?.securityDeposit || '0.00')}
-                        </Typography>
-                    </Box>
-
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
-                    >
-                        <Typography variant="body1" color="text.secondary">
-                       Other Income
-                        </Typography>
-                        <Typography variant="body1" fontWeight="500">
-                        ₱ {formatCurrency(income?.total_income?.other_income || '0.00')}
-                        </Typography>
-                    </Box>
-        
                     {/* Total */}
                     <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                     >

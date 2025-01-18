@@ -1,12 +1,30 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import {Typography, TextField, Button, Box, IconButton, Fade, Dialog, DialogTitle, DialogContent, DialogContentText} from '@mui/material';
+import React, { useEffect, useId, useState } from 'react';
+import {Typography, TextField, Button, Box, IconButton, Fade, Dialog, DialogTitle, DialogContent, DialogContentText, CircularProgress} from '@mui/material';
 import { useSnackbar } from "notistack";
+import useSWR from 'swr';
 
-  
 
-export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading}){
+const fetcherUnitInfo = async ([url, token]) => {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return response.json();
+};  
+
+
+export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading, loading}){
     const {enqueueSnackbar} = useSnackbar();
+    const [userId, setUserId] = useState(null);
+    const [accessToken, setAccessToken] = useState(null);
+    const [unitInformation, setUnitInformation] = useState([]);
     const [formError, setFormError] = useState([]);
     const [formData, setFormData] = useState({
         remarks: '',
@@ -14,13 +32,19 @@ export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading}
     
     console.log(cancelId)
     console.log(formData);
+    console.log(userId);
+    console.log(accessToken);
+    console.log(unitInformation);
+
+
     const handleChange = (e) => {
         const { name, value } = e.target;
+        const unitName = unitInformation.rented_unit.boarding_house_name || unitInformation.rented_unit.apartment_name;
         setFormData(prevData => ({
             ...prevData,
-        [name]: value
+            [name]: value,
+            unitName: unitName
         }));
-
         if(formError[name]){
             setErrors(prevErrors => ({
                 ...prevErrors,
@@ -28,6 +52,40 @@ export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading}
             }))
         }
     }
+
+    useEffect(() => {
+        const userDataString = localStorage.getItem("userDetails");
+        if (userDataString) {
+          const userData = JSON.parse(userDataString);
+          setUserId(userData?.user?.id || null);
+          setAccessToken(userData?.accessToken || null);
+        }
+    }, []);
+
+    const {data: responseUnitinfo, error: errorResponse, isLoading: isLoadingUnitInfo} = useSWR(
+        accessToken && userId 
+        ? [`http://127.0.0.1:8000/api/tenant_unit_info/${userId}`, accessToken] 
+        : null,
+        fetcherUnitInfo, {
+            refreshInterval: 60000,
+            revalidateOnFocus: false,
+            shouldRetryOnError: false,
+            errorRetryCount: 3,
+            onLoadingSlow: () => setLoading(true),
+        }
+    )
+
+    console.log(errorResponse)
+    useEffect(() => {
+        if (responseUnitinfo) {
+          setUnitInformation(responseUnitinfo?.data || "");
+          setLoading(false);
+        } else if (isLoadingUnitInfo) {
+          setLoading(true);
+        }
+    }, [responseUnitinfo, isLoadingUnitInfo, setLoading]);
+    
+
 
     const handleSubmit = async(e) => {
         e.preventDefault();
@@ -65,6 +123,7 @@ export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading}
                     setLoading(false);
                     enqueueSnackbar(data.message, {variant: 'error'})
                     console.log(data.error);
+                    console.log(data.message)
                 }
                 enqueueSnackbar('Your feedback has been submitted successfully.', {variant: 'success'})
                 console.log(data.data)
@@ -117,6 +176,7 @@ export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading}
                         color="primary"
                         size="small"
                         fullWidth
+                        disabled={loading}
                         sx={{
                             mt: 3,
                             py: 1.1,
@@ -124,7 +184,7 @@ export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading}
                             fontSize: '1.1rem'
                         }}
                         >
-                        Submit Remarks
+                        {loading ? <CircularProgress size="30px"  sx={{color:"white"}}/> : 'Submit Remarks'}
                         </Button>
                         <Button
                         
@@ -143,6 +203,7 @@ export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading}
                                 borderColor: "#000",
                             },
                             }}
+                            disabled={loading}
                             onClick={() => {
                             handleClose();
                             setFormError({});

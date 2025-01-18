@@ -117,6 +117,7 @@ export default function AddRemarksForm({open, setRemarksOpen, itemId, setLoading
                         color="primary"
                         size="small"
                         fullWidth
+                        disabled={loading}
                         sx={{
                             mt: 3,
                             py: 1.1,
@@ -124,7 +125,7 @@ export default function AddRemarksForm({open, setRemarksOpen, itemId, setLoading
                             fontSize: '1.1rem'
                         }}
                         >
-                        {loading ? <CircularProgress sx={{color:'white'}}/> : 'Submit Remarks'}
+                        {loading ? <CircularProgress color='primary'/> : 'Submit Remarks'}
                         </Button>
                         <Button
                         
@@ -143,6 +144,7 @@ export default function AddRemarksForm({open, setRemarksOpen, itemId, setLoading
                                 borderColor: "#000",
                             },
                             }}
+                            disabled={loading}
                             onClick={() => {
                             handleClose();
                             setFormError({});

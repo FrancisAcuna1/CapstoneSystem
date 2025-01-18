@@ -29,7 +29,7 @@ export default function RequestMaintenanceComponent({ loading, setLoading }) {
     const [error, setError] = useState(false);
     const [successful, setSuccessful] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const [editId, setEditId] = useState([]);
+    const [editId, setEditId] = useState(null);
 
     console.log(editId);
     console.log(loading)

@@ -396,11 +396,12 @@ const ProfilePage = ({ setLoading, loading }) => {
     if (accessToken) {
       setLoading(true);
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/resend-otp", {
+        const response = await fetch("http://127.0.0.1:8000/api/resend_otp", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
+            Accept: "application/json",
           },
         });
 
@@ -937,8 +938,7 @@ const ProfilePage = ({ setLoading, loading }) => {
                     {otpError}
                   </Typography>
                 )}
-
-                <Box display="flex" justifyContent="center" mt={2}>
+                <Box display="flex" justifyContent="center" mt={3}>
                   <Button
                     type="submit"
                     variant="contained"
@@ -947,8 +947,20 @@ const ProfilePage = ({ setLoading, loading }) => {
                   >
                     Verify OTP
                   </Button>
+                 
                 </Box>
+                <Box sx={{display:'flex', justifyContent:'center', mt:2}}>
+                  <Button
+                    variant="text"
+                    color="primary"
+                    onClick={handleResendOTP}
+                  >
+                    Resend OTP
+                  </Button>
+                </Box>
+                
               </Box>
+              
             </SectionPaper>
           )}
         </Box>

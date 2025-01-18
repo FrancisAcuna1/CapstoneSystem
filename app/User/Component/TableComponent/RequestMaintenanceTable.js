@@ -138,8 +138,8 @@ export default function RequestMaintenanceTable({
 }) {
     const { enqueueSnackbar } = useSnackbar();
     const [searchTerm, setSearchTerm] = useState("");
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
-    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [page, setPage] = useState(0);
     const [anchorEl, setAnchorEl] = useState(null);
     const [anchorEl1, setAnchorEl1] = useState(null);
     const isMenuOpen = Boolean(anchorEl);
@@ -200,9 +200,6 @@ export default function RequestMaintenanceTable({
             setLoading(true)
         }
     }, [response, isLoading, setLoading])
-    
-
-
 
     console.log(cancelId)
     console.log(viewId)
@@ -245,8 +242,10 @@ export default function RequestMaintenanceTable({
         setSelectedCategory(category);
         setAnchorEl(null);
     };
+
     const [currentId, setCurrentId] = useState(null); // State to track the current ID for the menu
     console.log(currentId)
+    console.log(page)
     const handleMenuButton = (event, id) => {
         setAnchorEl1(event.currentTarget);
         setCurrentId(id); // Set the current ID when the menu button is clicked

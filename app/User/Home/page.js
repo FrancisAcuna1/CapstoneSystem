@@ -15,6 +15,7 @@ import { Divider } from '@mui/material';
 // import Content from '../ComponentLayout/content';
 import dynamic from 'next/dynamic';
 import Chatbot from '@/app/ChatbotUI/chatbot';
+import Botpress from '@/app/ChatbotUI/chatbot';
 
 const HomeComponent = dynamic(() => import('../Component/HeroContent/HomeComponent'), {
   ssr: false
@@ -263,13 +264,15 @@ if(status === 'authenticated'){
           <Header onDrawerToggle={handleDrawerToggle} />
           <Box component="main" sx={{ flex: 1, py: 2, px: 4, bgcolor: '#eaeff1' }}>
               {/* <h5>This is Overview Page</h5> */}
+            
             <HomeComponent/>
-            <Chatbot
+            <Botpress/>
+            {/* <Chatbot
               isMenuOpen={isMenuOpen}
               anchorEl={anchorEl}
               handleProfileMenuOpen={handleProfileMenuOpen}
               handleMenuClose={handleMenuClose}
-            />
+            /> */}
               {/* <CardContentHeader/> */}
               {/* <Content/> */}
           </Box>

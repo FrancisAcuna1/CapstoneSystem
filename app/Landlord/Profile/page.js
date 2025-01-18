@@ -12,6 +12,7 @@ import Navigator from '../DashboardLayout/navigator';
 import Header from '../DashboardLayout/header';
 import { Divider } from '@mui/material';
 import dynamic from 'next/dynamic';
+import { SnackbarProvider } from 'notistack';
 
 const AdminProfileComponent = dynamic(() => import('../ComponentLayout/HeroContent/AdminProfileComponent'), {
   ssr: false
@@ -245,10 +246,12 @@ export default function PropertyPage (){
             {loading && <LinearProgress color='primary' sx={{ position: 'fixed',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4.99, borderRadius: '4px 4px 0 0' }} />}
             <Header onDrawerToggle={handleDrawerToggle} />
             <Box component="main" sx={{ flex: 1, py: 2, px: 3, bgcolor: '#eaeff1' }}>
-                <AdminProfileComponent
-                  loading={loading}
-                  setLoading={setLoading}
-                />
+                <SnackbarProvider maxSnack={3}>
+                  <AdminProfileComponent
+                    loading={loading}
+                    setLoading={setLoading}
+                  />
+                </SnackbarProvider>
                 {/* <Content/>
             </Box>
             <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>

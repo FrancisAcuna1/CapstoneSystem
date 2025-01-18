@@ -16,6 +16,11 @@ import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 import Image from "next/image";
 import { useSnackbar } from "notistack";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+
 
 const Backdrop = React.forwardRef((props, ref) => {
   const { open, ...other } = props;
@@ -143,6 +148,8 @@ export default function AddPropertyType({
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isMovingOut, setIsMovingOut] = useState(false);
+  const [moveOutDate, setMoveOutDate] = useState(null);
   const [numRooms, setNumRooms] = useState(1); 
   const [rooms, setRooms] = useState([
     {
@@ -178,6 +185,15 @@ export default function AddPropertyType({
     barangay: propAddress.barangay,
     municipality: "Sorsogon City",
   });
+  
+  const [moveOutStatus, setMoveOutStatus] = useState(
+    rooms.map((room) => room.beds ? room.beds.map(() => false) : []) // Ensure bed array exists for bh
+  );
+  
+  const [bhMoveOutDates, setBhMoveOutDates] = useState(
+    rooms.map((room) => room.beds ? room.beds.map(() => null) : []) // Ensure bed array exists for bh
+  );
+  
 
   console.log("Edit id:", editItem);
   console.log("id:", propsid);
@@ -188,6 +204,9 @@ export default function AddPropertyType({
   console.log("Edit Boarding House Value:", newboardinghouse);
   console.log("delete:", deleteImage);
   console.log("rooms:", rooms);
+  console.log(moveOutDate)
+  console.log(bhMoveOutDates)
+
 
   const handleChangeApartment = (e) => {
     const { name, value } = e.target;
@@ -337,6 +356,7 @@ export default function AddPropertyType({
                 setSelectedImage(existingImages);
               }
               setSelectedProperty(data?.apartment?.property_type);
+              setMoveOutDate(data?.apartment?.move_out_date)
             } else if (selectedProperty === "Boarding House") {
               setNewBoardinghouse({
                 propertyid: data?.boardinghouse?.property_id,
@@ -379,6 +399,14 @@ export default function AddPropertyType({
                 })) || [];
 
               setRooms(roomsArray);
+
+              const moveOutDatesArray = data?.boardinghouse?.rooms?.map(room => 
+                room.beds?.map(bed => 
+                  bed.move_out_date ? new Date(bed.move_out_date) : null
+                ) || []
+              ) || [];
+              
+              setBhMoveOutDates(moveOutDatesArray);
 
               const inclusionsArray =
                 data?.boardinghouse?.inclusions?.map((item) => ({
@@ -524,6 +552,7 @@ export default function AddPropertyType({
           formData.append("street", newApartment.street);
           formData.append("barangay", propAddress.barangay); //get the state value of barangay
           formData.append("municipality", newApartment.municipality);
+          formData.append("moveoutdate", dayjs(moveOutDate).format('MM/DD/YYYY'));
 
           if (hasErrors) {
             setErrors(newErrors);
@@ -716,6 +745,15 @@ export default function AddPropertyType({
                 `rooms[${roomIndex}][beds][${bedIndex}][status]`,
                 bed.status
               );
+              const moveOutDate = bhMoveOutDates[roomIndex]?.[bedIndex];
+              if (moveOutDate) {
+                // Convert the dayjs object to a formatted string
+                const formattedMoveOutDate = dayjs(moveOutDate).format('MM/DD/YYYY');
+                formData.append(
+                  `rooms[${roomIndex}][beds][${bedIndex}][move_out_date]`,
+                  formattedMoveOutDate
+                );
+              }
             });
           });
 
@@ -786,6 +824,7 @@ export default function AddPropertyType({
           // setEditItem(null);
           setLoading(false)
           enqueueSnackbar(data.message, {variant: 'error'});
+          console.log(data.error)
         }
       } catch (error) {
         console.error("An error occurred:", error);
@@ -1123,6 +1162,33 @@ export default function AddPropertyType({
   }, 0);
   // acc + (room.beds.bed_number || 0), 0);
 
+  // this is for apartment
+  const handleIsMoveOut = (event) => {
+    setIsMovingOut(event.target.checked);
+  }
+
+  const handleDateChange = (value) => {
+    setMoveOutDate(value);
+  };
+  
+  //this is for boarding house
+  const handleIsMoveOutBh = (roomIndex, bedIndex, event) => {
+    setMoveOutStatus((prevState) => {
+      const updatedState = [...prevState];
+      updatedState[roomIndex][bedIndex] = event.target.checked;
+      return updatedState;
+    });
+  };
+  
+  const handleDateChangeBh = (roomIndex, bedIndex, newValue) => {
+    setBhMoveOutDates((prevState) => {
+      const updatedState = [...prevState];
+      updatedState[roomIndex][bedIndex] = newValue;
+      return updatedState;
+    });
+  };
+  
+  
   return (
     <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5, mb: 3 }}>
       <AddButton
@@ -1167,12 +1233,14 @@ export default function AddPropertyType({
           });
           setSelectedImage(null);
           setSelectedProperty("");
+          setMoveOutStatus([[false]]); // Reset to initial state with one room and one bed
+          setBhMoveOutDates([[null]]); // Reset to initial state with one room and one bed
         }}
         closeAfterTransition
         slots={{ backdrop: StyledBackdrop }}
       >
         <Fade in={open}>
-          <ModalContent style={{ width: "90%", maxWidth: "740px" }}>
+          <ModalContent style={{ width: "90%", maxWidth: "800px" }}>
             <Typography
               variant="h5"
               gutterBottom
@@ -1391,6 +1459,41 @@ export default function AddPropertyType({
                       )}
                     </FormControl>
                   </Grid>
+
+                  {newApartment.apartmentstatus === "Occupied" && (
+                  <Grid item xs={12} sx={{mb:1}}>
+                    <Box sx={{display:'inline-flex', alignItems:'center'}}>
+                    <Checkbox
+                      checked={isMovingOut}
+                      onChange={handleIsMoveOut}
+                    />
+                    <Typography
+                    sx={{
+                      fontSize: "0.995rem",
+                      color:'#263238',
+                      fontWeight:500
+                    }}
+                    >
+                      Tenan't is moving out?
+                    </Typography>
+                    </Box>
+                  </Grid>
+                  )}
+
+                  {isMovingOut && (
+                    <Grid item xs={12}>
+                      <LocalizationProvider error={Boolean(errors.payment_date)} dateAdapter={AdapterDayjs} >
+                        <DatePicker
+                          label="Move Out Date"
+                          name="move_out_date"
+                          sx={{ width: '100%' }}
+                          value={moveOutDate}
+                          onChange={(newValue) => handleDateChange(newValue)}
+                          fullWidth
+                        />
+                      </LocalizationProvider>
+                    </Grid>
+                  )}
 
                   <Grid item xs={12}>
                     {/* Information message */}
@@ -2090,7 +2193,101 @@ export default function AddPropertyType({
                                         <RemoveCircleOutlineOutlinedIcon color="warning" />
                                       </IconButton>
                                     </CustomTooltip>
+                                    
                                   </Box>
+                                  {bed.status.toLocaleLowerCase() === "occupied" && (
+                                    <Grid item xs={12} sx={{ mb: 1 }}>
+                                      <Box sx={{ display: "inline-flex", alignItems: "center" }}>
+                                      <Checkbox
+                                        checked={moveOutStatus[roomIndex]?.[bedIndex] || 
+                                        (bhMoveOutDates[roomIndex]?.[bedIndex] !== null) || 
+                                        false}
+                                        onChange={(e) => handleIsMoveOutBh(roomIndex, bedIndex, e)}
+                                      />
+                                        <Typography
+                                          sx={{
+                                            fontSize: "0.995rem",
+                                            color: "#263238",
+                                            fontWeight: 500,
+                                          }}
+                                        >
+                                          Tenant is moving out?
+                                        </Typography>
+                                      </Box>
+                                    </Grid>
+                                  )}
+
+                                  {/* Move-out Date Picker */}
+                                  {(moveOutStatus[roomIndex]?.[bedIndex] || bhMoveOutDates[roomIndex]?.[bedIndex]) && (
+                                    <Grid item xs={12}>
+                                      {bhMoveOutDates[roomIndex]?.[bedIndex] ? (
+                                        <Box 
+                                        sx={{
+                                          backgroundColor: '#e3f2fd', // Light gray-blue background
+                                          border: '1px solidrgb(213, 227, 247)', // Subtle border
+                                          borderRadius: '8px',         // Rounded corners
+                                          padding: '12px 16px',       // Comfortable padding
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '8px', 
+                                          mb:3,                // Space between icon and text
+                                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', // Subtle shadow
+                                          marginTop: '8px',
+                                          width: 'fit-content',       // Only take up necessary width
+                                          '&:hover': {
+                                            backgroundColor: '#f1f5f9' // Slightly darker on hover
+                                          }
+                                        }}
+                                        >
+                                        {/* Calendar Icon */}
+                                          <svg 
+                                            width="20" 
+                                            height="20" 
+                                            viewBox="0 0 24 24" 
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            strokeWidth="2" 
+                                            strokeLinecap="round" 
+                                            strokeLinejoin="round"
+                                            style={{ color: '#64748b' }} // Icon color
+                                          >
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                          </svg>
+                                          
+                                          <Typography 
+                                            sx={{
+                                              fontSize: '0.925rem',
+                                              fontWeight: 500,
+                                              color: '#334155',      // Dark gray text
+                                              letterSpacing: '0.01em',
+                                              lineHeight: 1.5
+                                            }}
+                                          >
+                                            <span style={{ color: '#64748b', marginRight: '4px' }}>Move-out date:</span>
+                                            {new Date(bhMoveOutDates[roomIndex][bedIndex]).toLocaleDateString('en-US', {
+                                              year: 'numeric',
+                                              month: 'long', 
+                                              day: 'numeric'
+                                            })}
+                                          </Typography>
+                                        </Box>
+                                      ):(
+                                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                          label="Move Out Date"
+                                          value={bhMoveOutDates[roomIndex][bedIndex]}
+                                          onChange={(newValue) =>
+                                            handleDateChangeBh(roomIndex, bedIndex, newValue)
+                                          }
+                                          fullWidth
+                                        />
+                                      </LocalizationProvider>
+                                      )}
+                                    </Grid>
+                                  )}
                                 </Grid>
                               )
                             )}
@@ -2523,6 +2720,8 @@ export default function AddPropertyType({
                   setSelectedInclusions([""]);
                   setNumRooms(1);
                   setRooms([{ beds: [{ type: "", status: "" }] }]);
+                  setMoveOutStatus([[false]]); 
+                  setBhMoveOutDates([[null]]); 
                 }}
               >
                 Cancel

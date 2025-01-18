@@ -387,15 +387,58 @@ button{
 }
 
 .event-title {
-font-weight: bold;
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .event-status {
-font-size: 0.9em;
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
+    font-size: 0.9em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
+
+
+/* For botpress */
+/* Style the entire Webchat */
+.bp-webchat {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    border-radius: 10px;
+}
+
+/* Customize the header */
+.bp-webchat .bp-header {
+    background-color: #634433; /* Set header background color */
+    color: white;
+}
+
+/* Style the chat bubbles */
+.bp-webchat .bp-chat-bubble {
+    background-color: #634433;
+    color: white;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+/* Style the input area */
+.bp-webchat .bp-composer input {
+    background-color: #fff;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Style the send button */
+.bp-webchat .bp-composer button {
+    background-color: #634433;
+    color: white;
+    border-radius: 50%;
+}
+
+.bpHeaderContainer {
+    background-color: #634433;
+}
+  

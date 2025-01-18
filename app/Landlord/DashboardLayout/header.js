@@ -232,6 +232,29 @@ function Header(props) {
     };
       
     console.log(totalNotif);
+    const avatarColors = ['#1976d2', '#f44336', '#4caf50', '#ff9800', '#9c27b0', '#3f51b5', '#00bcd4', '#8bc34a', '#8785d0', '#a55555',];
+
+    const getRandomColor = () => {
+        return avatarColors[Math.floor(Math.random() * avatarColors.length)]
+    }
+    // Function to get or set the avatar color
+    const getAvatarColor = () => {
+        // Check if a color is already stored in localStorage
+        const storedColor = localStorage.getItem('avatarColor');
+        
+        if (storedColor) {
+            // Return the stored color if it exists
+            return storedColor;
+        } else {
+            // Generate a new random color, store it, and return it
+            const newColor = getRandomColor();
+            localStorage.setItem('avatarColor', newColor);
+            return newColor;
+        }
+    }
+
+    // Use the getAvatarColor function to set the background color
+    const avatarBackgroundColor = getAvatarColor();
     
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
@@ -350,7 +373,8 @@ function Header(props) {
                         </Badge>
                         
                     </IconButton>
-                    <Avatar
+                    {avatarSrc ? (
+                        <Avatar
                         size="large"
                         edge="end"
                         aria-label="account of current user"
@@ -358,11 +382,25 @@ function Header(props) {
                         aria-haspopup="true"
                         onClick={handleProfileMenuOpen}
                         color="inherit"
-                        sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px', }}
-                        src="/user.png"
-                    >
-                        
-                    </Avatar>
+                        sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px', backgroundColor: avatarBackgroundColor, }}
+                        src={avatarSrc}
+                        >
+                            
+                        </Avatar>
+                    ):(
+                        <Avatar
+                        size="large"
+                        edge="end"
+                        aria-label="account of current user"
+                        aria-controls={menuId}
+                        aria-haspopup="true"
+                        onClick={handleProfileMenuOpen}
+                        color="inherit"
+                        sx={{ml: '1.2rem', mt:'0.1rem', width: '37px', height: '37px', backgroundColor: avatarBackgroundColor, }}
+                        >
+                            {tenantInformation?.firstname?.charAt(0)}{tenantInformation?.lastname?.charAt(0)}
+                        </Avatar>
+                    )}
                     
                 </Box>
                 
