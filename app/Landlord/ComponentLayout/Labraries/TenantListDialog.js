@@ -75,36 +75,33 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogActions-root": { padding: theme.spacing(1) },
 }));
 
-const fetcherPayorInfo = async([url, token]) => {
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    })
-    if(!response.ok){
-        throw new Error(response.statusText)
-    }
-    return response.json();
-}
+const fetcherPayorInfo = async ([url, token]) => {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+  return response.json();
+};
 
-const fetcherPaymentInfo = async([url, token]) => {
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    })
-    if(!response.ok){
-        throw new Error(response.statusText)
-    }
-    return response.json();
-}
-
-
-
+const fetcherPaymentInfo = async ([url, token]) => {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+  return response.json();
+};
 
 export default function TenantListDialog({
   openDialog,
@@ -125,14 +122,13 @@ export default function TenantListDialog({
   const [expandedRows, setExpandedRows] = useState({});
   const [deliquent, setDeliquent] = useState([]);
   const [tenantId, setTenantId] = useState([]);
-  const [accessToken, setAccessToken] = useState([])
+  const [accessToken, setAccessToken] = useState([]);
   // const [overdueData, setOverdueData] = useState([]);
 
   console.log(tenantId);
   console.log(payorList);
   console.log(tenantPayment);
   console.log(payorList?.tenant_id);
-
 
   const toggleRow = (tenantId) => {
     setExpandedRows((prev) => ({
@@ -151,56 +147,73 @@ export default function TenantListDialog({
   };
 
   useEffect(() => {
-    const userDataString = localStorage.getItem("userDetails"); 
+    const userDataString = localStorage.getItem("userDetails");
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       if (userData && userData.accessToken) {
         setAccessToken(userData.accessToken);
       }
     }
-  }, []); 
+  }, []);
 
-  const {data: responsePayor, error:errorPayor, isLoading:isloadingPayor} = useSWR(
-    accessToken && selectedUnit.id && selectedUnit.property_type 
-    ? [ `http://127.0.0.1:8000/api/get_payor_list/${selectedUnit.id}/${selectedUnit.property_type}`, accessToken]
-    : null,
-    fetcherPayorInfo, {
-        refreshInterval: 2000,
-        revalidateOnFocus: false,
-        shouldRetryOnError: false,
-        errorRetryCount: 3,
-        onLoadingSlow: () => setLoading(true),
+  const {
+    data: responsePayor,
+    error: errorPayor,
+    isLoading: isloadingPayor,
+  } = useSWR(
+    accessToken && selectedUnit.id && selectedUnit.property_type
+      ? [
+          `http://127.0.0.1:8000/api/get_payor_list/${selectedUnit.id}/${selectedUnit.property_type}`,
+          accessToken,
+        ]
+      : null,
+    fetcherPayorInfo,
+    {
+      refreshInterval: 2000,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      errorRetryCount: 3,
+      onLoadingSlow: () => setLoading(true),
     }
-  )
-  useEffect(() => {
-    if(responsePayor){
-        setPayorList(responsePayor.data);
-        setLoading(false);
-    }else if(isloadingPayor){
-        setLoading(true);
-    }
-  }, [responsePayor,isloadingPayor, setLoading])
+  );
 
-  const {data: responsePayment, error:errorPayment, isLoading:isloadingPayment} = useSWR(
-    accessToken && selectedUnit.id && selectedUnit.property_type 
-    ? [`http://127.0.0.1:8000/api/get_tenant_payment/${selectedUnit.id}/${selectedUnit.property_type}`, accessToken]
-    : null,
-    fetcherPaymentInfo, {
-        refreshInterval: 3000,
-        revalidateOnFocus: false,
-        shouldRetryOnError: false,
-        errorRetryCount: 3,
-        onLoadingSlow: () => setLoading(true),
-    }
-  )
   useEffect(() => {
-    if(responsePayment){
-        setLastPayment(responsePayment.data);
-        setLoading(false);
-    }else if(isloadingPayment){
-        setLoading(true);
+    if (responsePayor) {
+      setPayorList(responsePayor.data);
+      setLoading(false);
+    } else if (isloadingPayor) {
+      setLoading(true);
     }
-  }, [responsePayment,isloadingPayment, setLoading])
+  }, [responsePayor, isloadingPayor, setLoading]);
+
+  const {
+    data: responsePayment,
+    error: errorPayment,
+    isLoading: isloadingPayment,
+  } = useSWR(
+    accessToken && selectedUnit.id && selectedUnit.property_type
+      ? [
+          `http://127.0.0.1:8000/api/get_tenant_payment/${selectedUnit.id}/${selectedUnit.property_type}`,
+          accessToken,
+        ]
+      : null,
+    fetcherPaymentInfo,
+    {
+      refreshInterval: 3000,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      errorRetryCount: 3,
+      onLoadingSlow: () => setLoading(true),
+    }
+  );
+  useEffect(() => {
+    if (responsePayment) {
+      setLastPayment(responsePayment.data);
+      setLoading(false);
+    } else if (isloadingPayment) {
+      setLoading(true);
+    }
+  }, [responsePayment, isloadingPayment, setLoading]);
 
   // this code is get the last payment of every tenant
   const getLastPayments = () => {
@@ -212,7 +225,7 @@ export default function TenantListDialog({
       acc[payment.tenant_id].push(payment);
       return acc;
     }, {});
-    console.log(groupedPayments)
+    console.log(groupedPayments);
 
     // Find the last payment for each tenant
     return Object.values(groupedPayments).map(
@@ -403,12 +416,11 @@ export default function TenantListDialog({
     }
   });
 
-
   const formatDueDate = (payor) => {
     const leaseStart = new Date(payor.lease_start_date);
-    const currentDate = new Date('2025-1-11'); // You might want to replace with current date dynamically
+    const currentDate = new Date("2025-1-11"); // You might want to replace with current date dynamically
     const prepaidMonths = payor.prepaid_rent_period;
-    console.log(prepaidMonths)
+    console.log(prepaidMonths);
     // Filter payments specific to this tenant
     const tenantPayments = lastPayments.filter(
       (payment) => payment.tenant_id === payor.tenant?.id
@@ -488,7 +500,7 @@ export default function TenantListDialog({
     const isNextDueDatePaid = allPayments.some((payment) =>
       isSameMonth(new Date(payment.date || payment.month_overdue), nextDueDate)
     );
-    console.log(isNextDueDatePaid)
+    console.log(isNextDueDatePaid);
 
     // Determine status based on current date and payment history
     if (isSameMonth(currentDate, nextDueDate)) {
@@ -773,8 +785,11 @@ export default function TenantListDialog({
   console.log(deliquent);
 
   const handleWarning = () => {
-    return enqueueSnackbar("The security deposit cannot be used if the status marked as paid", { variant: "warning" })
-  }
+    return enqueueSnackbar(
+      "The security deposit cannot be used if the status marked as paid",
+      { variant: "warning" }
+    );
+  };
   // const filteredOverdue Data = deliquent.flatMap(tenantItem =>
   //     tenantItem.deliquentData
   //         .filter(delinquentItem => delinquentItem.status === 'Overdue')
@@ -785,420 +800,415 @@ export default function TenantListDialog({
   // );
   // console.log(filteredOverdueData)
 
-    return (
-        <React.Fragment>
-        <BootstrapDialog
-            onClose={handleCloseDialog}
-            open={openDialog}
-            fullWidth
-            maxWidth={"lg"}
+  return (
+    <React.Fragment>
+      <BootstrapDialog
+        onClose={handleCloseDialog}
+        open={openDialog}
+        fullWidth
+        maxWidth={"lg"}
+      >
+        <DialogTitle sx={{ m: 0, p: 2 }}>Tenant Payment Status</DialogTitle>
+        <IconButton
+          onClick={handleCloseDialog}
+          sx={{
+            "&:hover": { backgroundColor: "#263238" },
+            position: "absolute",
+            right: 8,
+            top: 8,
+            height: "35px",
+            width: "35px",
+          }}
         >
-            <DialogTitle sx={{ m: 0, p: 2 }}>Tenant Payment Status</DialogTitle>
-            <IconButton
-            onClick={handleCloseDialog}
+          <CloseIcon
             sx={{
-                "&:hover": { backgroundColor: "#263238" },
-                position: "absolute",
-                right: 8,
-                top: 8,
-                height: "35px",
-                width: "35px",
+              transition: "transform 0.3s ease-in-out",
+              "&:hover": { transform: "rotate(90deg)", color: "#fefefe" },
             }}
-            >
-            <CloseIcon
-                sx={{
-                transition: "transform 0.3s ease-in-out",
-                "&:hover": { transform: "rotate(90deg)", color: "#fefefe" },
-                }}
-            />
-            </IconButton>
-            {/* <IconButton aria-label="close" onClick={handleCloseDialog} sx={{ position: 'absolute', right: 8, top: 8, color: 'grey' }}>
+          />
+        </IconButton>
+        {/* <IconButton aria-label="close" onClick={handleCloseDialog} sx={{ position: 'absolute', right: 8, top: 8, color: 'grey' }}>
                     <CloseIcon />
                 </IconButton> */}
-            <DialogContent dividers>
-            <Typography
-                variant="body1"
-                sx={{
-                display: "flex",
-                alignItems: "center",
-                mt: "0.2rem",
-                fontSize: "14px",
-                color: "gray",
-                }}
-            >
-                <InfoOutlinedIcon fontSize="small" sx={{ mr: 1 }} />
-                Please mark the box to confirm tenant payment
-            </Typography>
-            <TableContainer sx={{ overflowy: "auto", width: "100%", mb: 3 }}>
-                <Table size="small" sx={{ mt: 2 }}>
-                <TableHead sx={{ backgroundColor: "whitesmoke", p: 2 }}>
-                    <TableRow>
-                    <StyledTableCell>Tenant Name</StyledTableCell>
-                    <StyledTableCell>Due Date</StyledTableCell>
-                    <StyledTableCell>Rental Fee</StyledTableCell>
-                    <StyledTableCell>Paid</StyledTableCell>
-                    <StyledTableCell>Advance Payment</StyledTableCell>
-                    <StyledTableCell>Security Deposit</StyledTableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {payorList.map((payor, index) => {
-                    const tenantOverdueData =
-                        deliquent
-                        .find((item) => item.tenantId === payor.tenant.id)
-                        ?.deliquentData.filter(
-                            (deliquenItem) => deliquenItem.status === "Overdue"
-                        ) || [];
-                    const { dueDate, status } = formatDueDate(payor);
-                    // const overdueMonths = getOverdueDetails(payor);
-                    // console.log(overdueMonths)
-                    const isSelected = selectedItem.includes(payor.tenant.id);
-                    const isExpanded = expandedRows[payor.tenant.id];
-                    const tenantSelectedMonths =
-                        selectedMonths[payor.tenant.id] || [];
+        <DialogContent dividers>
+          <Typography
+            variant="body1"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mt: "0.2rem",
+              fontSize: "14px",
+              color: "gray",
+            }}
+          >
+            <InfoOutlinedIcon fontSize="small" sx={{ mr: 1 }} />
+            Please mark the box to confirm tenant payment
+          </Typography>
+          <TableContainer sx={{ overflowy: "auto", width: "100%", mb: 3 }}>
+            <Table size="small" sx={{ mt: 2 }}>
+              <TableHead sx={{ backgroundColor: "whitesmoke", p: 2 }}>
+                <TableRow>
+                  <StyledTableCell>Tenant Name</StyledTableCell>
+                  <StyledTableCell>Due Date</StyledTableCell>
+                  <StyledTableCell>Rental Fee</StyledTableCell>
+                  <StyledTableCell>Paid</StyledTableCell>
+                  <StyledTableCell>Advance Payment</StyledTableCell>
+                  <StyledTableCell>Security Deposit</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {payorList.map((payor, index) => {
+                  const tenantOverdueData = deliquent.find((item) => item.tenantId === payor.tenant.id)
+                    ?.deliquentData.filter(
+                      (deliquenItem) => deliquenItem.status === "Overdue"
+                    ) || [];
+                  const { dueDate, status } = formatDueDate(payor);
+                  // const overdueMonths = getOverdueDetails(payor);
+                  // console.log(overdueMonths)
+                  const isSelected = selectedItem.includes(payor.tenant.id);
+                  const isExpanded = expandedRows[payor.tenant.id];
+                  const tenantSelectedMonths =
+                    selectedMonths[payor.tenant.id] || [];
 
-                    // Check if all overdue months are selected
-                    const hasUnselectedOverdueMonths = tenantOverdueData.some(
-                        (item) => {
-                        const date = new Date(item.month_overdue);
-                        const formattedMonth = date.toLocaleString("default", {
-                            month: "long",
-                        });
-                        const day = date.getDate();
-                        const year = date.getFullYear();
-                        const monthYear = `${formattedMonth} ${day}, ${year}`;
-                        return !tenantSelectedMonths.includes(monthYear); // Check if the month is not selected
+                  // Check if all overdue months are selected
+                  const hasUnselectedOverdueMonths = tenantOverdueData.some(
+                    (item) => {
+                      const date = new Date(item.month_overdue);
+                      const formattedMonth = date.toLocaleString("default", {
+                        month: "long",
+                      });
+                      const day = date.getDate();
+                      const year = date.getFullYear();
+                      const monthYear = `${formattedMonth} ${day}, ${year}`;
+                      return !tenantSelectedMonths.includes(monthYear); // Check if the month is not selected
+                    }
+                  );
+                  const isAdvancePaymentDisabled =
+                    tenantOverdueData.length > 1 && hasUnselectedOverdueMonths;
+                  const monthOverdueDate = new Date(
+                    tenantOverdueData[0]?.month_overdue
+                  );
+                  const currentDate = new Date(); // use this current date to track the number of days
+                  const daysOverdue =
+                    differenceInDays(currentDate, monthOverdueDate) + 1;
+                  return (
+                    <>
+                      <StyledTableRow
+                        key={payor.tenant.id}
+                        selected={isSelected}
+                        onChange={(event) =>
+                          handleCheckBoxChange(event, payor.tenant.id)
                         }
-                    );
-                    const isAdvancePaymentDisabled =
-                        tenantOverdueData.length > 1 && hasUnselectedOverdueMonths;
-                    const monthOverdueDate = new Date(
-                        tenantOverdueData[0]?.month_overdue
-                    );
-                    const currentDate = new Date(); // use this current date to track the number of days
-                    const daysOverdue =
-                        differenceInDays(currentDate, monthOverdueDate) + 1;
-                    return (
-                        <>
-                        <StyledTableRow
-                            key={payor.tenant.id}
-                            selected={isSelected}
-                            onChange={(event) =>
-                            handleCheckBoxChange(event, payor.tenant.id)
-                            }
-                        >
-                            <TableCell align="start">
-                            {payor.tenant.firstname} {payor.tenant.lastname}
-                            <Divider sx={{ width: "40%" }} />
-                            <Typography
+                      >
+                        <TableCell align="start">
+                          {payor.tenant.firstname} {payor.tenant.lastname}
+                          <Divider sx={{ width: "40%" }} />
+                          <Typography
+                            sx={{
+                              fontSize: "13px",
+                              color: "gray",
+                              fontStyle: "italic",
+                              mt: "0.3rem",
+                            }}
+                          >
+                            {payor.tenant.contact}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="start">
+                          <Box
+                            variant={"component"}
+                            sx={{ display: "inline-flex" }}
+                          >
+                            {tenantOverdueData &&
+                            tenantOverdueData.length > 1 ? (
+                              <Chip
+                                label={`${tenantOverdueData.length} unpaid ${
+                                  tenantOverdueData.length === 1
+                                    ? "month"
+                                    : "months"
+                                }`}
+                                size="small"
                                 sx={{
-                                fontSize: "13px",
-                                color: "gray",
-                                fontStyle: "italic",
-                                mt: "0.3rem",
+                                  mt: 1,
+                                  backgroundColor: "#ffebee",
+                                  color: "#b71c1c",
+                                  "& .MuiChip-label": {
+                                    fontSize: "0.78rem",
+                                    fontWeight: 500,
+                                    letterSpacing: 0.4,
+                                  },
                                 }}
-                            >
-                                {payor.tenant.contact}
-                            </Typography>
-                            </TableCell>
-                            <TableCell align="start">
-                            <Box
-                                variant={"component"}
-                                sx={{ display: "inline-flex" }}
-                            >
-                                {tenantOverdueData &&
-                                tenantOverdueData.length > 1 ? (
-                                <Chip
-                                    label={`${tenantOverdueData.length} unpaid ${
-                                    tenantOverdueData.length === 1
-                                        ? "month"
-                                        : "months"
-                                    }`}
-                                    size="small"
-                                    sx={{
-                                    mt: 1,
-                                    backgroundColor: "#ffebee",
-                                    color: "#b71c1c",
-                                    "& .MuiChip-label": {
-                                        fontSize: "0.78rem",
-                                        fontWeight: 500,
-                                        letterSpacing: 0.4,
-                                    },
-                                    }}
-                                />
-                                ) : (
-                                <GeneralTooltip
-                                    title={tenantOverdueData[0]?.status === "Overdue"
-                                        ? `Tenant is overdue by ${daysOverdue} day(s)`
-                                        : payor.is_last_month === 1 
-                                        ? 'The tenant is in their final lease period'
-                                        : ''
-                                    }
+                              />
+                            ) : (
+                              <GeneralTooltip
+                                title={
+                                  tenantOverdueData[0]?.status === "Overdue"
+                                    ? `Tenant is overdue by ${daysOverdue} day(s)`
+                                    : payor.is_last_month === 1
+                                    ? "The tenant is in their final lease period"
+                                    : ""
+                                }
+                              >
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontSize: "14px",
+                                    color:
+                                      tenantOverdueData[0]?.status === "Overdue"
+                                        ? "red"
+                                        : "inherit",
+                                  }}
                                 >
-                                    <Typography
-                                    variant="body2"
-                                    sx={{
-                                        fontSize: "14px",
-                                        color:
-                                        tenantOverdueData[0]?.status === "Overdue"
-                                            ? "red"
-                                            : "inherit",
-                                    }}
-                                    >
-                                    {payor.is_last_month === 1 ? (
+                                  {payor.is_last_month === 1 ? (
                                     <Chip
-                                    label={'No upcoming duedate'}
-                                    variant="contained"
-                                    color={"success"}
-                                    sx={{
+                                      label={"No upcoming duedate"}
+                                      variant="contained"
+                                      color={"success"}
+                                      sx={{
                                         backgroundColor: "#e8f5e9",
                                         color: "#004d40",
                                         "& .MuiChip-label": {
-                                        color: "#004d40",
-                                        fontWeight: 560,
-                                        letterSpacing: 1,
+                                          color: "#004d40",
+                                          fontWeight: 560,
+                                          letterSpacing: 1,
                                         },
-                                    }}/>
-                                    ): (
-                                        format(dueDate, "MMM d, yyyy")
-                                    )}
-                                    </Typography>
-                                </GeneralTooltip>
-                                )}
+                                      }}
+                                    />
+                                  ) : (
+                                    format(dueDate, "MMM d, yyyy")
+                                  )}
+                                </Typography>
+                              </GeneralTooltip>
+                            )}
 
-                                {tenantOverdueData &&
-                                tenantOverdueData.length > 1 && (
-                                    <IconButton
-                                    size="small"
-                                    onClick={() => toggleRow(payor.tenant.id)}
-                                    sx={{ ml: 0.1 }}
-                                    >
-                                    {isExpanded ? (
-                                        <KeyboardArrowUpIcon />
-                                    ) : (
-                                        <KeyboardArrowDownIcon />
-                                    )}
-                                    </IconButton>
-                                )}
-                            </Box>
+                            {tenantOverdueData &&
+                              tenantOverdueData.length > 1 && (
+                                <IconButton
+                                  size="small"
+                                  onClick={() => toggleRow(payor.tenant.id)}
+                                  sx={{ ml: 0.1 }}
+                                >
+                                  {isExpanded ? (
+                                    <KeyboardArrowUpIcon />
+                                  ) : (
+                                    <KeyboardArrowDownIcon />
+                                  )}
+                                </IconButton>
+                            )}
+                          </Box>
 
-                            {/* {unpaid.join(", ")},  */}
-                            </TableCell>
-                            <TableCell align="start">
-                                {payor.is_last_month === 1 ? (
-                                <>
-                                    <Chip
-                                    label={'Covered by Deposit'}
-                                    variant="contained"
-                                    // backgroundColor={item.status === 'Available' ? '#ede7f6' : 'secondary'}
-                                    color={"success"}
-                                    sx={{
-                                        backgroundColor: "#e8f5e9",
-                                        color: "#004d40",
-                                        ml: -0.6,
-                                        "& .MuiChip-label": {
-                                        color: "#004d40",
-                                        fontWeight: 560,
-                                        letterSpacing: 1,
-                                        },
-                                    }}
-                                />
-                                </>
-                                ):(
-                                <>
-                                {payor.rental_fee}
-                                </>
-                                )}
-                            </TableCell>
-                            <TableCell align="start">
-                            {status === "Paid" ? (
-                                <Chip
-                                label={status}
+                          {/* {unpaid.join(", ")},  */}
+                        </TableCell>
+                        <TableCell align="start">
+                          {payor.is_last_month === 1 ? (
+                            <>
+                              <Chip
+                                label={"Covered by Deposit"}
                                 variant="contained"
                                 // backgroundColor={item.status === 'Available' ? '#ede7f6' : 'secondary'}
                                 color={"success"}
                                 sx={{
-                                    backgroundColor: "#e8f5e9",
-                                    color: "#004d40",
-                                    ml: -0.6,
-                                    "& .MuiChip-label": {
+                                  backgroundColor: "#e8f5e9",
+                                  color: "#004d40",
+                                  ml: -0.6,
+                                  "& .MuiChip-label": {
                                     color: "#004d40",
                                     fontWeight: 560,
                                     letterSpacing: 1,
-                                    },
+                                  },
                                 }}
-                                />
-                            ) : (
-                                <Checkbox color="primary" checked={isSelected} />
-                            )}
-                            </TableCell>
-                            <TableCell align="start">
-                            <Select
-                                value={advancePayments[payor.tenant.id] || 0}
-                                onChange={(e) =>
-                                handleAdvancePaymentChange(
-                                    payor.tenant.id,
-                                    e.target.value
-                                )
-                                }
-                                size="small"
-                                // disabled={status === "Paid"}
-                                disabled={
-                                isAdvancePaymentDisabled ||
-                                !isSelected ||
-                                status === "Paid"
-                                }
+                              />
+                            </>
+                          ) : (
+                            <>{payor.rental_fee}</>
+                          )}
+                        </TableCell>
+                        <TableCell align="start">
+                          {status === "Paid" ? (
+                            <Chip
+                              label={status}
+                              variant="contained"
+                              // backgroundColor={item.status === 'Available' ? '#ede7f6' : 'secondary'}
+                              color={"success"}
+                              sx={{
+                                backgroundColor: "#e8f5e9",
+                                color: "#004d40",
+                                ml: -0.6,
+                                "& .MuiChip-label": {
+                                  color: "#004d40",
+                                  fontWeight: 560,
+                                  letterSpacing: 1,
+                                },
+                              }}
+                            />
+                          ) : (
+                            <Checkbox color="primary" checked={isSelected} />
+                          )}
+                        </TableCell>
+                        <TableCell align="start">
+                          <Select
+                            value={advancePayments[payor.tenant.id] || 0}
+                            onChange={(e) =>
+                              handleAdvancePaymentChange(
+                                payor.tenant.id,
+                                e.target.value
+                              )
+                            }
+                            size="small"
+                            // disabled={status === "Paid"}
+                            disabled={
+                              isAdvancePaymentDisabled ||
+                              !isSelected ||
+                              status === "Paid"
+                            }
+                          >
+                            <MenuItem value={0}>No advance</MenuItem>
+                            <MenuItem value={1}>1 month</MenuItem>
+                            <MenuItem value={2}>2 months</MenuItem>
+                            <MenuItem value={3}>3 months</MenuItem>
+                            <MenuItem value={6}>6 months</MenuItem>
+                            <MenuItem value={12}>12 months</MenuItem>
+                          </Select>
+                        </TableCell>
+                        <TableCell sx={{ cursor: "pointer" }}>
+                          {status === "Paid" ? (
+                            <Typography
+                              variant="body2"
+                              onClick={handleWarning}
+                              sx={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                color: "#2196f3",
+                                fontSize: "0.9rem",
+                              }}
                             >
-                                <MenuItem value={0}>No advance</MenuItem>
-                                <MenuItem value={1}>1 month</MenuItem>
-                                <MenuItem value={2}>2 months</MenuItem>
-                                <MenuItem value={3}>3 months</MenuItem>
-                                <MenuItem value={6}>6 months</MenuItem>
-                                <MenuItem value={12}>12 months</MenuItem>
-                            </Select>
-                            </TableCell>
-                            <TableCell sx={{ cursor: "pointer" }}>
-                            {status === 'Paid' ? (
-                               <Typography
-                               variant="body2"
-                               onClick={handleWarning}
-                             
-                               sx={{
-                               display: "inline-flex",
-                               alignItems: "center",
-                               color: "#2196f3",
-                               fontSize: "0.9rem",
-                               }}
-                           >
-                               <SecurityTwoToneIcon /> Security Deposit Options
-                           </Typography>
-                            ):(
+                              <SecurityTwoToneIcon /> Security Deposit Options
+                            </Typography>
+                          ) : (
                             <Typography
                               variant="body2"
                               onClick={() => handleShowDeposit(payor.tenant.id)}
-                            
                               sx={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              color: "#2196f3",
-                              fontSize: "0.9rem",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                color: "#2196f3",
+                                fontSize: "0.9rem",
                               }}
                             >
-                                <SecurityTwoToneIcon /> Security Deposit Options
+                              <SecurityTwoToneIcon /> Security Deposit Options
                             </Typography>
-                            )}
-                            
-                            </TableCell>
-                        </StyledTableRow>
-                        <StyledTableRow>
-                            <TableCell
-                            colSpan={4}
-                            sx={{
-                                py: 0,
-                                borderBottom: isExpanded
-                                ? "1px solid rgba(224, 224, 224, 1)"
-                                : "none",
-                            }}
+                          )}
+                        </TableCell>
+                      </StyledTableRow>
+                      <StyledTableRow>
+                        <TableCell
+                          colSpan={4}
+                          sx={{
+                            py: 0,
+                            borderBottom: isExpanded
+                              ? "1px solid rgba(224, 224, 224, 1)"
+                              : "none",
+                          }}
+                        >
+                          <Collapse
+                            in={isExpanded}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <Box
+                              sx={{
+                                m: 2,
+                                backgroundColor: "#fafafa",
+                                borderRadius: 1,
+                                p: 2,
+                              }}
                             >
-                            <Collapse
-                                in={isExpanded}
-                                timeout="auto"
-                                unmountOnExit
-                            >
-                                <Box
+                              <Typography
+                                variant="subtitle2"
+                                gutterBottom
+                                sx={{ color: "#455a64" }}
+                              >
+                                Select months to mark as paid:
+                              </Typography>
+                              <FormGroup
                                 sx={{
-                                    m: 2,
-                                    backgroundColor: "#fafafa",
-                                    borderRadius: 1,
-                                    p: 2,
+                                  display: "flex",
+                                  flexDirection: "row",
+                                  flexWrap: "wrap",
+                                  gap: 2,
                                 }}
-                                >
-                                <Typography
-                                    variant="subtitle2"
-                                    gutterBottom
-                                    sx={{ color: "#455a64" }}
-                                >
-                                    Select months to mark as paid:
-                                </Typography>
-                                <FormGroup
-                                    sx={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    flexWrap: "wrap",
-                                    gap: 2,
-                                    }}
-                                >
-                                    {tenantOverdueData.map((item, index) => {
-                                    const date = new Date(item.month_overdue);
-                                    const formattedMonth = date.toLocaleString(
-                                        "default",
-                                        { month: "long" }
-                                    );
-                                    const day = date.getDate();
-                                    const year = date.getFullYear();
-                                    const monthYear = `${formattedMonth} ${day}, ${year}`;
-                                    return (
-                                        <FormControlLabel
-                                        key={index}
-                                        control={
-                                            <Checkbox
-                                            checked={tenantSelectedMonths.includes(
-                                                monthYear
-                                            )}
-                                            onChange={() =>
-                                                handleMonthSelection(
-                                                payor.tenant.id,
-                                                monthYear
-                                                )
-                                            }
-                                            size="small"
-                                            />
-                                        }
-                                        label={monthYear}
-                                        sx={{
-                                            "& .MuiFormControlLabel-label": {
-                                            fontSize: "0.875rem",
-                                            color: "#455a64",
-                                            },
-                                        }}
+                              >
+                                {tenantOverdueData.map((item, index) => {
+                                  const date = new Date(item.month_overdue);
+                                  const formattedMonth = date.toLocaleString(
+                                    "default",
+                                    { month: "long" }
+                                  );
+                                  const day = date.getDate();
+                                  const year = date.getFullYear();
+                                  const monthYear = `${formattedMonth} ${day}, ${year}`;
+                                  return (
+                                    <FormControlLabel
+                                      key={index}
+                                      control={
+                                        <Checkbox
+                                          checked={tenantSelectedMonths.includes(
+                                            monthYear
+                                          )}
+                                          onChange={() =>
+                                            handleMonthSelection(
+                                              payor.tenant.id,
+                                              monthYear
+                                            )
+                                          }
+                                          size="small"
                                         />
-                                    );
-                                    })}
-                                </FormGroup>
-                                </Box>
-                            </Collapse>
-                            </TableCell>
-                        </StyledTableRow>
-                        </>
-                    );
-                    })}
-                </TableBody>
-                </Table>
-            </TableContainer>
-            </DialogContent>
-            <DialogActions>
-            <Button
-                autoFocus
-                onClick={handleSave}
-                variant="contained"
-                size="medium"
-                sx={{ mr: 2, mt: 0.5, mb: 0.5 }}
-            >
-                Save
-            </Button>
-            </DialogActions>
-        </BootstrapDialog>
-        <SnackbarProvider maxSnack={3}>
-            <Box sx={{ display: "none" }}>
-            <SecurityDepositDialog
+                                      }
+                                      label={monthYear}
+                                      sx={{
+                                        "& .MuiFormControlLabel-label": {
+                                          fontSize: "0.875rem",
+                                          color: "#455a64",
+                                        },
+                                      }}
+                                    />
+                                  );
+                                })}
+                              </FormGroup>
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </StyledTableRow>
+                    </>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            autoFocus
+            onClick={handleSave}
+            variant="contained"
+            size="medium"
+            sx={{ mr: 2, mt: 0.5, mb: 0.5 }}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </BootstrapDialog>
+      <SnackbarProvider maxSnack={3}>
+        <Box sx={{ display: "none" }}>
+          <SecurityDepositDialog
             open={isShowSecurityDeposit}
             handleClose={handleCloseDeposit}
             tenantId={tenantId}
             setLoading={setLoading}
             loading={loading}
-            />
-            </Box>            
-        </SnackbarProvider>
-        </React.Fragment>
-    );
+          />
+        </Box>
+      </SnackbarProvider>
+    </React.Fragment>
+  );
 }

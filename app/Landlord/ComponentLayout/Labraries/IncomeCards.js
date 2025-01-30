@@ -108,6 +108,7 @@ export default function IncomeCards({selectedMonth, selectedYear, setLoading, lo
     console.log(selectedYear);
     console.log(income);
     console.log(IncomeStats);
+    console.log(loading)
     // Sample data - replace with your actual data
     const months = [
         { value: 1, label: 'January' },

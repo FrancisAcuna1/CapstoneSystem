@@ -1474,7 +1474,7 @@ export default function AddPropertyType({
                       fontWeight:500
                     }}
                     >
-                      Tenan't is moving out?
+                      Tenan&apos;t is moving out?
                     </Typography>
                     </Box>
                   </Grid>

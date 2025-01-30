@@ -12,8 +12,8 @@ export default function Botpress() {
 
   return (
     <div>
-      <Script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js" />
-      <Script src="https://files.bpcontent.cloud/2025/01/10/10/20250110102202-L436PWXR.js" />
+      <Script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"/>
+      <Script src="https://files.bpcontent.cloud/2025/01/29/14/20250129142342-604PY1CP.js" />
     </div>
   );
 }

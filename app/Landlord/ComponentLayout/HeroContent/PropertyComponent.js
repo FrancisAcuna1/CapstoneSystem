@@ -16,6 +16,9 @@ import {
   Card,
   CardActions,
   CardMedia,
+  IconButton,
+  Badge, 
+  Tooltip
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
@@ -25,11 +28,25 @@ import { styled, css } from "@mui/system";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import Image from "next/image";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import AddApartmentModal from "../ModalComponent/AddEstateModal";
 import { SnackbarProvider } from "notistack";
 import useSWR from "swr";
+import UpComingDuedates from "../Labraries/UpcomingDuedate";
+
+
+const GeneralTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))({
+  "& .MuiTooltip-tooltip": {
+    backgroundColor: "#263238", // Background color of the tooltip
+    color: "#ffffff", // Text color
+    borderRadius: "4px",
+  },
+});
+
 
 const fetcherProperty = async ([url, token]) => {
   const response = await fetch(url, {
@@ -64,11 +81,14 @@ export default function PropertyComponent({ loading, setLoading }) {
     const [editproperty, setEditProperty] = useState(null); //props id for editing
     const [status, setStatus] = useState([]);
     const [open, setOpen] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [propId, setPropId] = useState();
     // const theme = useTheme();
     // const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     console.log(editproperty);
     console.log(property);
     console.log(status);
+    console.log(propId)
 
     const getUserToken = () => {
         const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
@@ -158,6 +178,16 @@ export default function PropertyComponent({ loading, setLoading }) {
         setLoading(false);
         }
     };
+
+    // this code is for UpcomingDIalog
+    const handleDialogOpen = (propId) => {
+        setOpenDialog(true);
+        setPropId(propId)
+    }
+
+    const handleDialogClose = () => {
+        setOpenDialog(false);
+    }
 
     return (
         <Box sx={{ maxWidth: 1400, margin: "auto" }}>
@@ -254,13 +284,45 @@ export default function PropertyComponent({ loading, setLoading }) {
                         borderRadius: "10px",
                     }}
                     >
-                    <CardMedia
+                    {/* <CardMedia
                         sx={{ height: 150 }}
                         image={`http://127.0.0.1:8000/ApartmentImage/${item.image}`} // Use the URL of the first image
                         title={item.propertyname[0].caption || "Image"}
 
                         // style={{ width: '100%', height: 'auto', objectFit: 'contain',  }}
-                    />
+                    /> */}
+                    <Box sx={{ position: 'relative' }}>
+                        <CardMedia
+                            sx={{ height: 150 }}
+                            image={`http://127.0.0.1:8000/ApartmentImage/${item.image}`}
+                            title={item.propertyname[0].caption || "Image"}
+                        />
+                        {/* Calendar Icon Button */}
+                        <GeneralTooltip title="View Upcoming Due Dates">
+                            <IconButton
+                                sx={{
+                                    position: 'absolute',
+                                    top: 8,
+                                    right: 8,
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                                    },
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                    padding: '8px',
+                                }}
+                                onClick={() => {handleDialogOpen(item.id)}}
+                            >
+                                <Badge
+                                    variant="dot"
+                                    color="error"
+                                    // invisible={!hasUpcomingDueDates} // Your boolean for upcoming dues
+                                >
+                                    <CalendarMonthOutlinedIcon sx={{ fontSize: 20, color: '#3f51b5' }} />
+                                </Badge>
+                            </IconButton>
+                        </GeneralTooltip>
+                    </Box>
 
                     <Box
                         sx={(theme) => ({
@@ -490,6 +552,15 @@ export default function PropertyComponent({ loading, setLoading }) {
             })
             )}
         </Grid>
+        <React.Fragment>
+            <UpComingDuedates
+            openDialog={openDialog}
+            handleDialogClose={handleDialogClose}
+            propId={propId}
+            setLoading={setLoading}
+            loading={loading}
+            />
+        </React.Fragment>
         </Box>
     );
 }

@@ -204,7 +204,7 @@ export default function TenantInformationTable({
   )
   console.log(error);
   console.log(response);
-
+  console.log(tenantInformation)
   useEffect(() => {
     if (response) {
         setTenantInformation(response?.data || '');
@@ -539,22 +539,22 @@ export default function TenantInformationTable({
                     )}
                    
                     {selectedItem.length > 0 ? (
-                        <DeleteTooltip title="Delete">
-                           <IconButton
-                            onClick={handleClickOpen}
-                            sx={{
-                                mt: 2,
-                                "&:hover": { backgroundColor: "#e57373" },
-                                height: "35px",
-                                width: "35px",
-                                mr: 2
-                            }}
-                            >
-                            <DeleteForeverOutlinedIcon
-                                sx={{ color: "#e57373", "&:hover": { color: "#fafafa" }, fontSize: '28px' }}
-                            />
-                            </IconButton>
-                        </DeleteTooltip>
+                      <DeleteTooltip title="Delete">
+                        <IconButton
+                        onClick={handleClickOpen}
+                        sx={{
+                            mt: 2,
+                            "&:hover": { backgroundColor: "#e57373" },
+                            height: "35px",
+                            width: "35px",
+                            mr: 2
+                        }}
+                        >
+                        <DeleteForeverOutlinedIcon
+                            sx={{ color: "#e57373", "&:hover": { color: "#fafafa" }, fontSize: '28px' }}
+                        />
+                        </IconButton>
+                      </DeleteTooltip>
                     ):(
                         <Box
                         sx={{

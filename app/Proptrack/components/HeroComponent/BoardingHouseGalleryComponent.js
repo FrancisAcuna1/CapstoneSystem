@@ -27,8 +27,11 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import BedroomChildOutlinedIcon from "@mui/icons-material/BedroomChildOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import Image from "next/image";
+import { format, parseISO } from "date-fns";
 import useSWR from "swr";
+
 
 const NavigationButton = styled(IconButton)(({ theme }) => ({
   background: "rgba(0, 0, 0, 0.5)",
@@ -40,6 +43,14 @@ const NavigationButton = styled(IconButton)(({ theme }) => ({
   top: "50%",
   transform: "translateY(-50%)",
   zIndex: 1,
+}));
+
+const StyledStack = styled(Stack)(({ theme }) => ({
+  flex: '1 1 auto',
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.mode === 'dark' ? '#424242' : '#eceff1',
+  borderRadius: theme.shape.borderRadius,
+  marginTop: theme.spacing(1)
 }));
 
 function srcset(image, width, height, rows = 1, cols = 1) {
@@ -133,6 +144,30 @@ export default function BoardingHouseGallery({
 
   const images = (details?.images && details?.images) || [];
   console.log(images);
+
+
+  const formatDate = (dateString) => {
+    if (!dateString) {
+    return null;
+    }
+
+    try {
+    const parseDate = parseISO(dateString);
+    return format(parseDate, "MMMM d, yyyy");
+    } catch (error) {
+    console.log("Error formating Date:", error);
+    return dateString;
+    }
+  };
+
+  const calculateDaysUntilMoveOut = (moveOutDate) => {
+    if (!moveOutDate) return 'No move-out date';
+    const today = new Date();
+    const moveOut = new Date(moveOutDate);
+    const diffTime = moveOut - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return `${diffDays} day(s) remaining`;
+  };
 
   const CustomNextArrow = ({ className, onClick }) => (
     <div
@@ -325,42 +360,116 @@ export default function BoardingHouseGallery({
                             key={bed.id}
                             sx={{
                               display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
+                              flexDirection: 'column', // Changed to column to stack content vertically
                               bgcolor: 'background.default',
                               p: 2,
-                              borderRadius: 1
+                              borderRadius: 1,
+                              border: '1px solid',
+                              borderColor: 'divider',
                             }}
                           >
-                            <Box>
-                              <Typography 
-                                variant="body2" 
-                                sx={{ 
-                                  fontWeight: 500,
-                                  color: 'text.primary' 
-                                }}
-                              >
-                                Bed {bed.bed_number}
-                              </Typography>
-                              <Typography 
-                                variant="body2" 
-                                sx={{ 
-                                  color: 'text.secondary',
-                                  fontSize: '0.8rem'
-                                }}
-                              >
-                                Rental Fee: ₱ {bed.price.toLocaleString()}
-                              </Typography>
-                            </Box>
-                            <Chip
-                              label={bed.status}
-                              size="small"
-                              color={bed.status === 'Available' ? 'success' : 'error'}
-                              sx={{ 
-                                fontWeight: 600,
-                                fontSize: '0.7rem'
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'start',
+                                width: '100%',
+                                mb: 1
                               }}
-                            />
+                            >
+                              <Box>
+                                <Typography 
+                                  variant="body2" 
+                                  sx={{ 
+                                    fontWeight: 500,
+                                    color: 'text.primary' 
+                                  }}
+                                >
+                                  Bed {bed.bed_number}
+                                </Typography>
+                                <Typography 
+                                  variant="body2" 
+                                  sx={{ 
+                                    color: 'text.secondary',
+                                    fontSize: '0.8rem'
+                                  }}
+                                >
+                                  Rental Fee: ₱ {bed.price.toLocaleString()}
+                                </Typography>
+                              </Box>
+                              <Chip
+                                label={bed.status}
+                                size="small"
+                                color={bed.status === 'Available' ? 'success' : 'error'}
+                                sx={{ 
+                                  fontWeight: 600,
+                                  fontSize: '0.7rem'
+                                }}
+                              />
+                            </Box>
+
+                            {bed.status === 'Occupied' && bed.move_out_date !== null && (
+                              <Box 
+                              sx={{
+                                backgroundColor: theme.palette.mode === 'dark' ? '#424242' : '#e3f2fd', // Dark mode background
+                                p: 1,
+                                borderRadius: 1}}
+                              >
+                                <Box 
+                                  sx={{ 
+                                    display: 'inline-flex',  // Changed to inline-flex
+                                    alignItems: 'center', 
+                                    gap: 1,
+                                    mt: 1,
+                                  }}
+                                >
+                                  <CalendarTodayOutlinedIcon 
+                                    sx={{ 
+                                      fontSize: '0.99rem',
+                                      color:  theme.palette.mode === 'dark' ? '#90caf9' : '#3f51b5',
+                                      display: 'flex',     
+                                      alignSelf: 'center'  
+                                    }} 
+                                  />
+                                  <Typography 
+                                    variant="body2"
+                                    sx={{ 
+                                      color: theme.palette.mode === 'dark' ? '#90caf9' : '#3f51b5',
+                                      fontSize: '0.9rem',
+                                      lineHeight: 1,      
+                                      display: 'flex',   
+                                      alignItems: 'center',
+                                      fontWeight:550
+                                       
+                                    }}
+                                  >
+                                    Next Availability:
+                                  </Typography>
+                                </Box>
+                                <Box sx={{alignItems:'center', gap: 0.5 }}>
+                                  <Typography
+                                    variant="body2"
+                                    gutterBottom
+                                    sx={{
+                                      fontSize: '0.81rem',
+                                      fontWeight: 550,
+                                      color: theme.palette.mode === 'dark' ? '#f5f5f5' : '#263238'
+                                    }}
+                                  >
+                                    {formatDate(bed.move_out_date)}
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontSize: '0.8rem',
+                                      color: 'text.secondary'
+                                    }}
+                                  >
+                                    {calculateDaysUntilMoveOut(bed.move_out_date)}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            )}
                           </Box>
                         ))}
                       </Stack>

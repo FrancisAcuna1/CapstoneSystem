@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   Container, Stack, Box, Grid, Chip, Card, CardContent, CardMedia, CardActions,
   Typography, Button, IconButton, FormControl, InputLabel, Select, MenuItem,
-  InputBase, AppBar, Toolbar, CircularProgress, TextField, InputAdornment, Tooltip, useTheme
+  InputBase, AppBar, Toolbar, CircularProgress, TextField, InputAdornment, Tooltip, useTheme, Badge
 } from '@mui/material';
 import { styled, alpha } from '@mui/system';
 import SearchIcon from '@mui/icons-material/Search';
@@ -14,8 +14,9 @@ import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
+import BedroomChildOutlinedIcon from '@mui/icons-material/BedroomChildOutlined';
 import NoResultUI from '../Libraries/NoResult';
-
+import { format, parseISO } from "date-fns";
 
 const GeneralTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -26,6 +27,14 @@ const GeneralTooltip = styled(({ className, ...props }) => (
     borderRadius: "4px",
   },
 });
+
+const StyledStack = styled(Stack)(({ theme }) => ({
+  flex: '1 1 auto',
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.mode === 'dark' ? '#424242' : '#eceff1',
+  borderRadius: theme.shape.borderRadius,
+  marginTop: theme.spacing(1)
+}));
 
 const fetcher = async([url]) => {
   const response = await fetch(url, {
@@ -122,6 +131,40 @@ export default function PropertyComponentPage({loading, setLoading}) {
   });
 
   console.log(filteredProperties)
+
+  const formatDate = (dateString) => {
+      if (!dateString) {
+      return null;
+      }
+
+      try {
+      const parseDate = parseISO(dateString);
+      return format(parseDate, "MMMM d, yyyy");
+      } catch (error) {
+      console.log("Error formating Date:", error);
+      return dateString;
+      }
+  };
+
+  const calculateDaysUntilAvailable = (date) => {
+    const today = new Date();
+    const availableDate = new Date(date);
+    const diffTime = availableDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const propertiesWithDaysUntilAvailable = filteredProperties.map((property) => {
+      const moveOutDate = property.move_out_date; // Assuming property has move_out_date field
+      const daysUntilAvailable = moveOutDate ? calculateDaysUntilAvailable(moveOutDate) : null;
+      
+      return {
+          ...property,
+          daysUntilAvailable
+      };
+  });
+
+  console.log(propertiesWithDaysUntilAvailable);
 
   return (
     <Box
@@ -269,8 +312,8 @@ export default function PropertyComponentPage({loading, setLoading}) {
               <Grid item xs={12} sx={{ textAlign: 'center' }}>
                 <CircularProgress />
               </Grid>
-            ) : filteredProperties.length > 0 ? (
-              filteredProperties.map((property, index) => (
+            ) : propertiesWithDaysUntilAvailable.length > 0 ? (
+              propertiesWithDaysUntilAvailable.map((property, index) => (
                 <Grid item key={index} xs={12} sm={6} md={6} lg={4}>
                 <Card 
                   sx={{ 
@@ -368,12 +411,28 @@ export default function PropertyComponentPage({loading, setLoading}) {
                       </GeneralTooltip>
                     )}
                     </Stack>
+                    <Stack>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary" 
+                        sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center',
+                          gap: 0.5,
+                          mt:-1,
+                          mb:2
+                        }}
+                      >
+                        <BedroomChildOutlinedIcon/> {property.property_type}
+                      </Typography>
+                    </Stack>
                     <Stack 
                       direction="row" 
                       alignItems="center" 
                       justifyContent="space-between"
                       sx={{ mb: 2 }}
                     >
+                      
                       <Typography 
                         variant="body2" 
                         color="text.secondary" 
@@ -385,11 +444,31 @@ export default function PropertyComponentPage({loading, setLoading}) {
                           mb:1
                         }}
                       >
-                        <LocationOnOutlinedIcon/> {property.street} st. {property.barangay}, {property.municipality}
+                        <LocationOnOutlinedIcon/> {property.street} st. {property.barangay}, {property.municipality}, 
                       </Typography>
                     </Stack>
                     
-                    <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+                    {(property.property_type === "Apartment" && property.status === "Occupied" && property.move_out_date !== null) &&  (
+                    <StyledStack>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <div>
+                          <Typography variant="subtitle2" fontWeight="medium">
+                            Available from
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {formatDate(property.move_out_date)}
+                          </Typography>
+                        </div>
+                        <Chip 
+                          label={`In ${property.daysUntilAvailable} days`}
+                          color="warning"
+                          size="small"
+                        />
+                      </Stack>
+                    </StyledStack>
+                    )}
+
+                    <Stack direction="row" spacing={2} sx={{ mb: 2, mt:2 }}>
                       <Box 
                         sx={{
                           flex: '1 1 auto',
@@ -468,6 +547,7 @@ export default function PropertyComponentPage({loading, setLoading}) {
                         />
                       ))}
                     </Stack>
+                   
                   </CardContent>
 
                   <CardActions sx={{ p: 3, pt: 0 }}>

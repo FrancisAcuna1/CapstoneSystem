@@ -213,6 +213,7 @@ export default function PaymentTransactionTable({
         const accessToken = userData.accessToken;
         return accessToken;
     };
+
     const token = getUserToken();
     const {data: response, error, isLoading,} = useSWR(
         token && selectedMonth && selectedYear ? [endPoint, token, selectedMonth, selectedYear]: null,
@@ -225,8 +226,16 @@ export default function PaymentTransactionTable({
         }
     );
     console.log(error);
-
+    console.log(response)
+    console.log(paymentTransaction)
     useEffect(() => {
+        if (response?.message === "No payment found for the specified filters!") {
+            // Clear the state if no payments are found
+            setPaymentTransaction([]);
+            setLoading(false);
+            return;
+        }
+        
         if (response?.data) {
             const updatedDetails = response?.data.map((payment) => {
                 if (
@@ -298,6 +307,7 @@ export default function PaymentTransactionTable({
             });
     
             setPaymentTransaction(updatedDetails);
+            setLoading(false)
         } else if (isLoading) {
             setLoading(true);
         }
@@ -376,15 +386,15 @@ export default function PaymentTransactionTable({
 
     const formatDate = (dateString) => {
         if (!dateString) {
-        return null;
+            return null;
         }
 
         try {
-        const parseDate = parseISO(dateString);
-        return format(parseDate, "MMM d, yyyy");
+            const parseDate = parseISO(dateString);
+            return format(parseDate, "MMM d, yyyy");
         } catch (error) {
-        console.log("Error formating Date:", error);
-        return dateString;
+            console.log("Error formating Date:", error);
+            return dateString;
         }
     };
 
