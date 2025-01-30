@@ -207,9 +207,10 @@ export default function HomePage (){
   setMobileOpen(!mobileOpen);
   };
 
+  console.log(status)
   useEffect(() => {
     if (status === "unauthenticated") {
-      console.log('anauthenticated')
+      console.log('unauthenticated')
       router.replace('/'); // Redirect to login if not authenticated
     }
   }, [status, router]);
