@@ -186,6 +186,13 @@ export default function PaymentHistoryTable({ TenantId, setLoading, loading }) {
   console.log(response)
   console.log(loading)
   useEffect(() => {
+    if (response?.message === "No payment found for the specified filters!") {
+      // Clear the state if no payments are found
+      setPaymentDetails([]);
+      setLoading(false);
+      return;
+    }
+
     if(response){
       const updatedDetails = response?.data.map((payment) => {
         if (
@@ -193,33 +200,62 @@ export default function PaymentHistoryTable({ TenantId, setLoading, loading }) {
             payment.transaction_type === "Advance Payment" ||
             payment.transaction_type === "Rental Fee"
         ) {
-            const startDate = parseISO(payment.date);
+            const startDate = parseISO(payment.paid_for_month);
             const monthsCovered = payment.months_covered || 0;
 
+            // Check if Advance Payment and there's an Initial Payment to calculate from
+            if (payment.transaction_type === "Advance Payment") {
+              const initialPayment = response?.data.find(
+              (p) =>
+                  p.transaction_type === "Initial Payment" &&
+                  p.tenant_id === payment.tenant_id
+              );
+      
+              if (initialPayment) {
+              const initialPaymentEndDate = addMonths(
+                  parseISO(initialPayment.paid_for_month),
+                  initialPayment.months_covered || 0
+              );
+      
+              // Adjust the start date of Advance Payment to the end date of Initial Payment
+              const adjustedStartDate = setDate(initialPaymentEndDate, getDate(initialPaymentEndDate));
+              // Advance payments include an extra month
+              const endDate = addMonths(adjustedStartDate, monthsCovered);
+      
+              payment.date_coverage = {
+                  start_date: format(adjustedStartDate, "yyyy-MM-dd"),
+                  end_date: format(endDate, "yyyy-MM-dd"),
+              };
+      
+              return payment;
+              }
+            }
+
+            
             // Get lease start date from rental agreement
             const leaseStartDate = payment.tenant.rental_agreement?.[0]?.lease_start_date 
-                ? parseISO(payment.tenant.rental_agreement[0].lease_start_date) 
-                : null;
+              ? parseISO(payment.tenant.rental_agreement[0].lease_start_date) 
+              : null;
 
             if (leaseStartDate) {
                 // Adjust the day of startDate to match leaseStartDate's day
-                const adjustedStartDate = setDate(startDate, getDate(leaseStartDate));
-                
-                // Calculate the end date using the adjusted start date and months covered
-                const endDate = addMonths(adjustedStartDate, monthsCovered);
+              const adjustedStartDate = setDate(startDate, getDate(leaseStartDate));
+              
+              // Calculate the end date using the adjusted start date and months covered
+              const endDate = addMonths(adjustedStartDate, monthsCovered);
 
-                // Add date coverage to the payment object
-                payment.date_coverage = {
-                    start_date: format(adjustedStartDate, "yyyy-MM-dd"),
-                    end_date: format(endDate, "yyyy-MM-dd"),
-                };
+              // Add date coverage to the payment object
+              payment.date_coverage = {
+                  start_date: format(adjustedStartDate, "yyyy-MM-dd"),
+                  end_date: format(endDate, "yyyy-MM-dd"),
+              };
             } else {
-                // Fallback if no lease start date is found
-                const endDate = addMonths(startDate, monthsCovered);
-                payment.date_coverage = {
-                    start_date: format(startDate, "yyyy-MM-dd"),
-                    end_date: format(endDate, "yyyy-MM-dd"),
-                };
+              // Fallback if no lease start date is found
+              const endDate = addMonths(startDate, monthsCovered);
+              payment.date_coverage = {
+                  start_date: format(startDate, "yyyy-MM-dd"),
+                  end_date: format(endDate, "yyyy-MM-dd"),
+              };
             }
         } else {
             payment.date_coverage = null;

@@ -132,11 +132,7 @@ export default function LoginPage() {
         if (updatedSession && updatedSession.user) {
           console.log("Login successful:", updatedSession.user);
           console.log("Login successful:", updatedSession.user.role);
-          // router.push(`/${updatedSession.user.role}/Home`);
-          router.replace(`/${updatedSession.user.role}/Home`);
-          setTimeout(() => {
-            window.location.href = `/${updatedSession.user.role}/Home`; // Force full-page reload
-          }, 300);
+          router.push(`/${updatedSession.user.role}/Home`);
         } else {
           console.log("Login failed");
         }

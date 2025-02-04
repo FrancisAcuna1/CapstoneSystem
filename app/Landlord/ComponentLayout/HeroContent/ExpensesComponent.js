@@ -37,7 +37,7 @@ import AddRecurringExpenses from "../ModalComponent/AddRecurringExpensesModal";
 export default function ExpensesComponent({ loading, setLoading }) {
     const router = useRouter();
     const [selectedTab, setSelectedTab] = useState("all");
-    const [selectedYear, setSelectedYear] = useState("2024");
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [selectedMonth, setSelectedMonth] = useState("all");
     // const [selectedCategory, setSelectedCategory] = useState('');
     const [successful, setSuccessful] = useState(null);
@@ -50,6 +50,7 @@ export default function ExpensesComponent({ loading, setLoading }) {
 
     console.log(selectedTab);
     console.log(refreshTrigger);
+    console.log(selectedYear)
 
     const handleDataRefresh = useCallback(() => {
         setRefreshTrigger((prev) => prev + 1); // Increment to trigger refresh
@@ -111,7 +112,7 @@ export default function ExpensesComponent({ loading, setLoading }) {
     };
     // Example usage
     // const currentYear = new Date().getFullYear();
-    const years = generateYears(1999, 20);
+    const years = generateYears(1999, 30);
 
     const handleChangeTab = (event, newValue) => {
         setSelectedTab(newValue);

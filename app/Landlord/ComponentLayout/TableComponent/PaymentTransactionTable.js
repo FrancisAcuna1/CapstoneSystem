@@ -243,7 +243,7 @@ export default function PaymentTransactionTable({
                     payment.transaction_type === "Advance Payment" ||
                     payment.transaction_type === "Rental Fee"
                 ) {
-                    const startDate = parseISO(payment.date);
+                    const startDate = parseISO(payment.paid_for_month);
                     let monthsCovered = payment.months_covered || 0; 
 
                     // Check if Advance Payment and there's an Initial Payment to calculate from
@@ -256,7 +256,7 @@ export default function PaymentTransactionTable({
                 
                         if (initialPayment) {
                         const initialPaymentEndDate = addMonths(
-                            parseISO(initialPayment.date),
+                            parseISO(initialPayment.paid_for_month),
                             initialPayment.months_covered || 0
                         );
                 

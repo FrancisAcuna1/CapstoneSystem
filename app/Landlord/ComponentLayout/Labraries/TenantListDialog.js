@@ -303,6 +303,7 @@ export default function TenantListDialog({
             let paymentAmount;
             let totalMonthsCovered;
 
+            console.log(selectedMonthsList)
             const selectedMonthsCount = selectedMonthsList.length;
 
             advanceMonthCount = advanceMonthCount > 0 ? advanceMonthCount : 0;
@@ -331,6 +332,7 @@ export default function TenantListDialog({
               tenant_id: payor.tenant.id,
               amount: paymentAmount.toFixed(0),
               payment_date: format(new Date(), "MM/dd/yyyy"),
+              paid_for_month: format(new Date(selectedMonthsList[0]), "MM/dd/yyyy"),
               transaction_type: "Rental Fee",
               status: "Paid",
               months_covered: totalMonthsCovered,
@@ -418,7 +420,7 @@ export default function TenantListDialog({
 
   const formatDueDate = (payor) => {
     const leaseStart = new Date(payor.lease_start_date);
-    const currentDate = new Date("2025-1-11"); // You might want to replace with current date dynamically
+    const currentDate = new Date("2025-3-11"); // You might want to replace with current date dynamically
     const prepaidMonths = payor.prepaid_rent_period;
     console.log(prepaidMonths);
     // Filter payments specific to this tenant
@@ -441,7 +443,7 @@ export default function TenantListDialog({
     // If no payments, use lease start date
     const lastPayment = allPayments[0] || null;
     const lastPaymentDate = lastPayment
-      ? new Date(lastPayment.date || lastPayment.month_overdue)
+      ? new Date(lastPayment.paid_for_month || lastPayment.month_overdue)
       : leaseStart;
 
     const dueDay = leaseStart.getDate();
@@ -498,7 +500,7 @@ export default function TenantListDialog({
     console.log(previousDueDate);
     // Check if next due date is paid
     const isNextDueDatePaid = allPayments.some((payment) =>
-      isSameMonth(new Date(payment.date || payment.month_overdue), nextDueDate)
+      isSameMonth(new Date(payment.paid_for_month || payment.month_overdue), nextDueDate)
     );
     console.log(isNextDueDatePaid);
 
@@ -858,10 +860,12 @@ export default function TenantListDialog({
               </TableHead>
               <TableBody>
                 {payorList.map((payor, index) => {
-                  const tenantOverdueData = deliquent.find((item) => item.tenantId === payor.tenant.id)
-                    ?.deliquentData.filter(
-                      (deliquenItem) => deliquenItem.status === "Overdue"
-                    ) || [];
+                  const tenantOverdueData =
+                    deliquent
+                      .find((item) => item.tenantId === payor.tenant.id)
+                      ?.deliquentData.filter(
+                        (deliquenItem) => deliquenItem.status === "Overdue"
+                      ) || [];
                   const { dueDate, status } = formatDueDate(payor);
                   // const overdueMonths = getOverdueDetails(payor);
                   // console.log(overdueMonths)
@@ -994,7 +998,7 @@ export default function TenantListDialog({
                                     <KeyboardArrowDownIcon />
                                   )}
                                 </IconButton>
-                            )}
+                              )}
                           </Box>
 
                           {/* {unpaid.join(", ")},  */}

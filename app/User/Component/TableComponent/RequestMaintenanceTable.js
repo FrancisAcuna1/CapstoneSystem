@@ -371,7 +371,7 @@ export default function RequestMaintenanceTable({
                 elevation={3}
                 sx={{
                 maxWidth: {
-                    xs: 312,
+                    xs: 340,
                     sm: 767,
                     md: 1000,
                     lg: 1400,

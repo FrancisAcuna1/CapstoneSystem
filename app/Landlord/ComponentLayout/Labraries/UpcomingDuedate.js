@@ -145,8 +145,7 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
 
         const overdue = payments
           .map((payment) => {
-            const nextDueDate = dayjs(calculateNextDueDate(payment.last_payment.date, payment.last_payment.months_covered));
-      
+            const nextDueDate = dayjs(calculateNextDueDate(payment.last_payment.paid_for_month, payment.last_payment.months_covered));
             // Check if the tenant is overdue
             if (dayjs().isAfter(nextDueDate)) {
                 const overdueDates = [];
@@ -178,6 +177,8 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
         // Update state with overdue tenants
         setOverdueTenants(overdue);
     };
+
+  
 
     const checkAndSubmitOverdues = useCallback(async() => {
         if(accessToken){
@@ -223,7 +224,7 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
 
     useEffect(() => {
         if (lastPayment.length > 0) {
-            getOverdueTenants(lastPayment);
+            getOverdueTenants(lastPayment, '2025-05-1');
         }
     }, [lastPayment]);
 
@@ -285,7 +286,7 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
 
     console.log(delinquentData)
     
-     const formatDate = (dateString) => {
+    const formatDate = (dateString) => {
         if (!dateString) {
             return null;
         }
@@ -364,7 +365,7 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
                         <>
                         {lastPayment && lastPayment.length > 0 ? (
                             lastPayment.map(payment => {
-                                const nextDueDate = calculateNextDueDate(payment.last_payment.date, payment.last_payment.months_covered);
+                                const nextDueDate = calculateNextDueDate(payment.last_payment.paid_for_month, payment.last_payment.months_covered);
                                 const overDueDetails = delinquentData.find((item) => item.tenantId === payment.rental_agreement?.tenant_id)
                                     ?.delinquentData.filter((delinquentItem) => delinquentItem.status === "Overdue") || [];
                                 console.log(overDueDetails);

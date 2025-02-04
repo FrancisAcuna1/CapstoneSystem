@@ -1,7 +1,26 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { TextField, Typography, Box, Fab, Button, Fade, FormHelperText, FormControl, InputLabel, Select, MenuItem, Grid, Autocomplete, Checkbox, IconButton, Tooltip, Divider, CircularProgress,} from "@mui/material";
+import {
+  TextField,
+  Typography,
+  Box,
+  Fab,
+  Button,
+  Fade,
+  FormHelperText,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid,
+  Autocomplete,
+  Checkbox,
+  IconButton,
+  Tooltip,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
 import { styled, useTheme, css } from "@mui/system";
 import { Modal as BaseModal } from "@mui/base/Modal";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -16,11 +35,10 @@ import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 import Image from "next/image";
 import { useSnackbar } from "notistack";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
-
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 const Backdrop = React.forwardRef((props, ref) => {
   const { open, ...other } = props;
@@ -143,14 +161,14 @@ export default function AddPropertyType({
   setEditItem,
   setSelectedProperty,
   selectedProperty,
-  onRefresh
+  onRefresh,
 }) {
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [isMovingOut, setIsMovingOut] = useState(false);
   const [moveOutDate, setMoveOutDate] = useState(null);
-  const [numRooms, setNumRooms] = useState(1); 
+  const [numRooms, setNumRooms] = useState(1);
   const [rooms, setRooms] = useState([
     {
       beds: [{ price: "", status: "" }],
@@ -185,15 +203,14 @@ export default function AddPropertyType({
     barangay: propAddress.barangay,
     municipality: "Sorsogon City",
   });
-  
+
   const [moveOutStatus, setMoveOutStatus] = useState(
-    rooms.map((room) => room.beds ? room.beds.map(() => false) : []) // Ensure bed array exists for bh
+    rooms.map((room) => (room.beds ? room.beds.map(() => false) : [])) // Ensure bed array exists for bh
   );
-  
+
   const [bhMoveOutDates, setBhMoveOutDates] = useState(
-    rooms.map((room) => room.beds ? room.beds.map(() => null) : []) // Ensure bed array exists for bh
+    rooms.map((room) => (room.beds ? room.beds.map(() => null) : [])) // Ensure bed array exists for bh
   );
-  
 
   console.log("Edit id:", editItem);
   console.log("id:", propsid);
@@ -204,9 +221,8 @@ export default function AddPropertyType({
   console.log("Edit Boarding House Value:", newboardinghouse);
   console.log("delete:", deleteImage);
   console.log("rooms:", rooms);
-  console.log(moveOutDate)
-  console.log(bhMoveOutDates)
-
+  console.log(moveOutDate);
+  console.log(bhMoveOutDates);
 
   const handleChangeApartment = (e) => {
     const { name, value } = e.target;
@@ -219,7 +235,7 @@ export default function AddPropertyType({
 
     setNewApartment({
       ...newApartment,
-      municipality: 'Sorosgon City',
+      municipality: "Sorosgon City",
       [name]: value || "",
     });
   };
@@ -236,7 +252,7 @@ export default function AddPropertyType({
 
     setNewBoardinghouse({
       ...newboardinghouse,
-      municipality: 'Sorosgon City',
+      municipality: "Sorosgon City",
       [name]: value || "",
     });
   };
@@ -324,7 +340,7 @@ export default function AddPropertyType({
           console.log(response.status);
 
           if (response.ok) {
-            console.log(data)
+            console.log(data);
             if (selectedProperty === "Apartment") {
               setNewApartment({
                 propertyid: data?.apartment?.property_id,
@@ -347,7 +363,7 @@ export default function AddPropertyType({
                 })) || [];
               setSelectedInclusions(inclusionsArray);
               // setSelectedImage(data?.boardinghouse?.images);
-              if (data?.apartment?.images || '') {
+              if (data?.apartment?.images || "") {
                 const existingImages = data.apartment.images.map((img) => ({
                   id: img.id,
                   path: img.image_path,
@@ -356,7 +372,7 @@ export default function AddPropertyType({
                 setSelectedImage(existingImages);
               }
               setSelectedProperty(data?.apartment?.property_type);
-              setMoveOutDate(data?.apartment?.move_out_date)
+              setMoveOutDate(data?.apartment?.move_out_date);
             } else if (selectedProperty === "Boarding House") {
               setNewBoardinghouse({
                 propertyid: data?.boardinghouse?.property_id,
@@ -400,12 +416,14 @@ export default function AddPropertyType({
 
               setRooms(roomsArray);
 
-              const moveOutDatesArray = data?.boardinghouse?.rooms?.map(room => 
-                room.beds?.map(bed => 
-                  bed.move_out_date ? new Date(bed.move_out_date) : null
-                ) || []
-              ) || [];
-              
+              const moveOutDatesArray =
+                data?.boardinghouse?.rooms?.map(
+                  (room) =>
+                    room.beds?.map((bed) =>
+                      bed.move_out_date ? new Date(bed.move_out_date) : null
+                    ) || []
+                ) || [];
+
               setBhMoveOutDates(moveOutDatesArray);
 
               const inclusionsArray =
@@ -416,20 +434,20 @@ export default function AddPropertyType({
                 })) || [];
               setSelectedInclusions(inclusionsArray);
               console.log("Processed inclusions:", inclusionsArray);
-              setNumRooms(data?.boardinghouse?.number_of_rooms)
+              setNumRooms(data?.boardinghouse?.number_of_rooms);
             }
           } else {
             console.error("Error fetching property details:", data.message);
           }
         } catch (error) {
-          console.log("Error:", error);;
+          console.log("Error:", error);
         } finally {
           console.log("finally");
         }
       }
     };
     fetchDataEdit();
-  }, [editItem, selectedProperty, setSelectedProperty,]);
+  }, [editItem, selectedProperty, setSelectedProperty]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -446,34 +464,34 @@ export default function AddPropertyType({
         (acc, room) => acc + (room.number_of_beds || 0),
         0
       );
-  
+
       const availableBeds = rooms.reduce(
-        (acc, room) => 
+        (acc, room) =>
           acc + room.beds.filter((bed) => bed.status === "Available").length,
         0
       );
-  
+
       const occupiedBeds = rooms.reduce(
-        (acc, room) => 
+        (acc, room) =>
           acc + room.beds.filter((bed) => bed.status === "Occupied").length,
         0
       );
-  
+
       // If there are no beds at all
       if (totalBeds === 0) {
         return "Available";
       }
-  
+
       // If all beds are occupied
       if (occupiedBeds === totalBeds) {
         return "Occupied";
       }
-  
+
       // If there are some available beds
       if (availableBeds > 0) {
         return "Available";
       }
-  
+
       // Fallback to the original status if something unexpected happens
       return originalStatus;
     };
@@ -490,7 +508,7 @@ export default function AddPropertyType({
         let newErrors = {};
 
         const updatedStatus = determinePropertyStatus(
-          newboardinghouse.boardinghousestatus, 
+          newboardinghouse.boardinghousestatus,
           rooms
         );
 
@@ -531,7 +549,7 @@ export default function AddPropertyType({
           if (!selectedImage || selectedImage.length === 0) {
             hasErrors = true;
             newErrors.images = "At least one image is required";
-          }else {
+          } else {
             // Check if the file size exceeds the limit (3050 KB = 3.05 MB)
             const maxSize = 3050 * 1024; // Convert 3050 KB to bytes
             if (selectedImage[0].size > maxSize) {
@@ -552,7 +570,18 @@ export default function AddPropertyType({
           formData.append("street", newApartment.street);
           formData.append("barangay", propAddress.barangay); //get the state value of barangay
           formData.append("municipality", newApartment.municipality);
-          formData.append("moveoutdate", dayjs(moveOutDate).format('MM/DD/YYYY'));
+
+          const formattedMoveOutDate = moveOutDate
+            ? dayjs(moveOutDate).format("MM/DD/YYYY")
+            : null;
+
+          console.log("📝 moveoutdate being sent:", formattedMoveOutDate);
+
+          if (formattedMoveOutDate) {
+            formData.append("moveoutdate", formattedMoveOutDate);
+          } else {
+            formData.append("moveoutdate", ""); // Laravel will convert this to null
+          }
 
           if (hasErrors) {
             setErrors(newErrors);
@@ -593,7 +622,6 @@ export default function AddPropertyType({
             );
             formData.append("inclusion", inclusionsJson);
           }
-
         } else if (selectedProperty === "Boarding House") {
           if (!newboardinghouse.boardinghousename?.trim()) {
             newErrors.boardinghousename = "Property name is required";
@@ -631,14 +659,14 @@ export default function AddPropertyType({
           if (!selectedImage || selectedImage.length === 0) {
             hasErrors = true;
             newErrors.images = "At least one image is required";
-          }else {
+          } else {
             // Check if the file is an image and check the type
             // const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
             // if (!validImageTypes.includes(selectedImage[0].type)) {
             //   hasErrors = true;
             //   newErrors.images = "Invalid image type. Only jpeg, png, jpg, or gif are allowed";
             // }
-        
+
             // Check if the file size exceeds the limit (3050 KB = 3.05 MB)
             const maxSize = 3050 * 1024; // Convert 3050 KB to bytes
             if (selectedImage[0].size > maxSize) {
@@ -696,7 +724,6 @@ export default function AddPropertyType({
               }
             });
           }
-          
 
           if (deleteImage && deleteImage.length > 0) {
             formData.append("deleted_images", JSON.stringify(deleteImage));
@@ -705,23 +732,7 @@ export default function AddPropertyType({
           if (numRooms) {
             formData.append("numberofrooms", numRooms);
           }
-          // if (rooms && rooms.length > 0) {
-          //   rooms.forEach((room, index) => {
-          //     formData.append(`rooms[${index}][room_number]`, parseInt(room.room_number || index + 1, 10));
-          //     formData.append(`rooms[${index}][number_of_beds]`, parseInt(room.beds, 10));
-          //   });
-          // }
-          // if (rooms && rooms.length > 0) {
-          //   rooms.forEach((room, roomIndex) => {
-          //     formData.append(`rooms[${roomIndex}][room_number]`, roomIndex + 1);
-          //     formData.append(`rooms[${roomIndex}][number_of_beds]`, room.beds.length);
-
-          //     room.beds.forEach((bed, bedIndex) => {
-          //       formData.append(`rooms[${roomIndex}][beds][${bedIndex}][type]`, bed.type);
-          //       formData.append(`rooms[${roomIndex}][beds][${bedIndex}][status]`, bed.status);
-          //     });
-          //   });
-          // }
+          
           rooms.forEach((room, roomIndex) => {
             formData.append(
               `rooms[${roomIndex}][room_number]`,
@@ -748,7 +759,8 @@ export default function AddPropertyType({
               const moveOutDate = bhMoveOutDates[roomIndex]?.[bedIndex];
               if (moveOutDate) {
                 // Convert the dayjs object to a formatted string
-                const formattedMoveOutDate = dayjs(moveOutDate).format('MM/DD/YYYY');
+                const formattedMoveOutDate =
+                  dayjs(moveOutDate).format("MM/DD/YYYY");
                 formData.append(
                   `rooms[${roomIndex}][beds][${bedIndex}][move_out_date]`,
                   formattedMoveOutDate
@@ -807,12 +819,12 @@ export default function AddPropertyType({
           setEditItem(null);
           onRefresh();
           setSelectedImage(null);
-          setSelectedInclusions([])
-          setErrors({})
-          setRooms([{beds: [{ price: "", status: "" }],}])
-          setSelectedProperty('')
-          enqueueSnackbar(data.message, {variant: 'success'});
-          setLoading(false)
+          setSelectedInclusions([]);
+          setErrors({});
+          setRooms([{ beds: [{ price: "", status: "" }] }]);
+          setSelectedProperty("");
+          enqueueSnackbar(data.message, { variant: "success" });
+          setLoading(false);
         } else {
           // handleClose();
           // setSelectedProperty('')
@@ -822,9 +834,9 @@ export default function AddPropertyType({
           // setNewBoardinghouse({});
           // setRooms([{beds: [{ price: "", status: "" }],}])
           // setEditItem(null);
-          setLoading(false)
-          enqueueSnackbar(data.message, {variant: 'error'});
-          console.log(data.error)
+          setLoading(false);
+          enqueueSnackbar(data.message, { variant: "error" });
+          console.log(data.error);
         }
       } catch (error) {
         console.error("An error occurred:", error);
@@ -880,7 +892,6 @@ export default function AddPropertyType({
     fetchedInclusionData();
   }, [setError]);
 
-
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       const filesArray = Array.from(e.target.files);
@@ -895,9 +906,8 @@ export default function AddPropertyType({
         const currentImages = Array.isArray(prevImages) ? prevImages : [];
         return [...currentImages, ...newPreviews];
       });
-   
     }
- 
+
     setErrors((prevErrors) => {
       const updatedErrors = { ...prevErrors };
       delete updatedErrors.images;
@@ -949,13 +959,13 @@ export default function AddPropertyType({
 
   const handleNumRoomsChange = (e) => {
     const newNumRooms = Math.min(parseInt(e.target.value, 10), 10);
-  
+
     // Check if any room has an occupied bed before decreasing numRooms
     const roomsWithOccupiedBeds = rooms.some((room) =>
       room.beds.some((bed) => bed.status === "Occupied")
     );
-  
-      // If we are decreasing the number of rooms
+
+    // If we are decreasing the number of rooms
     if (newNumRooms < numRooms) {
       // Filter out rooms with occupied beds
       const roomsWithOccupiedBeds = rooms.filter((room) =>
@@ -963,17 +973,23 @@ export default function AddPropertyType({
       );
 
       // If there are rooms with occupied beds, we can't decrease the room count
-      if (roomsWithOccupiedBeds.length > 0 && newNumRooms < roomsWithOccupiedBeds.length) {
-        enqueueSnackbar("Cannot decrease the number of rooms with occupied beds", { variant: "error" });
+      if (
+        roomsWithOccupiedBeds.length > 0 &&
+        newNumRooms < roomsWithOccupiedBeds.length
+      ) {
+        enqueueSnackbar(
+          "Cannot decrease the number of rooms with occupied beds",
+          { variant: "error" }
+        );
         return; // Prevent reducing the number of rooms if there are occupied beds
       }
     }
-  
+
     // If no occupied beds, proceed with updating the number of rooms
     setNumRooms(newNumRooms);
     setRooms((prevRooms) => {
       const currentRooms = [...prevRooms];
-  
+
       if (newNumRooms > currentRooms.length) {
         // Add new rooms
         const additionalRooms = Array.from(
@@ -990,25 +1006,28 @@ export default function AddPropertyType({
         const roomsWithOccupiedBeds = currentRooms.filter((room) =>
           room.beds.some((bed) => bed.status === "Occupied")
         );
-  
+
         // If there are more rooms than newNumRooms, we will slice off the non-occupied rooms.
-        const availableRoomsToRemove = currentRooms.filter((room) =>
-          !room.beds.some((bed) => bed.status === "Occupied")
+        const availableRoomsToRemove = currentRooms.filter(
+          (room) => !room.beds.some((bed) => bed.status === "Occupied")
         );
-  
+
         // Take the rooms that have occupied beds and add as many non-occupied rooms as possible
         const remainingRooms = [
           ...roomsWithOccupiedBeds,
-          ...availableRoomsToRemove.slice(0, newNumRooms - roomsWithOccupiedBeds.length),
+          ...availableRoomsToRemove.slice(
+            0,
+            newNumRooms - roomsWithOccupiedBeds.length
+          ),
         ];
-  
+
         return remainingRooms;
       }
-  
+
       // No change in room count
       return currentRooms;
     });
-  
+
     // Clear the error message when there's a valid value
     setErrors((prevErrors) => {
       const updatedErrors = { ...prevErrors };
@@ -1016,7 +1035,6 @@ export default function AddPropertyType({
       return updatedErrors;
     });
   };
-  
 
   const handleBedCountChange = (roomIndex, count) => {
     setRooms((prevRooms) => {
@@ -1165,12 +1183,12 @@ export default function AddPropertyType({
   // this is for apartment
   const handleIsMoveOut = (event) => {
     setIsMovingOut(event.target.checked);
-  }
+  };
 
   const handleDateChange = (value) => {
     setMoveOutDate(value);
   };
-  
+
   //this is for boarding house
   const handleIsMoveOutBh = (roomIndex, bedIndex, event) => {
     setMoveOutStatus((prevState) => {
@@ -1179,7 +1197,7 @@ export default function AddPropertyType({
       return updatedState;
     });
   };
-  
+
   const handleDateChangeBh = (roomIndex, bedIndex, newValue) => {
     setBhMoveOutDates((prevState) => {
       const updatedState = [...prevState];
@@ -1187,8 +1205,7 @@ export default function AddPropertyType({
       return updatedState;
     });
   };
-  
-  
+
   return (
     <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5, mb: 3 }}>
       <AddButton
@@ -1248,10 +1265,10 @@ export default function AddPropertyType({
                 fontWeight: 560,
                 letterSpacing: 1,
                 textTransform: "uppercase",
-                mb:3
+                mb: 3,
               }}
             >
-              {editItem ? 'Edit Unit Information' : 'Add Rental Unit'}
+              {editItem ? "Edit Unit Information" : "Add Rental Unit"}
             </Typography>
             <Box component="form" onSubmit={handleSubmit} noValidate>
               <FormControl fullWidth margin="normal" sx={{ mt: "-0.1rem" }}>
@@ -1266,8 +1283,18 @@ export default function AddPropertyType({
                   onChange={handleChange}
                 >
                   {/* <MenuItem >clear</MenuItem> */}
-                  <MenuItem disabled={editItem && selectedProperty === 'Boarding House'} value="Apartment">Apartment</MenuItem>
-                  <MenuItem disabled={editItem && selectedProperty === 'Apartment'} value="Boarding House">Boarding House</MenuItem>
+                  <MenuItem
+                    disabled={editItem && selectedProperty === "Boarding House"}
+                    value="Apartment"
+                  >
+                    Apartment
+                  </MenuItem>
+                  <MenuItem
+                    disabled={editItem && selectedProperty === "Apartment"}
+                    value="Boarding House"
+                  >
+                    Boarding House
+                  </MenuItem>
                 </Select>
               </FormControl>
 
@@ -1309,7 +1336,7 @@ export default function AddPropertyType({
                       id="apartment-name"
                       label="Unit Name"
                       name="apartmentname"
-                      value={newApartment.apartmentname || ''}
+                      value={newApartment.apartmentname || ""}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1325,7 +1352,7 @@ export default function AddPropertyType({
                       id="no-of-rooms"
                       label="No. of Rooms"
                       name="numberofrooms"
-                      value={newApartment.numberofrooms || ''}
+                      value={newApartment.numberofrooms || ""}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1351,7 +1378,7 @@ export default function AddPropertyType({
                       id="rental-fee"
                       label="Rental Fee"
                       name="rentalfee"
-                      value={newApartment.rentalfee || ''}
+                      value={newApartment.rentalfee || ""}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1377,7 +1404,7 @@ export default function AddPropertyType({
                       id="capacity"
                       label="Capacity"
                       name="capacity"
-                      value={newApartment.capacity || ''}
+                      value={newApartment.capacity || ""}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1402,7 +1429,7 @@ export default function AddPropertyType({
                       id="payor"
                       label="Payor Name"
                       name="payorname"
-                      value={newApartment.payorname || ''}
+                      value={newApartment.payorname || ""}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1420,7 +1447,9 @@ export default function AddPropertyType({
                       required
                       fullWidth
                       error={Boolean(errors.apartmentstatus)}
-                      disabled={editItem && newApartment.apartmentstatus === "Occupied"}
+                      disabled={
+                        editItem && newApartment.apartmentstatus === "Occupied"
+                      }
                     >
                       <InputLabel
                         error={Boolean(errors.apartmentstatus)}
@@ -1432,18 +1461,19 @@ export default function AddPropertyType({
                         required
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        value={newApartment.apartmentstatus || ''}
+                        value={newApartment.apartmentstatus || ""}
                         name="apartmentstatus"
                         label="Status"
                         error={Boolean(errors.apartmentstatus)}
                         onChange={handleChangeApartment}
                       >
                         <MenuItem value="Available">Available</MenuItem>
-                        {editItem && newApartment.apartmentstatus === "Occupied" && (
-                          <MenuItem value="Occupied" disabled>
-                            Occupied
-                          </MenuItem>
-                        )}
+                        {editItem &&
+                          newApartment.apartmentstatus === "Occupied" && (
+                            <MenuItem value="Occupied" disabled>
+                              Occupied
+                            </MenuItem>
+                          )}
                       </Select>
                       {errors.apartmentstatus && (
                         <FormHelperText
@@ -1461,32 +1491,37 @@ export default function AddPropertyType({
                   </Grid>
 
                   {newApartment.apartmentstatus === "Occupied" && (
-                  <Grid item xs={12} sx={{mb:1}}>
-                    <Box sx={{display:'inline-flex', alignItems:'center'}}>
-                    <Checkbox
-                      checked={isMovingOut}
-                      onChange={handleIsMoveOut}
-                    />
-                    <Typography
-                    sx={{
-                      fontSize: "0.995rem",
-                      color:'#263238',
-                      fontWeight:500
-                    }}
-                    >
-                      Tenan&apos;t is moving out?
-                    </Typography>
-                    </Box>
-                  </Grid>
+                    <Grid item xs={12} sx={{ mb: 1 }}>
+                      <Box
+                        sx={{ display: "inline-flex", alignItems: "center" }}
+                      >
+                        <Checkbox
+                          checked={isMovingOut}
+                          onChange={handleIsMoveOut}
+                        />
+                        <Typography
+                          sx={{
+                            fontSize: "0.995rem",
+                            color: "#263238",
+                            fontWeight: 500,
+                          }}
+                        >
+                          Tenan&apos;t is moving out?
+                        </Typography>
+                      </Box>
+                    </Grid>
                   )}
 
                   {isMovingOut && (
                     <Grid item xs={12}>
-                      <LocalizationProvider error={Boolean(errors.payment_date)} dateAdapter={AdapterDayjs} >
+                      <LocalizationProvider
+                        error={Boolean(errors.payment_date)}
+                        dateAdapter={AdapterDayjs}
+                      >
                         <DatePicker
                           label="Move Out Date"
                           name="move_out_date"
-                          sx={{ width: '100%' }}
+                          sx={{ width: "100%" }}
                           value={moveOutDate}
                           onChange={(newValue) => handleDateChange(newValue)}
                           fullWidth
@@ -1518,7 +1553,7 @@ export default function AddPropertyType({
                       id="building-no"
                       label="Building No."
                       name="buildingno"
-                      value={newApartment.buildingno || ''}
+                      value={newApartment.buildingno || ""}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1533,7 +1568,7 @@ export default function AddPropertyType({
                       id="street"
                       label="Street"
                       name="street"
-                      value={newApartment.street || ''}
+                      value={newApartment.street || ""}
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
@@ -1881,7 +1916,7 @@ export default function AddPropertyType({
                       id="property-name"
                       label="Property Name"
                       name="boardinghousename"
-                      value={newboardinghouse.boardinghousename || ''}
+                      value={newboardinghouse.boardinghousename || ""}
                       onChange={handleChangeBoardinghouse}
                       margin="normal"
                       fullWidth
@@ -1948,7 +1983,7 @@ export default function AddPropertyType({
                       type="number"
                       name="numRooms"
                       value={numRooms}
-                      onChange={handleNumRoomsChange || ''}
+                      onChange={handleNumRoomsChange || ""}
                       inputProps={{ min: 1 }}
                       variant="outlined"
                       fullWidth
@@ -2095,7 +2130,7 @@ export default function AddPropertyType({
                                             e.preventDefault();
                                           }
                                         }}
-                                        value={bed.price || ''}
+                                        value={bed.price || ""}
                                         onChange={(e) =>
                                           handleBedPrice(
                                             roomIndex,
@@ -2193,17 +2228,34 @@ export default function AddPropertyType({
                                         <RemoveCircleOutlineOutlinedIcon color="warning" />
                                       </IconButton>
                                     </CustomTooltip>
-                                    
                                   </Box>
-                                  {bed.status.toLocaleLowerCase() === "occupied" && (
+                                  {bed.status.toLocaleLowerCase() ===
+                                    "occupied" && (
                                     <Grid item xs={12} sx={{ mb: 1 }}>
-                                      <Box sx={{ display: "inline-flex", alignItems: "center" }}>
-                                      <Checkbox
-                                        checked={moveOutStatus[roomIndex]?.[bedIndex] || 
-                                        (bhMoveOutDates[roomIndex]?.[bedIndex] !== null) || 
-                                        false}
-                                        onChange={(e) => handleIsMoveOutBh(roomIndex, bedIndex, e)}
-                                      />
+                                      <Box
+                                        sx={{
+                                          display: "inline-flex",
+                                          alignItems: "center",
+                                        }}
+                                      >
+                                        <Checkbox
+                                          checked={
+                                            moveOutStatus[roomIndex]?.[
+                                              bedIndex
+                                            ] ||
+                                            bhMoveOutDates[roomIndex]?.[
+                                              bedIndex
+                                            ] !== null ||
+                                            false
+                                          }
+                                          onChange={(e) =>
+                                            handleIsMoveOutBh(
+                                              roomIndex,
+                                              bedIndex,
+                                              e
+                                            )
+                                          }
+                                        />
                                         <Typography
                                           sx={{
                                             fontSize: "0.995rem",
@@ -2218,73 +2270,119 @@ export default function AddPropertyType({
                                   )}
 
                                   {/* Move-out Date Picker */}
-                                  {(moveOutStatus[roomIndex]?.[bedIndex] || bhMoveOutDates[roomIndex]?.[bedIndex]) && (
+                                  {(moveOutStatus[roomIndex]?.[bedIndex] ||
+                                    bhMoveOutDates[roomIndex]?.[bedIndex]) && (
                                     <Grid item xs={12}>
                                       {bhMoveOutDates[roomIndex]?.[bedIndex] ? (
-                                        <Box 
-                                        sx={{
-                                          backgroundColor: '#e3f2fd', // Light gray-blue background
-                                          border: '1px solidrgb(213, 227, 247)', // Subtle border
-                                          borderRadius: '8px',         // Rounded corners
-                                          padding: '12px 16px',       // Comfortable padding
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: '8px', 
-                                          mb:3,                // Space between icon and text
-                                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', // Subtle shadow
-                                          marginTop: '8px',
-                                          width: 'fit-content',       // Only take up necessary width
-                                          '&:hover': {
-                                            backgroundColor: '#f1f5f9' // Slightly darker on hover
-                                          }
-                                        }}
+                                        <Box
+                                          sx={{
+                                            backgroundColor: "#e3f2fd", // Light gray-blue background
+                                            border:
+                                              "1px solidrgb(213, 227, 247)", // Subtle border
+                                            borderRadius: "8px", // Rounded corners
+                                            padding: "12px 16px", // Comfortable padding
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "8px",
+                                            mb: 3, // Space between icon and text
+                                            boxShadow:
+                                              "0 1px 2px rgba(0, 0, 0, 0.05)", // Subtle shadow
+                                            marginTop: "8px",
+                                            width: "fit-content", // Only take up necessary width
+                                            "&:hover": {
+                                              backgroundColor: "#f1f5f9", // Slightly darker on hover
+                                            },
+                                          }}
                                         >
-                                        {/* Calendar Icon */}
-                                          <svg 
-                                            width="20" 
-                                            height="20" 
-                                            viewBox="0 0 24 24" 
-                                            fill="none" 
-                                            stroke="currentColor" 
-                                            strokeWidth="2" 
-                                            strokeLinecap="round" 
+                                          {/* Calendar Icon */}
+                                          <svg
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
                                             strokeLinejoin="round"
-                                            style={{ color: '#64748b' }} // Icon color
+                                            style={{ color: "#64748b" }} // Icon color
                                           >
-                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                            <rect
+                                              x="3"
+                                              y="4"
+                                              width="18"
+                                              height="18"
+                                              rx="2"
+                                              ry="2"
+                                            ></rect>
+                                            <line
+                                              x1="16"
+                                              y1="2"
+                                              x2="16"
+                                              y2="6"
+                                            ></line>
+                                            <line
+                                              x1="8"
+                                              y1="2"
+                                              x2="8"
+                                              y2="6"
+                                            ></line>
+                                            <line
+                                              x1="3"
+                                              y1="10"
+                                              x2="21"
+                                              y2="10"
+                                            ></line>
                                           </svg>
-                                          
-                                          <Typography 
+
+                                          <Typography
                                             sx={{
-                                              fontSize: '0.925rem',
+                                              fontSize: "0.925rem",
                                               fontWeight: 500,
-                                              color: '#334155',      // Dark gray text
-                                              letterSpacing: '0.01em',
-                                              lineHeight: 1.5
+                                              color: "#334155", // Dark gray text
+                                              letterSpacing: "0.01em",
+                                              lineHeight: 1.5,
                                             }}
                                           >
-                                            <span style={{ color: '#64748b', marginRight: '4px' }}>Move-out date:</span>
-                                            {new Date(bhMoveOutDates[roomIndex][bedIndex]).toLocaleDateString('en-US', {
-                                              year: 'numeric',
-                                              month: 'long', 
-                                              day: 'numeric'
+                                            <span
+                                              style={{
+                                                color: "#64748b",
+                                                marginRight: "4px",
+                                              }}
+                                            >
+                                              Move-out date:
+                                            </span>
+                                            {new Date(
+                                              bhMoveOutDates[roomIndex][
+                                                bedIndex
+                                              ]
+                                            ).toLocaleDateString("en-US", {
+                                              year: "numeric",
+                                              month: "long",
+                                              day: "numeric",
                                             })}
                                           </Typography>
                                         </Box>
-                                      ):(
-                                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DatePicker
-                                          label="Move Out Date"
-                                          value={bhMoveOutDates[roomIndex][bedIndex]}
-                                          onChange={(newValue) =>
-                                            handleDateChangeBh(roomIndex, bedIndex, newValue)
-                                          }
-                                          fullWidth
-                                        />
-                                      </LocalizationProvider>
+                                      ) : (
+                                        <LocalizationProvider
+                                          dateAdapter={AdapterDayjs}
+                                        >
+                                          <DatePicker
+                                            label="Move Out Date"
+                                            value={
+                                              bhMoveOutDates[roomIndex][
+                                                bedIndex
+                                              ]
+                                            }
+                                            onChange={(newValue) =>
+                                              handleDateChangeBh(
+                                                roomIndex,
+                                                bedIndex,
+                                                newValue
+                                              )
+                                            }
+                                            fullWidth
+                                          />
+                                        </LocalizationProvider>
                                       )}
                                     </Grid>
                                   )}
@@ -2319,7 +2417,7 @@ export default function AddPropertyType({
                       id="building-no"
                       label="Building No."
                       name="buildingno"
-                      value={newboardinghouse.buildingno || ''}
+                      value={newboardinghouse.buildingno || ""}
                       onChange={handleChangeBoardinghouse}
                       margin="normal"
                       fullWidth
@@ -2333,7 +2431,7 @@ export default function AddPropertyType({
                       id="street"
                       label="Street"
                       name="street"
-                      value={newboardinghouse.street || ''}
+                      value={newboardinghouse.street || ""}
                       onChange={handleChangeBoardinghouse}
                       margin="normal"
                       fullWidth
@@ -2618,7 +2716,6 @@ export default function AddPropertyType({
                               </Box>
                             ))}
                           </Box>
-                          
                         ) : (
                           <Typography
                             variant="body1"
@@ -2671,7 +2768,11 @@ export default function AddPropertyType({
                   letterSpacing: "2px",
                 }}
               >
-                {isLoading ? <CircularProgress sx={{color:'white'}}/>  : 'Submit'}
+                {isLoading ? (
+                  <CircularProgress sx={{ color: "white" }} />
+                ) : (
+                  "Submit"
+                )}
               </Button>
               <Button
                 variant="outlined"
@@ -2720,8 +2821,8 @@ export default function AddPropertyType({
                   setSelectedInclusions([""]);
                   setNumRooms(1);
                   setRooms([{ beds: [{ type: "", status: "" }] }]);
-                  setMoveOutStatus([[false]]); 
-                  setBhMoveOutDates([[null]]); 
+                  setMoveOutStatus([[false]]);
+                  setBhMoveOutDates([[null]]);
                 }}
               >
                 Cancel

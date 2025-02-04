@@ -591,7 +591,7 @@ export default function TenantInformationTable({ setLoading, loading }) {
                             ))}
                         </StyledTableCell>
                         <StyledTableCell onClick={() => handleSort("startDate")}>
-                        Date Started{" "}
+                        Start Date{" "}
                         {sortConfig.key === "startDate" &&
                             (sortConfig.direction === "asc" ? (
                             <NorthIcon
@@ -617,7 +617,7 @@ export default function TenantInformationTable({ setLoading, loading }) {
                             ))}
                         </StyledTableCell>
                         <StyledTableCell onClick={() => handleSort("reported_issue")}>
-                        Issues Type{" "}
+                        Issue Type{" "}
                         {sortConfig.key === "reported_issue" &&
                             (sortConfig.direction === "asc" ? (
                             <NorthIcon

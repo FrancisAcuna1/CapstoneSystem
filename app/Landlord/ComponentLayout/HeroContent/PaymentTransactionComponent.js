@@ -37,7 +37,7 @@ const IncomeChartHeader = dynamic(
 );
 
 export default function PaymentTransactionComponent({ loading, setLoading }) {
-  const [selectedYear, setSelectedYear] = useState("2024");
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState("all");
   const [successful, setSuccessful] = useState(null);
   const [error, setError] = useState(null);
@@ -97,7 +97,7 @@ export default function PaymentTransactionComponent({ loading, setLoading }) {
   };
   // Example usage
   // const currentYear = new Date().getFullYear();
-  const years = generateYears(1999, 20);
+  const years = generateYears(1999, 30);
 
   return (
     <Box sx={{ maxWidth: 1400, margin: "auto" }}>

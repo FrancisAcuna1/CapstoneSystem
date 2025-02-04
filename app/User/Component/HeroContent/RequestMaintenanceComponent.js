@@ -93,7 +93,7 @@ export default function RequestMaintenanceComponent({ loading, setLoading }) {
             <Grid
             container
             spacing={1}
-            sx={{ mt: "-0.9rem", display: "flex", justifyContent: " center" }}
+            sx={{ mt: "-0.9rem", display: "flex", justifyContent: " end" }}
             >
             <Grid item xs={12} sm={6} md={4} lg={12}>
                 <SnackbarProvider maxSnack={3}>
@@ -116,7 +116,7 @@ export default function RequestMaintenanceComponent({ loading, setLoading }) {
                 <Paper
                 elevation={2}
                 sx={{
-                    maxWidth: { xs: 312, sm: 741, md: 940, lg: 1400 },
+                    maxWidth: { xs: 1400, sm: 741, md: 940, lg: 1400 },
                     padding: "1rem 0rem 0rem 0rem",
                     borderRadius: "8px",
                     marginTop: "2rem",

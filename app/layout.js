@@ -2,14 +2,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
-import {
-  ClerkProvider,
-  SignIn,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
-
 const inter = Inter({ subsets: ["latin"] });
 
 // export const metadata = {
@@ -21,37 +13,21 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <title>PropTrack</title>
+      {/* Basic SEO Metadata */}
+      <title>PropTrack | Home</title>
+      <meta name="description" content="PropTrack is an integrated property management and tenant communication system." />
+      <meta name="keywords" content="PropTrack, Property Management, Tenant System, Rental Management, Real Estate, Apartment Management" />
+      <meta name="author" content="Your Name or Company Name" />
+
+      {/* Favicon */}
+      <link rel="icon" href="/favicon.ico" />
       </head>
+    
       <body className={inter.className}>
         <SessionProvider>
             {children}
         </SessionProvider>
       </body>
     </html>
-    // <ClerkProvider
-
-    // >
-    //   <html lang="en">
-    //     <body className={inter.className}>
-    //       <SignedOut>
-    //         <SignIn
-    //           appearance={{
-    //             elements: {
-    //               // Hide the "Sign Up" button/link
-    //               formFieldAction__signUp: { display: 'none' },
-    //               // Hide the entire footer (Secured by Clerk)
-    //               cardFooter: { display: 'none' },
-    //             },
-    //           }}
-    //         />
-    //       </SignedOut>
-    //       <SignedIn>
-    //         <UserButton showName />
-    //         {children}
-    //       </SignedIn>
-    //     </body>
-    //   </html>
-    // </ClerkProvider>
   );
 }

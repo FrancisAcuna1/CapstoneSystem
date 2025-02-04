@@ -191,12 +191,14 @@ export default function EditTenantModal({
   });
 
   console.log("ID:", editItem);
-  console.log("EditItem:".formData);
+  console.log(allBarangays)
+  console.log(formData)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
+      'id': editItem, 
       [name]: value,
     });
   };
@@ -271,9 +273,7 @@ export default function EditTenantModal({
     return isValid;
   };
 
- 
-  console.log(allBarangays)
-  console.log(formData)
+
 
   const getUserToken = () => {
     const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
