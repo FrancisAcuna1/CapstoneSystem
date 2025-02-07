@@ -20,6 +20,8 @@ const GeneralTooltip = styled(({ className, ...props }) => (
     },
 });
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 // Municipality codes for Sorsogon
 const SORSOGON_MUNICIPALITIES = [
     { code: '056202000', name: 'Barcelona' },
@@ -249,7 +251,7 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
             setLoading(true);
             try{
 
-                const response = await fetch(`http://127.0.0.1:8000/api/apartment_tenant_registration`,{
+                const response = await fetch(`${API_URL}/apartment_tenant_registration`,{
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

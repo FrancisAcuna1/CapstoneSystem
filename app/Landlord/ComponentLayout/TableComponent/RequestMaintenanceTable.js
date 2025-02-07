@@ -161,6 +161,10 @@ const fetcher = async([url, token]) => {
   return response.json()
 }
 
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function MaintenanceRequestTable({
   loading,
   setLoading,
@@ -196,8 +200,8 @@ export default function MaintenanceRequestTable({
   }
   const token = getUserToken();
   const endPoint = selectedCategory === 'All'
-    ? `http://127.0.0.1:8000/api/maintenance_request_list`
-    : `http://127.0.0.1:8000/api/filter_maintenance/${selectedCategory}`;
+    ? `${API_URL}/maintenance_request_list`
+    : `${API_URL}/filter_maintenance/${selectedCategory}`;
 
   const {data: response, error, isLoading} = useSWR(
     token && [endPoint, token] || null,
@@ -231,7 +235,7 @@ export default function MaintenanceRequestTable({
     if (accessToken) {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/api/view_request/${id}`,
+          `${API_URL}/view_request/${id}`,
           {
             method: "GET",
             headers: {

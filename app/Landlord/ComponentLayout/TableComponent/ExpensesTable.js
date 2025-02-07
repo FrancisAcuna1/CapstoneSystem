@@ -178,6 +178,9 @@ const fetcherExpense = async([url, token, selectedMonth, selectedYear]) => {
   return response.json();
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function ExpensesTable({
   openRecurringModal,
   setOpenRecurringModal,
@@ -277,8 +280,8 @@ export default function ExpensesTable({
   }
   const token = getUserToken();
   const endpoint = selectedCategory === 'all'
-    ? "http://127.0.0.1:8000/api/get_all_expenses"
-    : `http://127.0.0.1:8000/api/filter_expenses/${selectedCategory}`;
+    ? `${API_URL}/get_all_expenses`
+    : `${API_URL}/filter_expenses/${selectedCategory}`;
 
   console.log(token)
   const {data: response, error, mutate, isLoading} = useSWR(
@@ -360,7 +363,7 @@ export default function ExpensesTable({
       setLoading(true);
       try {
       const response = await fetch(
-          `http://127.0.0.1:8000/api/markaspaid/${recurringId}`,
+          `${API_URL}/markaspaid/${recurringId}`,
           {
           method: "PUT",
           headers: {
@@ -409,7 +412,7 @@ export default function ExpensesTable({
       let data 
       for(const deleteId of selectedItem){
         try{
-          const response = await fetch(`http://127.0.0.1:8000/api/delete_expenses/${deleteId}`,{
+          const response = await fetch(`${API_URL}/delete_expenses/${deleteId}`,{
             method: "DELETE",
             headers: {
                 'Content-Type': 'application/json',

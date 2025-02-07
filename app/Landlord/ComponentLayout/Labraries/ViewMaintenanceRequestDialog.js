@@ -83,6 +83,9 @@ const fetchUnitAddress = async ([url, token]) => {
   return response.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 const MaintenanceRequestDialog = ({
   open,
   handleClose,
@@ -116,7 +119,7 @@ const MaintenanceRequestDialog = ({
     isLoading: isLoadingResponse,
   } = useSWR(
     (token && [
-      `http://127.0.0.1:8000/api/tenant_information_lease/${viewRequest.tenant_id}`,
+      `${API_URL}/tenant_information_lease/${viewRequest.tenant_id}`,
       token,
     ]) ||
       null,
@@ -149,7 +152,7 @@ const MaintenanceRequestDialog = ({
     if (accessToken) {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/api/accept_maintenance/${itemId}`,
+          `${API_URL}/accept_maintenance/${itemId}`,
           {
             method: "PUT",
             headers: {
@@ -193,7 +196,7 @@ const MaintenanceRequestDialog = ({
   const images =
     (viewRequest?.maintenance_images && viewRequest?.maintenance_images) || [];
   console.log("images:", images);
-  const imageBaseUrl = "http://127.0.0.1:8000/MaintenanceImages/"; // Adjust this based on your API endpoint
+  const imageBaseUrl = "https://sorciproptrack.com/MaintenanceImages/"; // Adjust this based on your API endpoint
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {

@@ -103,6 +103,8 @@ const fetcherProfileInfo = async ([url, token]) => {
   return response.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 const AdminProfileComponent = ({ setLoading, loading }) => {
     const { enqueueSnackbar } = useSnackbar();
     const [open, setOpen] = useState(false);
@@ -177,7 +179,7 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
         mutate,
     } = useSWR(
         accessToken && userId
-        ? [`http://127.0.0.1:8000/api/profile_image/${userId}`, accessToken]
+        ? [`${API_URL}/profile_image/${userId}`, accessToken]
         : null,
         fetcherProfileImage,
         {
@@ -204,7 +206,7 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
         isLoading: isLoadingUserInfo,
     } = useSWR(
         accessToken && userId
-        ? [`http://127.0.0.1:8000/api/tenant_information/${userId}`, accessToken]
+        ? [`${API_URL}/tenant_information/${userId}`, accessToken]
         : null,
         fetcherProfileInfo,
         {
@@ -237,7 +239,7 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
             setLoading(true);
             try {
             const response = await fetch(
-                "http://127.0.0.1:8000/api/add_profile_image",
+                `${API_URL}/add_profile_image`,
                 {
                 method: "POST",
                 headers: {
@@ -311,7 +313,7 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
             setLoading(false);
             return;
         }
-        const response = await fetch(`http://127.0.0.1:8000/api/generate_otp`, {
+        const response = await fetch(`${API_URL}/generate_otp`, {
             method: "POST",
             headers: {
             "Content-Type": "application/json",
@@ -351,7 +353,7 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
         try {
             const otpValue = otpInput.join("");
             const response = await fetch(
-            `http://127.0.0.1:8000/api/change_password`,
+            `${API_URL}/change_password`,
             {
                 method: "PUT",
                 headers: {
@@ -396,7 +398,7 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
         if (accessToken) {
         setLoading(true);
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/resend_otp", {
+            const response = await fetch(`${API_URL}/resend_otp`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -448,7 +450,7 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
             }
 
             const response = await fetch(
-            `http://127.0.0.1:8000/api/change_username`,
+            `${API_URL}/change_username`,
             {
                 method: "PUT",
                 headers: {
@@ -527,7 +529,7 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
     };
 
     const avatarSrc = profileImage
-        ? `http://127.0.0.1:8000/ProfileImages/${profileImage.image_path}`
+        ? `https://sorciproptrack.com/ProfileImages/${profileImage.image_path}`
         : null;
 
     return (

@@ -90,6 +90,7 @@ const legendItem = [
     {label: 'Upcoming', color: '#263238', tooltip: "Upcoming payment due date" },
 ]
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 export default function UpComingDuedates({propId, openDialog, handleDialogClose, setLoading, loading}){
     const [accessToken, setAccessToken] = useState([])
@@ -120,7 +121,7 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
     }, []);
 
     const {data:response, error: errorResponse, isLoading: isLoadingResponse} = useSWR(
-        accessToken && [`http://127.0.0.1:8000/api/get_all_units/${propId}`, accessToken] || null,
+        accessToken && [`${API_URL}/get_all_units/${propId}`, accessToken] || null,
         fetcher, {
             refreshInterval: 5000,
             revalidateOnFocus: false,
@@ -196,7 +197,7 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
                     };
                     console.log(overdueEntry)
                     try{
-                        const response = await fetch("http://127.0.0.1:8000/api/store_delequent",{
+                        const response = await fetch(`${API_URL}/store_delequent`,{
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -247,7 +248,7 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
             try {
                 // Use Promise.all to fetch data for all tenant IDs concurrently
                 const fetchPromises = tenantIds.map(id =>
-                    fetch(`http://127.0.0.1:8000/api/get_delequent/${id}`, {
+                    fetch(`${API_URL}/get_delequent/${id}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${accessToken}`,

@@ -33,6 +33,8 @@ const fetcher = async([url, token,]) => {
     return response.json()
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function EditRecurringModal({
   openRecurringModal,
   handleCloseModal,
@@ -89,7 +91,7 @@ export default function EditRecurringModal({
     }
     const token = getUserToken();
     const {data: response, error} = useSWR(
-        token && editItemId ? [`http://127.0.0.1:8000/api/edit_recurring/${editItemId}`, token] : null,
+        token && editItemId ? [`${API_URL}/edit_recurring/${editItemId}`, token] : null,
         fetcher, {
             refreshInterval: 1000,
             revalidateOnFocus: false,
@@ -123,7 +125,7 @@ export default function EditRecurringModal({
 
         if (accessToken) {
         const response = await fetch(
-            `http://127.0.0.1:8000/api/update_recurring/${editItemId}`,
+            `${API_URL}/update_recurring/${editItemId}`,
             {
             method: "PUT",
             headers: {

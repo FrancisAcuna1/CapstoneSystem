@@ -57,6 +57,7 @@ const ValueChangeIndicator = styled(Box)(({ theme, positive }) => ({
     fontWeight: 600,
     marginLeft: theme.spacing(1),
   }));
+
 const fetcher = async ([url, token]) => {
   const response = await fetch(url, {
     method: "GET",
@@ -70,6 +71,9 @@ const fetcher = async ([url, token]) => {
   }
   return response.json();
 };
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 
 export default function StatusCards({ loading, setLoading }) {
     const [countStatus, setCountStatus] = useState([]);
@@ -89,7 +93,7 @@ export default function StatusCards({ loading, setLoading }) {
         error,
         isLoading,
     } = useSWR(
-        (token && [`http://127.0.0.1:8000/api/count_status`, token]) || null,
+        (token && [`${API_URL}/count_status`, token]) || null,
         fetcher,
         {
         refreshInterval: 5000,

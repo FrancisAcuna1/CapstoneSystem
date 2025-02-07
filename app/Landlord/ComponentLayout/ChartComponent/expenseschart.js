@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 // import Chart from "react-apexcharts";
 import dynamic from 'next/dynamic';
 const ChartNoSSR = dynamic(() => import('react-apexcharts'), { ssr: false });
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 
 export default function ExpenseChart ({selectedMonth, selectedYear}){
@@ -40,7 +41,7 @@ export default function ExpenseChart ({selectedMonth, selectedYear}){
 
         if(accessToken){
             try{
-                const response = await fetch('http://127.0.0.1:8000/api/expenses_statistic', {
+                const response = await fetch(`${API_URL}/expenses_statistic`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

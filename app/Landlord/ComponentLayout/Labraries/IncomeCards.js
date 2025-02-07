@@ -97,6 +97,8 @@ const fetcherIncomeStats = async ([url, token, selectedYear]) => {
     return response.json();
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 
 export default function IncomeCards({selectedMonth, selectedYear, setLoading, loading}){
     const [income, setIncome] = useState([])
@@ -142,7 +144,7 @@ export default function IncomeCards({selectedMonth, selectedYear, setLoading, lo
 
     const token = getUserToken();
     const {data: incomeResponse, error: incomeError, isLoading: incomeLoading} = useSWR(
-        token && selectedMonth && selectedYear ? [`http://127.0.0.1:8000/api/calculate_income`, token, selectedMonth, selectedYear] : null,
+        token && selectedMonth && selectedYear ? [`${API_URL}/calculate_income`, token, selectedMonth, selectedYear] : null,
         fetcherIncome, {
             refreshInterval: 60000,
             revalidateOnFocus: false,
@@ -163,7 +165,7 @@ export default function IncomeCards({selectedMonth, selectedYear, setLoading, lo
     }, [incomeResponse, incomeLoading, setLoading]);
 
     const {data: statsResponse, error: statsErros, isLoading: statsloading} = useSWR(
-        token && selectedMonth && selectedYear ? [`http://127.0.0.1:8000/api/income_statistic`, token, selectedYear] : null,
+        token && selectedMonth && selectedYear ? [`${API_URL}/income_statistic`, token, selectedYear] : null,
         fetcherIncomeStats, {
             refreshInterval: 5000,
             revalidateOnFocus: false,

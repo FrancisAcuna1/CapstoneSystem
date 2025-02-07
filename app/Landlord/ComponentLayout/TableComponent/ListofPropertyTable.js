@@ -125,6 +125,8 @@ const Search = styled('div')(({ theme }) => ({
   });
 
  
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
   
 export default function UnitListTable({propertyId, error, setError, loading, setLoading, setSuccessful, handleEdit, refreshTrigger, onRefresh}){
   const router = useRouter();
@@ -162,12 +164,12 @@ export default function UnitListTable({propertyId, error, setError, loading, set
           try{
               setLoading(true);
               const url = selectedCategory === "Apartment"
-              ? `http://127.0.0.1:8000/api/property/${propsid}/all_apartment`
+              ? `${API_URL}/property/${propsid}/all_apartment`
               : selectedCategory === "Boardinghouse"
-              ? `http://127.0.0.1:8000/api/property/${propsid}/all_boardinghouse`
+              ? `${API_URL}/property/${propsid}/all_boardinghouse`
               : selectedCategory === "Available" || selectedCategory === "Occupied"
-              ? `http://127.0.0.1:8000/api/property/${propsid}/${selectedCategory}`
-              : `http://127.0.0.1:8000/api/all_property/${propsid}`;
+              ? `${API_URL}/property/${propsid}/${selectedCategory}`
+              : `${API_URL}/all_property/${propsid}`;
 
 
               const response = await fetch(url,{
@@ -183,37 +185,37 @@ export default function UnitListTable({propertyId, error, setError, loading, set
               const data = await response.json();
 
               if(response.ok){
-                  console.log('Data:', data)
-                  if(selectedCategory === "All"){
-                    setPropertyData({address: {
-                      street: data['0']?.street || '',
-                      barangay: data['0']?.barangay || '',
-                      municipality: data['0']?.municipality || ''
-                  },
-                   apartments: data['0']?.apartments || [], 
-                   boarding_houses: data['1'] || []});
-                    
-                  }else if (selectedCategory === "Available" || selectedCategory === "Occupied"){
-                    setPropertyData({apartments: data?.status || [], boarding_houses: data?.[0] || []});
-                  }else if (selectedCategory === "Apartment"){
-                    setPropertyData({apartments: data?.data || [],  boarding_houses: [],});
-                  }else{
-                    setPropertyData({apartments: [], boarding_houses: data?.data || []});
-                  }
-                
-                  // setBoardingHouse(data['1']);
-                  // setPropertyType(data);
+                console.log('Data:', data)
+                if(selectedCategory === "All"){
+                  setPropertyData({address: {
+                    street: data['0']?.street || '',
+                    barangay: data['0']?.barangay || '',
+                    municipality: data['0']?.municipality || ''
+                },
+                  apartments: data['0']?.apartments || [], 
+                  boarding_houses: data['1'] || []});
+                  
+                }else if (selectedCategory === "Available" || selectedCategory === "Occupied"){
+                  setPropertyData({apartments: data?.status || [], boarding_houses: data?.[0] || []});
+                }else if (selectedCategory === "Apartment"){
+                  setPropertyData({apartments: data?.data || [],  boarding_houses: [],});
+                }else{
+                  setPropertyData({apartments: [], boarding_houses: data?.data || []});
+                }
+              
+                // setBoardingHouse(data['1']);
+                // setPropertyType(data);
               }
               else{
-                  console.log('Error:', response.status)
+                console.log('Error:', response.status)
               }
 
           }catch (error) {
-              console.error("Error fetching data:", error);
+            console.error("Error fetching data:", error);
              
 
-          } finally {
-              setLoading(false); // Set loading to false regardless of success or failure
+          }finally {
+            setLoading(false); // Set loading to false regardless of success or failure
           }
       }
 
@@ -275,8 +277,8 @@ export default function UnitListTable({propertyId, error, setError, loading, set
         try{
           setDeleting(true);
           const endpoint = property_type === "Apartment"
-          ? `http://127.0.0.1:8000/api/delete_apartment/${id}`
-          : `http://127.0.0.1:8000/api/delete_boardinghouse/${id}`;
+          ? `${API_URL}/delete_apartment/${id}`
+          : `${API_URL}/delete_boardinghouse/${id}`;
   
           const response = await fetch(endpoint, {
             method: "DELETE",

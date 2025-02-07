@@ -19,6 +19,7 @@ const fetcherUnitInfo = async ([url, token]) => {
     return response.json();
 };  
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading, loading}){
     const {enqueueSnackbar} = useSnackbar();
@@ -64,7 +65,7 @@ export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading,
 
     const {data: responseUnitinfo, error: errorResponse, isLoading: isLoadingUnitInfo} = useSWR(
         accessToken && userId 
-        ? [`http://127.0.0.1:8000/api/tenant_unit_info/${userId}`, accessToken] 
+        ? [`${API_URL}/tenant_unit_info/${userId}`, accessToken] 
         : null,
         fetcherUnitInfo, {
             refreshInterval: 60000,
@@ -109,7 +110,7 @@ export default function RemarksForm({open, setRemarksOpen, cancelId, setLoading,
                     newErrors.remarks = 'Remarks must be at least 10 characters long';
                 } 
                 
-                const response = await fetch(`http://127.0.0.1:8000/api/cancel_request/${cancelId}`, {
+                const response = await fetch(`${API_URL}/cancel_request/${cancelId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

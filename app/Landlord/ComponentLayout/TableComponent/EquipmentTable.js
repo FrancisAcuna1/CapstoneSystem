@@ -147,6 +147,9 @@ const unitsData = [
   { id: 15, name: "Unit 101" },
 ];
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function EquipmentTable({
   handleEdit,
   setSuccessful,
@@ -184,7 +187,7 @@ export default function EquipmentTable({
         try {
           setLoading(true);
           const response = await fetch(
-            "http://127.0.0.1:8000/api/inclusion_list",
+            `${API_URL}/inclusion_list`,
             {
               method: "GET",
               headers: {
@@ -260,7 +263,7 @@ export default function EquipmentTable({
       for (const id of idsToDelete) {
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/api/delete_inclusion/${id}`,
+            `${API_URL}/delete_inclusion/${id}`,
             {
               method: "DELETE",
               headers: {
@@ -494,7 +497,7 @@ export default function EquipmentTable({
                     onChange={handleSelectAllClick}
                     indeterminate={
                       selectedItem.length > 0 &&
-                      selectedItem.length < unitsData.length
+                      selectedItem.length < inclusionList.length
                     }
                     inputProps={{
                       "aria-label": "select all desserts",

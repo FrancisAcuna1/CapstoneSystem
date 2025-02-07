@@ -250,6 +250,9 @@ const fetcherUnitInfo = async ([url, token]) => {
   return response.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function RequestMaintenanceForm({
   setLoading,
   loading,
@@ -338,7 +341,7 @@ export default function RequestMaintenanceForm({
     isLoading: isLoadingUnitInfo,
   } = useSWR(
     accessToken && userId
-      ? [`http://127.0.0.1:8000/api/tenant_unit_info/${userId}`, accessToken]
+      ? [`${API_URL}/tenant_unit_info/${userId}`, accessToken]
       : null,
     fetcherUnitInfo,
     {
@@ -365,7 +368,7 @@ export default function RequestMaintenanceForm({
     isLoading: isLoadingEdit,
   } = useSWR(
     accessToken && editId
-      ? [`http://127.0.0.1:8000/api/edit_request/${editId}`, accessToken]
+      ? [`${API_URL}/edit_request/${editId}`, accessToken]
       : null,
     fetcher,
     {
@@ -398,7 +401,7 @@ export default function RequestMaintenanceForm({
           maintenance_id: image.maintenance_id,
           expenses_id: image.expenses_id,
           image_path: image.image_path,
-          preview: `http://127.0.0.1:8000/MaintenanceImages/${image.image_path}`, // Create a preview URL
+          preview: `https://sorciproptrack.com/MaintenanceImages/${image.image_path}`, // Create a preview URL
         }));
 
         setSelectedImage(imagesWithPreview);
@@ -484,8 +487,8 @@ export default function RequestMaintenanceForm({
         }
         setLoading(true);
         const endPoint = editId
-        ? `http://127.0.0.1:8000/api/update_request/${editId}`
-        : `http://127.0.0.1:8000/api/requestmaintenance`;
+        ? `${API_URL}/update_request/${editId}`
+        : `${API_URL}/requestmaintenance`;
 
         const response = await fetch(endPoint, {
           method: "POST",
@@ -836,7 +839,7 @@ export default function RequestMaintenanceForm({
                       <Image
                         src={
                           image.preview ||
-                          `http://127.0.0.1:8000/MaintenanceImages/${image.path}`
+                          `https://sorciproptrack.com/MaintenanceImages/${image.path}`
                         }
                         alt={image.name}
                         width={500}

@@ -134,6 +134,9 @@ const GeneralTooltip = styled(({ className, ...props }) => (
   },
 });
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function TenantInformationTable({ setLoading, loading }) {
     const router = useRouter();
     const [anchorEl, setAnchorEl] = useState(null);
@@ -166,8 +169,8 @@ export default function TenantInformationTable({ setLoading, loading }) {
             try {
             const url =
                 selectedCategory === "All"
-                ? `http://127.0.0.1:8000/api/get_status`
-                : `http://127.0.0.1:8000/api/filter_status/${selectedCategory}`;
+                ? `${API_URL}/get_status`
+                : `${API_URL}/filter_status/${selectedCategory}`;
 
             const response = await fetch(url, {
                 method: "GET",

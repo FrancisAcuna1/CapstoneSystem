@@ -149,18 +149,21 @@ const GeneralTooltip = styled(({ className, ...props }) => (
 });
 
 const fetcher = async([url, token]) => {
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-    })
-    if(!response.ok){
-        throw new Error(response.statusText)
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     }
-    return response.json();
+  })
+  if(!response.ok){
+    throw new Error(response.statusText)
+  }
+  return response.json();
 }
+
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 export default function TenantInformationTable({
   setLoading,
@@ -190,8 +193,8 @@ export default function TenantInformationTable({
   }
   const token = getUserToken();
   const endpoint = selectedCategory === 'All'
-    ?  "http://127.0.0.1:8000/api/tenant_list"
-    : `http://127.0.0.1:8000/api/filter_tenant_list/${selectedCategory}`
+    ? `${API_URL}/tenant_list`
+    : `${API_URL}/filter_tenant_list/${selectedCategory}`
   
   const {data: response, error, isLoading, mutate} = useSWR(
     token && selectedCategory ? [endpoint, token] : null,
@@ -226,7 +229,7 @@ export default function TenantInformationTable({
       for(const tenantId of selectedItem){
         setLoading(true);
         try{
-          const response = await fetch(`http://127.0.0.1:8000/api/delete_tenant_information/${tenantId}`, {
+          const response = await fetch(`${API_URL}/delete_tenant_information/${tenantId}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',

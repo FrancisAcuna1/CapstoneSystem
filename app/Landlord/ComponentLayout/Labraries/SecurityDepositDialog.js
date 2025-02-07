@@ -47,8 +47,7 @@ const fetcherDelinquent = async([url, token]) => {
     return response.json();
 }   
 
-
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 export default function SecurityDepositDialog({open, handleClose, tenantId, setLoading, loading, payorList, formatDueDate}) { 
   const { enqueueSnackbar } = useSnackbar();
@@ -78,7 +77,7 @@ export default function SecurityDepositDialog({open, handleClose, tenantId, setL
 
   const {data: responseDeposit, error: errorDeposit, isLoading: isLoadingDeposit} = useSWR(
     accessToken && tenantId 
-    ? [`http://127.0.0.1:8000/api/security_deposit/${tenantId}`, accessToken]
+    ? [`${API_URL}/security_deposit/${tenantId}`, accessToken]
     : null,
     fetcherSecurityDeposit, {
       refreshInterval: 3000,
@@ -101,7 +100,7 @@ export default function SecurityDepositDialog({open, handleClose, tenantId, setL
 
   const {data: responseDelinquent, error: errorDeliquent, isLoading: isLoadingDeliquent} = useSWR(
     accessToken && tenantId 
-    ? [`http://127.0.0.1:8000/api/get_delequent/${tenantId}`, accessToken]
+    ? [`${API_URL}/get_delequent/${tenantId}`, accessToken]
     : null,
     fetcherDelinquent, {
       refreshInterval: 3000,
@@ -131,7 +130,7 @@ export default function SecurityDepositDialog({open, handleClose, tenantId, setL
     if(accessToken){
         setLoading(true)
         try{
-            const response = await fetch(`http://127.0.0.1:8000/api/paid_by_deposit/${tenantId}`, {
+            const response = await fetch(`${API_URL}/paid_by_deposit/${tenantId}`, {
                 method: 'POST',
                 headers:{
                     "Content-Type": "application/json",

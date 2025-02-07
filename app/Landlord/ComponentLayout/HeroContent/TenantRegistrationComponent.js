@@ -20,6 +20,7 @@ function srcset(image, width, height, rows = 1, cols = 1) {
     };
   }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 export default function TenantRegistrationComponent({propsId, apartmentId, loading, setLoading}){
     const apartmentID = apartmentId; // apartment ID
@@ -46,7 +47,7 @@ export default function TenantRegistrationComponent({propsId, apartmentId, loadi
 
                 try{
                     setLoading(true);
-                    const response = await fetch(`http://127.0.0.1:8000/api/property/${propsID}/details/${apartmentID}`,{
+                    const response = await fetch(`${API_URL}/property/${propsID}/details/${apartmentID}`,{
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${accessToken}`,
@@ -232,7 +233,7 @@ export default function TenantRegistrationComponent({propsId, apartmentId, loadi
                                     }}
                                     >
                                     <Image
-                                        src={`http://127.0.0.1:8000/ApartmentImage/${image.image_path}`}
+                                        src={`https://sorciproptrack.com/ApartmentImage/${image.image_path}`}
                                         alt={`Apartment image ${index + 1}`}
                                         layout="fill"
                                         objectFit="cover"

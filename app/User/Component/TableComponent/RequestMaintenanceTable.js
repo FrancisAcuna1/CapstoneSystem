@@ -131,6 +131,8 @@ const fetcher = async([url, token]) => {
     return response.json();
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function RequestMaintenanceTable({
   loading,
   setLoading,
@@ -174,8 +176,8 @@ export default function RequestMaintenanceTable({
     }, []);
 
     const endPoint = selectedCategory === 'All'
-        ? `http://127.0.0.1:8000/api/requested_maintenance_list/${userId}`
-        : `http://127.0.0.1:8000/api/filter_maintenance/${selectedCategory}/${userId}`
+        ? `${API_URL}/requested_maintenance_list/${userId}`
+        : `${API_URL}/filter_maintenance/${selectedCategory}/${userId}`
 
     const {data: response, error, isLoading} = useSWR(
         userId && userToken && selectedCategory

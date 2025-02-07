@@ -157,6 +157,8 @@ const Backdrop = React.forwardRef((props, ref) => {
   }
 
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function AddPaymentTransaction({open, handleOpen, handleClose, setLoading, setSuccessful, isEdit, editPayment, setEditPayment}){
     const { enqueueSnackbar } = useSnackbar();
     const [errors, setErrors] = useState({});
@@ -229,7 +231,7 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
     const token = getUserToken();
 
     const {data: response, error} = useSWR(
-        editPayment && [`http://127.0.0.1:8000/api/editpayment/${editPayment}`, token] || null,
+        editPayment && [`${API_URL}/editpayment/${editPayment}`, token] || null,
         fetcher, {
             refreshInterval: 1000,
             revalidateOnFocus: false,
@@ -259,7 +261,7 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
 
             if(accessToken){
                 try{
-                    const response = await fetch(`http://127.0.0.1:8000/api/listoftenants`,{
+                    const response = await fetch(`${API_URL}/listoftenants`,{
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -310,8 +312,8 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
             try{
                 const method = editPayment ? 'PUT' : 'POST';
                 const endpoint = editPayment 
-                ? `http://127.0.0.1:8000/api/updatepayment/${editPayment}`  
-                : 'http://127.0.0.1:8000/api/storepayment' 
+                ? `${API_URL}/updatepayment/${editPayment}`  
+                : `${API_URL}/storepayment`
                     
                 const response = await fetch(endpoint,{
                 method,

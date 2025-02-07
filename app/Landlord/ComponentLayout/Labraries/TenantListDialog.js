@@ -103,6 +103,9 @@ const fetcherPaymentInfo = async ([url, token]) => {
   return response.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function TenantListDialog({
   openDialog,
   handleCloseDialog,
@@ -163,7 +166,7 @@ export default function TenantListDialog({
   } = useSWR(
     accessToken && selectedUnit.id && selectedUnit.property_type
       ? [
-          `http://127.0.0.1:8000/api/get_payor_list/${selectedUnit.id}/${selectedUnit.property_type}`,
+          `${API_URL}/get_payor_list/${selectedUnit.id}/${selectedUnit.property_type}`,
           accessToken,
         ]
       : null,
@@ -193,7 +196,7 @@ export default function TenantListDialog({
   } = useSWR(
     accessToken && selectedUnit.id && selectedUnit.property_type
       ? [
-          `http://127.0.0.1:8000/api/get_tenant_payment/${selectedUnit.id}/${selectedUnit.property_type}`,
+          `${API_URL}/get_tenant_payment/${selectedUnit.id}/${selectedUnit.property_type}`,
           accessToken,
         ]
       : null,
@@ -343,7 +346,7 @@ export default function TenantListDialog({
 
         for (const paymentData of selectedTenantsData) {
           const response = await fetch(
-            `http://127.0.0.1:8000/api/storepayment`,
+            `${API_URL}/storepayment`,
             {
               method: "POST",
               headers: {
@@ -641,7 +644,7 @@ export default function TenantListDialog({
           };
           try {
             const response = await fetch(
-              "http://127.0.0.1:8000/api/store_delequent",
+              `${API_URL}/store_delequent`,
               {
                 method: "POST",
                 headers: {
@@ -734,7 +737,7 @@ export default function TenantListDialog({
           payorList.map(async (payor) => {
             try {
               const response = await fetch(
-                `http://127.0.0.1:8000/api/get_delequent/${payor.tenant.id}`,
+                `${API_URL}/get_delequent/${payor.tenant.id}`,
                 {
                   method: "GET",
                   headers: {

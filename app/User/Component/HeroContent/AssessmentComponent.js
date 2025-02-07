@@ -91,6 +91,9 @@ const fetcherDelinquentInformation = async ([url, token]) => {
   return response.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function AssessmentFeeComponent({ setLoading, loading }) {
   const [userId, setUserId] = useState([]);
   const [accessToken, setAccessToken] = useState([]);
@@ -116,7 +119,7 @@ export default function AssessmentFeeComponent({ setLoading, loading }) {
   }, []);
 
   const { data: responseTenantInfo, error: errorTenantInfo, isLoading: isLoadingTenantInfo} = useSWR(
-    userId && accessToken ? [ `http://127.0.0.1:8000/api/tenant_information_lease/${userId}`,accessToken,]
+    userId && accessToken ? [ `${API_URL}/tenant_information_lease/${userId}`,accessToken,]
     : null,
     fetcherTenantInformation,
     {
@@ -143,7 +146,7 @@ export default function AssessmentFeeComponent({ setLoading, loading }) {
     isLoading: isLoadingPaymentInfo,
   } = useSWR(
     userId && accessToken
-      ? [`http://127.0.0.1:8000/api/tenant_payment/${userId}`, accessToken]
+      ? [`${API_URL}/tenant_payment/${userId}`, accessToken]
       : null,
     fetcherPaymentInformation,
     {
@@ -170,7 +173,7 @@ export default function AssessmentFeeComponent({ setLoading, loading }) {
     isLoading: isLoadingDeliquent,
   } = useSWR(
     userId && accessToken
-      ? [`http://127.0.0.1:8000/api/get_delequent/${userId}`, accessToken]
+      ? [`${API_URL}/get_delequent/${userId}`, accessToken]
       : null,
     fetcherDelinquentInformation,
     {

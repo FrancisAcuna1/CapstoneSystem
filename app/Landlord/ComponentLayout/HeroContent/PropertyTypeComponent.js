@@ -35,6 +35,9 @@ const AddButton = styled(Fab)(({ theme }) => ({
   },
 }));
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function PropertyTypeComponent({
   propertyId,
   loading,
@@ -63,7 +66,7 @@ export default function PropertyTypeComponent({
       if (accessToken) {
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/api/property_address/${propertyId}`,
+            `${API_URL}/property_address/${propertyId}`,
             {
               method: "GET",
               headers: {

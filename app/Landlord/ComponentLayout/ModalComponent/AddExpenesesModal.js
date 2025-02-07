@@ -200,6 +200,8 @@ const fetcherUnitList = async([url, token]) => {
   return response.json();
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function AddExpensesTransaction({
   open,
   handleOpen,
@@ -369,7 +371,7 @@ export default function AddExpensesTransaction({
 
   const token = getUserToken();
   const {data:response, error} = useSWR(
-    token && editItemId ? [`http://127.0.0.1:8000/api/edit/${editItemId}`, token] : null,
+    token && editItemId ? [`${API_URL}/edit/${editItemId}`, token] : null,
     fetcher, {
       refreshInterval: 1000,
       revalidateOnFocus: false,
@@ -396,7 +398,7 @@ export default function AddExpensesTransaction({
         const existingImages = value.expenses_images.map((img) => ({
           id: img.id,
           path: img.image_path,
-          preview: `http://127.0.0.1:8000/MaintenanceImages/${img.image_path}`, // Adjust URL as needed
+          preview: `https://sorciproptrack.com/MaintenanceImages/${img.image_path}`, // Adjust URL as needed
         }));
         setSelectedImage(existingImages);
       }
@@ -405,7 +407,7 @@ export default function AddExpensesTransaction({
   }, [response])
 
   const {data: unitResponse, error: unitError} = useSWR(
-    token && [ `http://127.0.0.1:8000/api/get_all_property`, token] || null, 
+    token && [ `${API_URL}/get_all_property`, token] || null, 
     fetcherUnitList, {
       refreshInterval: 1000,
       revalidateOnFocus: false,
@@ -461,7 +463,7 @@ export default function AddExpensesTransaction({
           endDate: dayjs(formData.endDate).format("MM/DD/YYYY"),
         });
 
-        endpoint = "http://127.0.0.1:8000/api/generate_recurring_expenses";
+        endpoint = `${API_URL}/generate_recurring_expenses`;
         contentType = "application/json";
       } else if (expensesCategory === "manual") {
         // For manual expenses
@@ -490,8 +492,8 @@ export default function AddExpensesTransaction({
         }
         formValue = formatData;
         endpoint = editItemId 
-        ? `http://127.0.0.1:8000/api/update_expenses/${editItemId}`
-        : "http://127.0.0.1:8000/api/store_expenses";
+        ? `${API_URL}/update_expenses/${editItemId}`
+        : `${API_URL}/store_expenses`;
         contentType = "multipart/form-data";
       }
 
@@ -1063,7 +1065,7 @@ export default function AddExpensesTransaction({
                                     <Image
                                       src={
                                         image.preview ||
-                                        `http://127.0.0.1:8000/MaintenanceImages/${image.path}`
+                                        `https://sorciproptrack.com/MaintenanceImages/${image.path}`
                                       }
                                       alt={image.name}
                                       width={500} // Add specific width

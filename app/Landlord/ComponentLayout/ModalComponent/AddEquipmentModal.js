@@ -159,6 +159,8 @@ const fetcher = async([url, token]) => {
   return response.json();
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function AddEquipmentModal({
   open,
   handleOpen,
@@ -193,7 +195,7 @@ export default function AddEquipmentModal({
   };
 
   const {data: equipmentDetails, error} = useSWR(
-    editItem ? [`http://127.0.0.1:8000/api/edit_inclusion/${editItem}`, getUserToken()] : null,
+    editItem ? [`${API_URL}/edit_inclusion/${editItem}`, getUserToken()] : null,
     fetcher, {
       refreshInterval: 1000,
       revalidateOnFocus: false,
@@ -245,8 +247,8 @@ export default function AddEquipmentModal({
 
         const method = editItem ? "PUT" : "POST";
         const endpoint = editItem
-          ? `http://127.0.0.1:8000/api/update_inclusion/${editItem}`
-          : "http://127.0.0.1:8000/api/store_inclusion";
+          ? `${API_URL}/update_inclusion/${editItem}`
+          : `${API_URL}/store_inclusion`;
 
         const response = await fetch(endpoint, {
           method,

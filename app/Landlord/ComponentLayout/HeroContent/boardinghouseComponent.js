@@ -55,6 +55,9 @@ const fetcherBhDetails = async ([url, token]) => {
   return response.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function BoardingHouseDetailsComponent({
   boardinghouseId,
   propsId,
@@ -83,7 +86,7 @@ export default function BoardingHouseDetailsComponent({
 
   const {data: responseTenantInfo, error: errorTenantInfo, isLoading: isLoadingTenantInfo,} = useSWR( 
     token && boardinghouseID && propsID 
-    ? [`http://127.0.0.1:8000/api/property/${propsID}/bhdetails/${boardinghouseID}`,token,]
+    ? [`${API_URL}/property/${propsID}/bhdetails/${boardinghouseID}`,token,]
     : null,
 
     fetcherBhDetails,{
@@ -313,7 +316,7 @@ export default function BoardingHouseDetailsComponent({
                             }}
                           >
                             <Image
-                              src={`http://127.0.0.1:8000/ApartmentImage/${image.image_path}`}
+                              src={`https://sorciproptrack.com/ApartmentImage/${image.image_path}`}
                               alt={`Boardinghouse image ${index + 1}`}
                               layout="fill"
                               objectFit="cover"

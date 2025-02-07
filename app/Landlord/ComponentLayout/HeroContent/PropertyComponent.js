@@ -75,6 +75,8 @@ const fetcherOccupiedDetails = async ([url, token]) => {
   return response.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function PropertyComponent({ loading, setLoading }) {
     const router = useRouter();
     const [property, setProperty] = useState([]);
@@ -103,7 +105,7 @@ export default function PropertyComponent({ loading, setLoading }) {
         error: errorProperty,
         isLoading: isLoadingProperty,
     } = useSWR(
-        (token && ["http://127.0.0.1:8000/api/property_list", token]) || null,
+        (token && [`${API_URL}/property_list`, token]) || null,
         fetcherProperty,
         {
         refreshInterval: 3000,
@@ -126,7 +128,7 @@ export default function PropertyComponent({ loading, setLoading }) {
         error: errorStatus,
         isLoading: isLoadingStatus,
     } = useSWR(
-        (token && [`http://127.0.0.1:8000/api/all`, token]) || null,
+        (token && [`${API_URL}/all`, token]) || null,
         fetcherOccupiedDetails,
         {
         refreshInterval: 3000,
@@ -294,7 +296,7 @@ export default function PropertyComponent({ loading, setLoading }) {
                     <Box sx={{ position: 'relative' }}>
                         <CardMedia
                             sx={{ height: 150 }}
-                            image={`http://127.0.0.1:8000/ApartmentImage/${item.image}`}
+                            image={`https://sorciproptrack.com/ApartmentImage/${item.image}`}
                             title={item.propertyname[0].caption || "Image"}
                         />
                         {/* Calendar Icon Button */}

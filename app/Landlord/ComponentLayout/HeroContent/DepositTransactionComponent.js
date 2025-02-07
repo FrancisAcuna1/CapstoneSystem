@@ -10,6 +10,7 @@ import ErrorSnackbar from '../Labraries/ErrorSnackbar'
 import CreatePaymentTransaction from '../ModalComponent/AddPaymentModal';
 import DepositTransactionTable from '../TableComponent/ExpensesTable';
 
+
 export default function DepositTransactionComponent({loading, setLoading}){
     const [successful, setSuccessful] = useState(null);
     const [error, setError] = useState(null);

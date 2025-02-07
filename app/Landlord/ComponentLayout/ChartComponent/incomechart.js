@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import useSWR from "swr";
 import dynamic from 'next/dynamic';
 const ChartNoSSR = dynamic(() => import('react-apexcharts'), { ssr: false });
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 
 export default function IncomeChart ({selectedMonth, selectedYear,}){
    const [income, setIncome] = useState({
@@ -38,7 +40,7 @@ export default function IncomeChart ({selectedMonth, selectedYear,}){
 
         if(accessToken){
             try{
-                const response = await fetch(`http://127.0.0.1:8000/api/income_statistic`, {
+                const response = await fetch(`${API_URL}/income_statistic`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

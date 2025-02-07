@@ -166,6 +166,10 @@ const fetcherBarangays = async ([url, token]) => {
   return response.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
+
 export default function EditTenantModal({
   open,
   handleClose,
@@ -304,7 +308,7 @@ export default function EditTenantModal({
 
   const { data: response, error: errorResponse } = useSWR(
     token && editItem
-      ? [`http://127.0.0.1:8000/api/edit_tenant/${editItem}`, token]
+      ? [`${API_URL}/edit_tenant/${editItem}`, token]
       : null,
     fetcher,
     {
@@ -356,7 +360,7 @@ export default function EditTenantModal({
     if (accessToken) {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/api/update_tenant/${editItem}`,
+          `${API_URL}/update_tenant/${editItem}`,
           {
             method: "PUT",
             headers: {

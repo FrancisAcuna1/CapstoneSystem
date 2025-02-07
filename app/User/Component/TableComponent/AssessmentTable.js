@@ -125,6 +125,9 @@ const fetcher = async([url, token]) => {
   }
   return response.json();
 }
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function PaymentHistoryTable({ TenantId, setLoading, loading }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const isMenuOpen = Boolean(anchorEl);
@@ -168,8 +171,8 @@ export default function PaymentHistoryTable({ TenantId, setLoading, loading }) {
   const userId = getUserId();
   const token = getUserToken();
   const endpoint = selectedCategory === 'all'
-    ? `http://127.0.0.1:8000/api/show_payment/${userId}`
-    : `http://127.0.0.1:8000/api/filter_payment_history/${userId}/${selectedCategory}`;
+    ? `${API_URL}/show_payment/${userId}`
+    : `${API_URL}/filter_payment_history/${userId}/${selectedCategory}`;
 
   const {data: response, error, isLoading} = useSWR(
     token && userId && selectedCategory ? [endpoint, token] : null,

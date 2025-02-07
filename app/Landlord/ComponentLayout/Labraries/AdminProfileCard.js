@@ -27,13 +27,15 @@ const fetchAdminInfo = async([url, token]) => {
     return response.json()
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function AdminProfileCard({ avatarSrc, handleLogout, userId, userToken}) {
     const router = useRouter();
     const [admin, setAdmin] = useState([]);
     console.log(avatarSrc);
     console.log(admin)
     const {data: response, error} = useSWR(
-        userToken && userId ? [`http://127.0.0.1:8000/api/tenant_information/${userId}`, userToken] : null, 
+        userToken && userId ? [`${API_URL}/tenant_information/${userId}`, userToken] : null, 
         fetchAdminInfo, {
             refreshInterval: 10000,
             revalidateOnFocus: false,

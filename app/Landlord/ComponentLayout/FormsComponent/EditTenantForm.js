@@ -8,6 +8,8 @@ import dayjs from 'dayjs';
 import Swal from 'sweetalert2'; 
 
 const steps = ['Tenant Information', 'Account Creation', 'Unit Details'];
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 
 const MultiStepForm = ({details, setSuccessful, setError , setLoading}) => {
     const [contact, setContact] = useState('');
@@ -63,7 +65,7 @@ const MultiStepForm = ({details, setSuccessful, setError , setLoading}) => {
         if(accessToken){
             try{
 
-                const response = await fetch(`http://127.0.0.1:8000/api/register`,{
+                const response = await fetch(`${API_URL}/register`,{
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

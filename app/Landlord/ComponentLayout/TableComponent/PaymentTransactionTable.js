@@ -168,6 +168,10 @@ const fetcher = async ([url, token, selectedMonth, selectedYear]) => {
   return response.json();
 };
 
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function PaymentTransactionTable({
   handleEdit,
   setSuccessful,
@@ -204,8 +208,8 @@ export default function PaymentTransactionTable({
 
     const endPoint =
         selectedCategory === "All"
-        ? `http://127.0.0.1:8000/api/paymentdetails`
-        : `http://127.0.0.1:8000/api/filter_payment/${selectedCategory}`;
+        ? `${API_URL}/paymentdetails`
+        : `${API_URL}/filter_payment/${selectedCategory}`;
 
     const getUserToken = () => {
         const userDataString = localStorage.getItem("userDetails"); // get the
@@ -333,7 +337,7 @@ export default function PaymentTransactionTable({
         try {
             setLoading(true);
             const response = await fetch(
-            `http://127.0.0.1:8000/api/delete_payment/${deletePayment}`,
+            `${API_URL}/delete_payment/${deletePayment}`,
             {
                 method: "DELETE",
                 headers: {

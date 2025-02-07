@@ -28,6 +28,8 @@ const AcceptToolTip = styled(({ className, ...props }) => (
   },
 });
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function OccupiedBoardinghouse({
   boardinghouseId,
   propsId,
@@ -61,7 +63,7 @@ export default function OccupiedBoardinghouse({
         try {
           setLoading(true);
           const response = await fetch(
-            `http://127.0.0.1:8000/api/property/${propsID}/bhdetails/${boardinghouseID}`,
+            `${API_URL}/property/${propsID}/bhdetails/${boardinghouseID}`,
             {
               method: "GET",
               headers: {
@@ -102,7 +104,7 @@ export default function OccupiedBoardinghouse({
       if (accessToken) {
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/api/occupied_bed_info/${boardinghouseID}/type/${propertyType}`,
+            `${API_URL}/occupied_bed_info/${boardinghouseID}/type/${propertyType}`,
             {
               method: "GET",
               headers: {
@@ -163,7 +165,7 @@ export default function OccupiedBoardinghouse({
     if (accessToken) {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/api/remove_tenant_occupancy/${id}`,
+          `${API_URL}/remove_tenant_occupancy/${id}`,
           {
             method: "DELETE",
             headers: {
@@ -386,7 +388,7 @@ export default function OccupiedBoardinghouse({
                             }}
                           >
                             <Image
-                              src={`http://127.0.0.1:8000/ApartmentImage/${image.image_path}`}
+                              src={`https://sorciproptrack.com/ApartmentImage/${image.image_path}`}
                               alt={`Boardinghouse image ${index + 1}`}
                               layout="fill"
                               objectFit="cover"

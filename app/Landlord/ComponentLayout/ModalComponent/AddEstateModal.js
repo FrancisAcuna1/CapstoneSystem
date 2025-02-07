@@ -102,6 +102,7 @@ const fetcher = async([url, token]) => {
   return response.json()
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 export default function AddApartmentModal({open, handleOpen, handleClose, setLoading, editproperty, setEditProperty, refreshData}) {
   const { enqueueSnackbar } = useSnackbar();
@@ -172,7 +173,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, setLoa
   const token = getUserToken();
 
   const {data:response, error} = useSWR(
-    token && editItem ? [`http://127.0.0.1:8000/api/edit_property/${editItem}`, token] : null,
+    token && editItem ? [`${API_URL}/edit_property/${editItem}`, token] : null,
     fetcher, {
       refreshInterval: 1000,
       revalidateOnFocus: false,
@@ -250,8 +251,8 @@ export default function AddApartmentModal({open, handleOpen, handleClose, setLoa
         }
 
         const url = editItem 
-          ? `http://127.0.0.1:8000/api/update_property/${editItem}`
-          : 'http://127.0.0.1:8000/api/create'
+          ? `${API_URL}/update_property/${editItem}`
+          : `${API_URL}/create`
         
         // const method = editItem ? 'PUT' : 'POST';
 
@@ -437,7 +438,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, setLoa
                     <Image
                       src={
                         typeof selectedImage === 'string' 
-                          ? `http://127.0.0.1:8000/ApartmentImage/${selectedImage}`
+                          ? `https://sorciproptrack.com/ApartmentImage/${selectedImage}`
                           : selectedImage.preview
                       }
                       alt="Property Image"

@@ -160,6 +160,10 @@ const fetcherBhDetails = async ([url, token]) => {
   return response.json();
 };
 
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function RoomsTable({
   boardinghouseId,
   propsId,
@@ -196,7 +200,7 @@ export default function RoomsTable({
   } = useSWR(
     token && boardinghouseID && propsID
       ? [
-          `http://127.0.0.1:8000/api/property/${propsID}/bhdetails/${boardinghouseID}`,
+          `${API_URL}/property/${propsID}/bhdetails/${boardinghouseID}`,
           token,
         ]
       : null,
@@ -225,7 +229,7 @@ export default function RoomsTable({
   } = useSWR(
     token && boardinghouseID && propertyType
       ? [
-          `http://127.0.0.1:8000/api/occupied_bed_info/${boardinghouseID}/type/${propertyType}`,
+          `${API_URL}/occupied_bed_info/${boardinghouseID}/type/${propertyType}`,
           token,
         ]
       : null,

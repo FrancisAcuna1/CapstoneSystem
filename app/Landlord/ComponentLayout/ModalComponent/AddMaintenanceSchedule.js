@@ -213,6 +213,8 @@ const fetcher = async([url, token]) => {
   return response.json();
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 
 export default function AddMaintenanceSchedule({
   open,
@@ -379,7 +381,7 @@ export default function AddMaintenanceSchedule({
       const userData = JSON.parse(userDataString); // parse the datastring into json
       const accessToken = userData.accessToken;
       if (accessToken) {
-        const response = await fetch(`http://127.0.0.1:8000/api/get_accepted`, {
+        const response = await fetch(`${API_URL}/get_accepted`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -407,7 +409,7 @@ export default function AddMaintenanceSchedule({
       const accessToken = userData.accessToken;
       if(accessToken){
         try{
-          const response = await fetch(`http://127.0.0.1:8000/api/get_all_property`, {
+          const response = await fetch(`${API_URL}/get_all_property`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -438,7 +440,7 @@ export default function AddMaintenanceSchedule({
   };
 
   const {data: scheduleResponse, error} = useSWR(
-    selectedScheduleId ?  [`http://127.0.0.1:8000/api/edit_schedule/${selectedScheduleId}`, getUserToken()] : null,
+    selectedScheduleId ?  [`${API_URL}/edit_schedule/${selectedScheduleId}`, getUserToken()] : null,
     fetcher, {
       refreshInterval: 1000,
       revalidateOnFocus: false,
@@ -572,8 +574,8 @@ export default function AddMaintenanceSchedule({
     if (accessToken) {
       try {
         const url = selectedScheduleId
-          ? `http://127.0.0.1:8000/api/update_schedule/${selectedScheduleId}`
-          : "http://127.0.0.1:8000/api/add_schedule";
+          ? `${API_URL}/update_schedule/${selectedScheduleId}`
+          : `${API_URL}/add_schedule`;
 
         const method = selectedScheduleId ? "PUT" : "POST";
 
@@ -644,7 +646,7 @@ export default function AddMaintenanceSchedule({
     if (accessToken) {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/api/delete_schedule/${selectedScheduleId}`,
+          `${API_URL}/delete_schedule/${selectedScheduleId}`,
           {
             method: "DELETE",
             headers: {

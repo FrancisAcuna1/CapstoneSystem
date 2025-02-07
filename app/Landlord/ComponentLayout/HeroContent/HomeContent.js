@@ -165,6 +165,8 @@ const fetcherExpensesData = async ([url, token, isSelectedTypeExpenses]) => {
   return response.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function HomeContent({ setLoading, loading }) {
   const [isloading, setIsloading] = useState(false);
   const [isloading1, setIsloading1] = useState(false);
@@ -202,7 +204,7 @@ export default function HomeContent({ setLoading, loading }) {
     error: responseError,
     isLoading: responseIsLoading,
   } = useSWR(
-    (token && ["http://127.0.0.1:8000/api/index", token]) || null,
+    (token && [`${API_URL}/index`, token]) || null,
     fetcher,
     {
       refreshInterval: 1000,
@@ -231,7 +233,7 @@ export default function HomeContent({ setLoading, loading }) {
     isLoading: incomeDataIsLoading,
   } = useSWR(
     token && isSelectedTypeIncome
-      ? [`http://127.0.0.1:8000/api/getIncome`, token, isSelectedTypeIncome]
+      ? [`${API_URL}/getIncome`, token, isSelectedTypeIncome]
       : null,
     fetcherIncomeData,
     {
@@ -258,7 +260,7 @@ export default function HomeContent({ setLoading, loading }) {
     isLoading: expensesDataIsLoading,
   } = useSWR(
     token && isSelectedTypeExpenses
-      ? [`http://127.0.0.1:8000/api/getExpenses`, token, isSelectedTypeExpenses]
+      ? [`${API_URL}/getExpenses`, token, isSelectedTypeExpenses]
       : null,
     fetcherExpensesData,
     {

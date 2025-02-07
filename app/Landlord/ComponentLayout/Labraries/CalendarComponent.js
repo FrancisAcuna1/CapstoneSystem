@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic';
 // const Fullcalendar = dynamic(() => import('../Labraries/CalendarComponent'), {
 //   ssr: false
 // }) 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 const CalendarComponent = ({setLoading, loading, handleEventClick, refreshTrigger}) => {
   const [events, setEvents] = useState([]);
@@ -28,7 +29,7 @@ const CalendarComponent = ({setLoading, loading, handleEventClick, refreshTrigge
       setLoading(true)
       if(accessToken){
         try{
-          const response = await fetch(`http://127.0.0.1:8000/api/get_schedule`, {
+          const response = await fetch(`${API_URL}/get_schedule`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${accessToken}`,

@@ -45,6 +45,8 @@ const PaymentHistory = dynamic(
     ssr: false,
   }
 );
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 
 export default function OccupiedTenantInformation({
   apartmentId,
@@ -78,7 +80,7 @@ export default function OccupiedTenantInformation({
       if (accessToken) {
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/api/show_tenant_info/${apartmentId}/Apartment`,
+            `${API_URL}/show_tenant_info/${apartmentId}/Apartment`,
             {
               method: "GET",
               headers: {
@@ -122,7 +124,7 @@ export default function OccupiedTenantInformation({
       if (accessToken) {
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/api/tenant_payment/${TenantId}`,
+            `${API_URL}/tenant_payment/${TenantId}`,
             {
               method: "GET",
               headers: {
@@ -158,7 +160,7 @@ export default function OccupiedTenantInformation({
       if (accessToken) {
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/api/get_delequent/${TenantId}`,
+            `${API_URL}/get_delequent/${TenantId}`,
             {
               method: "GET",
               headers: {
@@ -244,7 +246,7 @@ export default function OccupiedTenantInformation({
     if (accessToken) {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/api/remove_tenant_occupancy/${id}`,
+          `${API_URL}/remove_tenant_occupancy/${id}`,
           {
             method: "DELETE",
             headers: {

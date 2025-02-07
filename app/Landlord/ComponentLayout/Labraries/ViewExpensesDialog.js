@@ -21,6 +21,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { format, parseISO } from "date-fns";
 import Image from "next/image";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function ViewExpensesDialog({
   open,
   handleClose,
@@ -37,7 +39,7 @@ export default function ViewExpensesDialog({
       if (accessToken) {
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/api/edit/${viewExpensesId}`,
+            `${API_URL}/edit/${viewExpensesId}`,
             {
               method: "GET",
               headers: {
@@ -222,7 +224,7 @@ export default function ViewExpensesDialog({
                           }}
                         >
                           <Image
-                            src={`http://127.0.0.1:8000/MaintenanceImages/${image.image_path}`}
+                            src={`https://sorciproptrack.com/MaintenanceImages/${image.image_path}`}
                             alt="Expense receipt"
                             width={300}
                             height={300}

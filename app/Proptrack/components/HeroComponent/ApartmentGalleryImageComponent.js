@@ -51,6 +51,8 @@ const fetcher = async ([url]) => {
   return respons.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function ApartmentGalleryComponent({
   loading,
   setLoading,
@@ -83,7 +85,7 @@ export default function ApartmentGalleryComponent({
     error,
     isLoading,
   } = useSWR(
-    [`http://127.0.0.1:8000/api/apartmentdetails/${propsId}/${apartmentId}`] ||
+    [`${API_URL}/apartmentdetails/${propsId}/${apartmentId}`] ||
       null,
     fetcher,
     {
@@ -345,7 +347,7 @@ export default function ApartmentGalleryComponent({
                       }}
                     >
                       <Image
-                        src={`http://127.0.0.1:8000/ApartmentImage/${image.image_path}`}
+                        src={`https://sorciproptrack.com/ApartmentImage/${image.image_path}`}
                         alt={`Apartment image ${index + 1}`}
                         width={200}
                         height={200}
@@ -395,13 +397,13 @@ export default function ApartmentGalleryComponent({
                       }}
                       onClick={() =>
                         handleImageClick(
-                          `http://127.0.0.1:8000/ApartmentImage/${image.image_path}`
+                          `https://sorciproptrack.com/ApartmentImage/${image.image_path}`
                         )
                       }
                     >
                       <Image
                         {...srcset(
-                          `http://127.0.0.1:8000/ApartmentImage/${image.image_path}`,
+                          `https://sorciproptrack.com/ApartmentImage/${image.image_path}`,
                           250,
                           200,
                           isTopImage ? 2 : 1,

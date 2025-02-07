@@ -22,6 +22,7 @@ const GeneralTooltip = styled(({ className, ...props }) => (
 });
 // const steps = ['Tenant Information', 'Account Creation', 'Unit Details'];
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 // Municipality codes for Sorsogon
 const SORSOGON_MUNICIPALITIES = [
@@ -283,7 +284,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
         if(accessToken){
             try{
                 setLoading(true);
-                const response = await fetch(`http://127.0.0.1:8000/api/bh_tenant_registration`,{
+                const response = await fetch(`${API_URL}/bh_tenant_registration`,{
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

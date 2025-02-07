@@ -141,6 +141,9 @@ const AcceptToolTip = styled(({ className, ...props }) => (
   },
 });
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function RecurringDialog({
   openRecurringModal,
   setOpenRecurringModal,
@@ -195,7 +198,7 @@ export default function RecurringDialog({
             setLoading(true);
             try {
             const response = await fetch(
-                `http://127.0.0.1:8000/api/markaspaid/${recurringId}`,
+                `${API_URL}/markaspaid/${recurringId}`,
                 {
                 method: "PUT",
                 headers: {
@@ -254,7 +257,7 @@ export default function RecurringDialog({
         for (const deleteId of selectedItem) {
             try {
             const response = await fetch(
-                `http://127.0.0.1:8000/api/delete/${deleteId}`,
+                `${API_URL}/delete/${deleteId}`,
                 {
                 method: "DELETE",
                 headers: {

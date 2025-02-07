@@ -61,6 +61,8 @@ const TenantCard = memo(({ tenant }) => (
 
 TenantCard.displayName = "TenantCard";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export default function TenantCardInfor({ setLoading, loading }) {
   const [tenantList, setTenantList] = useState([]);
 
@@ -75,7 +77,7 @@ export default function TenantCardInfor({ setLoading, loading }) {
     const controller = new AbortController();
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/all_tenant", {
+      const response = await fetch(`${API_URL}/all_tenant`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

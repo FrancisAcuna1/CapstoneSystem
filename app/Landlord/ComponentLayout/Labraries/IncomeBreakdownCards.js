@@ -32,6 +32,7 @@ const fetcher = async ([url, token, selectedMonth, selectedYear]) => {
     return response.json();
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 
 export default function IncomeBreackdownComponent({selectedMonth, selectedYear, setLoading, loading}){
@@ -52,7 +53,7 @@ export default function IncomeBreackdownComponent({selectedMonth, selectedYear, 
 
     const token = getUserToken();
     console.log(token);
-    const endpoint = `http://127.0.0.1:8000/api/calculate_income`;
+    const endpoint = `${API_URL}/calculate_income`;
     const {data: response, error, isLoading} = useSWR(
         token && selectedMonth && selectedYear ? [endpoint, token, selectedMonth, selectedYear] : null,
         fetcher, {

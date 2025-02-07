@@ -84,6 +84,10 @@ const categories = [
   "Occupied",
 ];
 
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function PropertyComponentPage({ loading, setLoading }) {
   const router = useRouter();
   const theme = useTheme();
@@ -95,14 +99,14 @@ export default function PropertyComponentPage({ loading, setLoading }) {
 
   const url =
     selectedCategory === "Apartment"
-      ? "http://127.0.0.1:8000/api/all_apartment"
+      ? `${API_URL}/all_apartment`
       : selectedCategory === "Boardinghouse"
-      ? "http://127.0.0.1:8000/api/all_boardinghouse"
+      ? `${API_URL}/all_boardinghouse`
       : selectedCategory === "Available"
-      ? "http://127.0.0.1:8000/api/all_available/Available"
+      ? `${API_URL}/all_available/Available`
       : selectedCategory === "Occupied"
-      ? "http://127.0.0.1:8000/api/all_occupied/Occupied"
-      : "http://127.0.0.1:8000/api/all_prop";
+      ? `${API_URL}/all_occupied/Occupied`
+      : `${API_URL}/all_prop`;
 
   const {
     data: response,
@@ -534,7 +538,7 @@ export default function PropertyComponentPage({ loading, setLoading }) {
                                   }}
                                 >
                                   <Image
-                                    src={`http://127.0.0.1:8000/ApartmentImage/${image}`}
+                                    src={`https://sorciproptrack.com/ApartmentImage/${image}`}
                                     alt={`Image image ${index + 1}`}
                                     layout="fill"
                                     objectFit="cover"

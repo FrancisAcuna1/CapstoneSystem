@@ -150,6 +150,9 @@ const AcceptToolTip = styled(({ className, ...props }) => (
   },
 });
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function AddPropertyType({
   open,
   handleOpen,
@@ -266,7 +269,7 @@ export default function AddPropertyType({
       if (accessToken) {
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/api/property_address/${propsid}`,
+            `${API_URL}/property_address/${propsid}`,
             {
               method: "GET",
               headers: {
@@ -324,8 +327,8 @@ export default function AddPropertyType({
         try {
           const endpoint =
             selectedProperty === "Apartment"
-              ? `http://127.0.0.1:8000/api/edit_apartment/${editItem}`
-              : `http://127.0.0.1:8000/api/edit_boardinghouse/${editItem}`;
+              ? `${API_URL}/edit_apartment/${editItem}`
+              : `${API_URL}/edit_boardinghouse/${editItem}`;
 
           const response = await fetch(endpoint, {
             method: "GET",
@@ -367,7 +370,7 @@ export default function AddPropertyType({
                 const existingImages = data.apartment.images.map((img) => ({
                   id: img.id,
                   path: img.image_path,
-                  preview: `http://127.0.0.1:8000/ApartmentImage/${img.image_path}`, // Adjust URL as needed
+                  preview: `https://sorciproptrack.com/ApartmentImage/${img.image_path}`, // Adjust URL as needed
                 }));
                 setSelectedImage(existingImages);
               }
@@ -391,7 +394,7 @@ export default function AddPropertyType({
                 const existingImages = data.boardinghouse.images.map((img) => ({
                   id: img.id,
                   path: img.image_path,
-                  preview: `http://127.0.0.1:8000/ApartmentImage/${img.image_path}`, // Adjust URL as needed
+                  preview: `https://sorciproptrack.com/ApartmentImage/${img.image_path}`, // Adjust URL as needed
                 }));
                 setSelectedImage(existingImages);
               }
@@ -787,14 +790,14 @@ export default function AddPropertyType({
           formData.append("_method", "PUT");
           endpoint =
             selectedProperty === "Apartment"
-              ? `http://127.0.0.1:8000/api/update_apartment/${editItem}`
-              : `http://127.0.0.1:8000/api/update_boardinghouse/${editItem}`;
+              ? `${API_URL}/update_apartment/${editItem}`
+              : `${API_URL}/update_boardinghouse/${editItem}`;
           method = "POST"; // Since we're using '_method', use POST for sending
         } else {
           endpoint =
             selectedProperty === "Apartment"
-              ? "http://127.0.0.1:8000/api/store_apartment"
-              : "http://127.0.0.1:8000/api/store_boardinghouse";
+              ? `${API_URL}/store_apartment`
+              : `${API_URL}/store_boardinghouse`;
           method = "POST";
         }
 
@@ -858,7 +861,7 @@ export default function AddPropertyType({
         try {
           setLoading(true);
           const response = await fetch(
-            "http://127.0.0.1:8000/api/inclusion_list",
+            `${API_URL}/inclusion_list`,
             {
               method: "GET",
               headers: {
@@ -1813,7 +1816,7 @@ export default function AddPropertyType({
                                 <Image
                                   src={
                                     image.preview ||
-                                    `http://127.0.0.1:8000/ApartmentImage/${image.path}`
+                                    `https://sorciproptrack.com/ApartmentImage/${image.path}`
                                   }
                                   alt={image.name}
                                   width={500} // Add specific width
@@ -2676,7 +2679,7 @@ export default function AddPropertyType({
                                 <Image
                                   src={
                                     image.preview ||
-                                    `http://127.0.0.1:8000/ApartmentImage/${image.path}`
+                                    `https://sorciproptrack.com/ApartmentImage/${image.path}`
                                   }
                                   alt={image.name}
                                   width={500} // Add specific width

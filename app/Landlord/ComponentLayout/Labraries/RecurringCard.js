@@ -8,6 +8,9 @@ Info as AlertIcon
 } from '@mui/icons-material';
 import {addMonths, subMonths, differenceInMonths, parseISO, format, isBefore, parse} from 'date-fns';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function RecurringCardComponent({setLoading, loading, setSuccessful, successful, setError, error}){
     const [recurringExpenses, setRecurringExpenses] = useState([]);
     console.log(recurringExpenses)
@@ -18,7 +21,7 @@ export default function RecurringCardComponent({setLoading, loading, setSuccessf
             const accessToken = userData.accessToken;
             setLoading(true)
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/get_recurring_expenses`, {
+                const response = await fetch(`${API_URL}/get_recurring_expenses`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

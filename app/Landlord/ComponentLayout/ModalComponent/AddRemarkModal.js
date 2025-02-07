@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import {Typography, TextField, Button, Box, IconButton, Fade, Dialog, DialogTitle, DialogContent, DialogContentText, CircularProgress} from '@mui/material';
 import { useSnackbar } from "notistack";
 
-  
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 
 export default function AddRemarksForm({open, setRemarksOpen, itemId, setLoading, loading, handleClose1}){
     const {enqueueSnackbar} = useSnackbar();
@@ -51,7 +52,7 @@ export default function AddRemarksForm({open, setRemarksOpen, itemId, setLoading
                     newErrors.remarks = 'Remarks must be at least 10 characters long';
                 } 
                 
-                const response = await fetch(`http://127.0.0.1:8000/api/rejected_maintenance/${itemId}`, {
+                const response = await fetch(`${API_URL}/rejected_maintenance/${itemId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

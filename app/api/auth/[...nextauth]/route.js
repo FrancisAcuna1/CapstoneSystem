@@ -3,6 +3,8 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -13,7 +15,7 @@ export const authOptions = {
       },
       async authorize(credentials) {
         try {
-          const response = await fetch("http://127.0.0.1:8000/api/login", {
+          const response = await fetch(`${API_URL}/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

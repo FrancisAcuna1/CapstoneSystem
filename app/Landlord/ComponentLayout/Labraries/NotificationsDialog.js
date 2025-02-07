@@ -1,9 +1,9 @@
 'use client';
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { DialogContent, useMediaQuery, useTheme, Divider, Grid, Button, Box, Paper, Dialog, DialogTitle, Avatar, Typography, Stack, IconButton, CircularProgress} from '@mui/material';
 import { format, parseISO, formatDistance } from 'date-fns';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
 
 const NotificationsDialog = ({ open}) => {
@@ -23,7 +23,7 @@ const NotificationsDialog = ({ open}) => {
 
         if(accessToken){
             try{
-                const response = await fetch(`http://127.0.0.1:8000/api/getnotifications`, {
+                const response = await fetch(`${API_URL}/getnotifications`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${accessToken}`,
@@ -63,7 +63,7 @@ const NotificationsDialog = ({ open}) => {
         // setLoading(true);
         if(accessToken){
             try{
-                const response = await fetch(`http://127.0.0.1:8000/api/notifications/${id}/read`,{
+                const response = await fetch(`${API_URL}/notifications/${id}/read`,{
                     method:'POST',
                     headers:{
                         'Authorization': `Bearer ${accessToken}`,

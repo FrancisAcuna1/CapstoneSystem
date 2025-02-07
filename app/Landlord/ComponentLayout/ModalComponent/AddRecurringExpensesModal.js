@@ -16,8 +16,6 @@ import dayjs from 'dayjs';
 import { Category, Description } from "@mui/icons-material";
 
 
-
-
 const Backdrop = React.forwardRef((props, ref) => {
     const { open, ...other } = props;
     return (
@@ -143,6 +141,8 @@ const Backdrop = React.forwardRef((props, ref) => {
     `,
   );
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
 
 export default function AddRecurringExpenses({openRecurringModal, handleOpenModal, handleCloseModal, setLoading, setSuccessful, setError, error, editItemId}){
     const [errors, setErrors] = useState({});
@@ -237,7 +237,7 @@ export default function AddRecurringExpenses({openRecurringModal, handleOpenModa
 
             if(accessToken){
                 try{
-                    const response = await fetch(`http://127.0.0.1:8000/api/get_all_property`,{
+                    const response = await fetch(`${API_URL}/get_all_property`,{
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -294,7 +294,7 @@ export default function AddRecurringExpenses({openRecurringModal, handleOpenModa
                 // ? `http://127.0.0.1:8000/api/update_inclusion/${editPayment}`  
                 // : 'http://127.0.0.1:8000/api/store_expenses' 
                     
-                const response = await fetch(`http://127.0.0.1:8000/api/generate_recurring_expenses`,{
+                const response = await fetch(`${API_URL}/generate_recurring_expenses`,{
                 method: 'POST',
                 headers:{
                     'Content-Type': 'application/json',

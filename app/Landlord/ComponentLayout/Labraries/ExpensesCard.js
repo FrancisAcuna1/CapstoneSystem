@@ -79,6 +79,9 @@ const fetcher = async([url, token, selectedMonth, selectedYear]) => {
   return response.json();
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 export default function ExpensesCard({ loading, setLoading, selectedMonth, selectedYear }) {
   const [totalExpenses, setTotalExpenses] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -108,7 +111,7 @@ export default function ExpensesCard({ loading, setLoading, selectedMonth, selec
   }
   const token = getUserToken();
   const {data: response, error, isLoading} = useSWR(
-    token && selectedMonth && selectedYear ? [`http://127.0.0.1:8000/api/calculate_expenses`, token, selectedMonth, selectedYear] : null,
+    token && selectedMonth && selectedYear ? [`${API_URL}/calculate_expenses`, token, selectedMonth, selectedYear] : null,
     fetcher, {
       refreshInterval: 1000,
       revalidateOnFocus: false,
