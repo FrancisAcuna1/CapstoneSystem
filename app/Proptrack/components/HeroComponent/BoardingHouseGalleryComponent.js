@@ -76,6 +76,7 @@ const fetcher = async ([url]) => {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
 
 
 export default function BoardingHouseGallery({
@@ -563,7 +564,7 @@ export default function BoardingHouseGallery({
                       }}
                     >
                       <Image
-                        src={`https://sorciproptrack.com/ApartmentImage/${image.image_path}`}
+                        src={`${API_URL_IMG}/ApartmentImage/${image.image_path}`}
                         alt={`Apartment image ${index + 1}`}
                         width={100}
                         height={100}
@@ -613,13 +614,13 @@ export default function BoardingHouseGallery({
                       }}
                       onClick={() =>
                         handleImageClick(
-                          `https://sorciproptrack.com/ApartmentImage/${image.image_path}`
+                          `${API_URL_IMG}/ApartmentImage/${image.image_path}`
                         )
                       }
                     >
                       <Image
                         {...srcset(
-                          `https://sorciproptrack.com/ApartmentImage/${image.image_path}`,
+                          `${API_URL_IMG}/ApartmentImage/${image.image_path}`,
                           250,
                           200,
                           isTopImage ? 2 : 1,

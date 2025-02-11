@@ -22,6 +22,8 @@ import { format, parseISO } from "date-fns";
 import Image from "next/image";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
+
 
 export default function ViewExpensesDialog({
   open,
@@ -224,7 +226,7 @@ export default function ViewExpensesDialog({
                           }}
                         >
                           <Image
-                            src={`https://sorciproptrack.com/MaintenanceImages/${image.image_path}`}
+                            src={`${API_URL_IMG}/MaintenanceImages/${image.image_path}`}
                             alt="Expense receipt"
                             width={300}
                             height={300}

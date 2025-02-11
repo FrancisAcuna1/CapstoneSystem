@@ -159,7 +159,7 @@ const Backdrop = React.forwardRef((props, ref) => {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
-export default function AddPaymentTransaction({open, handleOpen, handleClose, setLoading, setSuccessful, isEdit, editPayment, setEditPayment}){
+export default function AddPaymentTransaction({open, handleOpen, handleClose, setLoading, setSuccessful, isEdit, setIsEdit, editPayment, setEditPayment}){
     const { enqueueSnackbar } = useSnackbar();
     const [errors, setErrors] = useState({});
     const [tenantlist, setTenantList] = useState([]);
@@ -306,6 +306,7 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
         const formattedFormData = {
             ...paymentData,
             payment_date: dayjs(paymentData.payment_date).format('MM/DD/YYYY'),
+            paid_for_month: null
         };
 
         if(accessToken){
@@ -328,6 +329,7 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
                 
                 if(response.ok){
                     setLoading(false);
+                    setIsEdit(false);
                     handleClose()
                     setPaymentData({
                         tenant_id:'',
@@ -339,6 +341,7 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
                     enqueueSnackbar(data.message, { variant: "success" });
                 }else{
                     setLoading(false);
+                    setIsEdit(false);
                     handleClose();
                     console.log(data.error)
                     enqueueSnackbar(data.message, { variant: "error" });
@@ -417,6 +420,7 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
             open={open}
             onClose={() => {
                 handleClose()
+                setIsEdit(false);
                 setErrors({})
                 setPaymentData({
                     tenant_id:'',
@@ -590,6 +594,7 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
                 onClick={() => {
                     handleClose()
                     setErrors({})
+                    setIsEdit(false);
                     setPaymentData({
                         tenant_id:'',
                         amount: '', 

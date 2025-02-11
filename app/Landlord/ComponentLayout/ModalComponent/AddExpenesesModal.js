@@ -201,6 +201,7 @@ const fetcherUnitList = async([url, token]) => {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
 
 export default function AddExpensesTransaction({
   open,
@@ -398,7 +399,7 @@ export default function AddExpensesTransaction({
         const existingImages = value.expenses_images.map((img) => ({
           id: img.id,
           path: img.image_path,
-          preview: `https://sorciproptrack.com/MaintenanceImages/${img.image_path}`, // Adjust URL as needed
+          preview: `${API_URL_IMG}/MaintenanceImages/${img.image_path}`, // Adjust URL as needed
         }));
         setSelectedImage(existingImages);
       }
@@ -1065,7 +1066,7 @@ export default function AddExpensesTransaction({
                                     <Image
                                       src={
                                         image.preview ||
-                                        `https://sorciproptrack.com/MaintenanceImages/${image.path}`
+                                        `${API_URL_IMG}/MaintenanceImages/${image.path}`
                                       }
                                       alt={image.name}
                                       width={500} // Add specific width

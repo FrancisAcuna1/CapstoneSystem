@@ -37,6 +37,9 @@ const fetcher = async ([url, token]) => {
   return response.json();
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
+
 const MaintenanceRequestDialog = ({
   open,
   handleClose,
@@ -61,7 +64,7 @@ const MaintenanceRequestDialog = ({
 
   const { data: response, error, isLoading,} = useSWR(
     userToken && viewId
-      ? [`http://127.0.0.1:8000/api/view_accepted_request/${viewId}`, userToken]
+      ? [`${API_URL}/view_accepted_request/${viewId}`, userToken]
       : null,
     fetcher, {
       refreshInterval: 1000,
@@ -104,7 +107,7 @@ const MaintenanceRequestDialog = ({
     (viewAccepted?.maintenance_images && viewAccepted?.maintenance_images) ||
     [];
   console.log("images:", images);
-  const imageBaseUrl = "http://127.0.0.1:8000/MaintenanceImages/"; // Adjust this based on your API endpoint
+  const imageBaseUrl = `${API_URL_IMG}/MaintenanceImages/`; // Adjust this based on your API endpoint
 
     return (
         <Dialog

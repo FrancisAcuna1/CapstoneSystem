@@ -251,7 +251,7 @@ const fetcherUnitInfo = async ([url, token]) => {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
-
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
 
 export default function RequestMaintenanceForm({
   setLoading,
@@ -401,7 +401,7 @@ export default function RequestMaintenanceForm({
           maintenance_id: image.maintenance_id,
           expenses_id: image.expenses_id,
           image_path: image.image_path,
-          preview: `https://sorciproptrack.com/MaintenanceImages/${image.image_path}`, // Create a preview URL
+          preview: `${API_URL_IMG}/MaintenanceImages/${image.image_path}`, // Create a preview URL
         }));
 
         setSelectedImage(imagesWithPreview);
@@ -839,7 +839,7 @@ export default function RequestMaintenanceForm({
                       <Image
                         src={
                           image.preview ||
-                          `https://sorciproptrack.com/MaintenanceImages/${image.path}`
+                          `${API_URL_IMG}/MaintenanceImages/${image.path}`
                         }
                         alt={image.name}
                         width={500}

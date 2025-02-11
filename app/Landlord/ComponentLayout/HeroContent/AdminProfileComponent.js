@@ -104,6 +104,7 @@ const fetcherProfileInfo = async ([url, token]) => {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG; // Store API URL in a variable
 
 const AdminProfileComponent = ({ setLoading, loading }) => {
     const { enqueueSnackbar } = useSnackbar();
@@ -529,7 +530,7 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
     };
 
     const avatarSrc = profileImage
-        ? `https://sorciproptrack.com/ProfileImages/${profileImage.image_path}`
+        ? `${API_URL_IMG}/ProfileImages/${profileImage.image_path}`
         : null;
 
     return (

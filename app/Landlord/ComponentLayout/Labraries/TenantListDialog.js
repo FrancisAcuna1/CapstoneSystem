@@ -423,7 +423,7 @@ export default function TenantListDialog({
 
   const formatDueDate = (payor) => {
     const leaseStart = new Date(payor.lease_start_date);
-    const currentDate = new Date("2025-3-11"); // You might want to replace with current date dynamically
+    const currentDate = new Date(); // You might want to replace with current date dynamically
     const prepaidMonths = payor.prepaid_rent_period;
     console.log(prepaidMonths);
     // Filter payments specific to this tenant

@@ -76,6 +76,8 @@ const fetcherOccupiedDetails = async ([url, token]) => {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
+
 
 export default function PropertyComponent({ loading, setLoading }) {
     const router = useRouter();
@@ -296,7 +298,7 @@ export default function PropertyComponent({ loading, setLoading }) {
                     <Box sx={{ position: 'relative' }}>
                         <CardMedia
                             sx={{ height: 150 }}
-                            image={`https://sorciproptrack.com/ApartmentImage/${item.image}`}
+                            image={`${API_URL_IMG}/ApartmentImage/${item.image}`}
                             title={item.propertyname[0].caption || "Image"}
                         />
                         {/* Calendar Icon Button */}

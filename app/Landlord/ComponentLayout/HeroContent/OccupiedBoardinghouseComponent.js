@@ -29,6 +29,7 @@ const AcceptToolTip = styled(({ className, ...props }) => (
 });
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
 
 export default function OccupiedBoardinghouse({
   boardinghouseId,
@@ -388,7 +389,7 @@ export default function OccupiedBoardinghouse({
                             }}
                           >
                             <Image
-                              src={`https://sorciproptrack.com/ApartmentImage/${image.image_path}`}
+                              src={`${API_URL_IMG}/ApartmentImage/${image.image_path}`}
                               alt={`Boardinghouse image ${index + 1}`}
                               layout="fill"
                               objectFit="cover"

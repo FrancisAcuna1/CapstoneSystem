@@ -106,6 +106,10 @@ const Search = styled('div')(({ theme }) => ({
     return response.json();
   }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
+
+
 function Header(props) {
     const { onDrawerToggle } = props;
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -128,7 +132,7 @@ function Header(props) {
     }, []);
 
     const {data:responseTotalNotif, error: errorTotalNotif} = useSWR(
-        userToken && userId ? [`http://127.0.0.1:8000/api/total_notifications`, userToken] : null,
+        userToken && userId ? [`${API_URL}/total_notifications`, userToken] : null,
         fetcherTotalNotif, {
             refreshInterval: 1000,
             revalidateOnFocus: false,
@@ -143,7 +147,7 @@ function Header(props) {
     }, [responseTotalNotif])
 
     const {data:responseTenantInfo, error: errorTenantInfo} = useSWR(
-        userToken && userId ? [`http://127.0.0.1:8000/api/tenant_information/${userId}`, userToken] : null,
+        userToken && userId ? [`${API_URL}/tenant_information/${userId}`, userToken] : null,
         fetcherTenantInformation, {
             refreshInterval: 1000,
             revalidateOnFocus: false,
@@ -158,7 +162,7 @@ function Header(props) {
     }, [responseTenantInfo])
 
     const {data: responseImage, error: errorImage, isLoading: isLoadingImage} = useSWR(
-        userToken && userId ? [ `http://127.0.0.1:8000/api/profile_image/${userId}`, userToken] : null,
+        userToken && userId ? [ `${API_URL}/profile_image/${userId}`, userToken] : null,
         fetcherProfileImage, {
           refreshInterval: 3000,
           revalidateOnFocus: false,
@@ -174,7 +178,7 @@ function Header(props) {
     }, [responseImage])
 
     const avatarSrc = profileImage
-    ? `http://127.0.0.1:8000/ProfileImages/${profileImage.image_path}`
+    ? `${API_URL_IMG}/ProfileImages/${profileImage.image_path}`
     : null;
 
     console.log(tenantInformation)
@@ -214,7 +218,7 @@ function Header(props) {
         const accessToken = userData.accessToken;
         if(accessToken){
             try{
-                const response = await fetch(`http://127.0.0.1:8000/api/logout`,{
+                const response = await fetch(`${API_URL}/logout`,{
                     method:'POST',
                     headers:{
                         'Content-Type': 'application/json',

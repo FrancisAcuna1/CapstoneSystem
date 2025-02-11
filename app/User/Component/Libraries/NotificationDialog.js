@@ -21,6 +21,9 @@ const fetcher = async([url, token]) => {
     return response.json()
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+
+
 const NotificationsDialog = ({ open}) => {
     const [loading, setLoading] = useState(false);
     const [userToken, setUserToken] = useState([]);
@@ -41,7 +44,7 @@ const NotificationsDialog = ({ open}) => {
     }, []);
 
     const {data: response, error, isLoading} = useSWR(
-        userToken && [`http://127.0.0.1:8000/api/getnotifications`, userToken] || null,
+        userToken && [`${API_URL}/getnotifications`, userToken] || null,
         fetcher, {
             refreshInterval: 1000,
             revalidateOnFocus: false,
@@ -69,7 +72,7 @@ const NotificationsDialog = ({ open}) => {
         // setLoading(true);
         if(accessToken){
             try{
-                const response = await fetch(`http://127.0.0.1:8000/api/notifications/${id}/read`,{
+                const response = await fetch(`${API_URL}/notifications/${id}/read`,{
                     method:'POST',
                     headers:{
                         'Authorization': `Bearer ${accessToken}`,

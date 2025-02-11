@@ -198,6 +198,7 @@ export default function PaymentTransactionTable({
         "Initial Payment",
         "Rental Fee",
         "Advance Payment",
+        "Security Deposit",
         "Penalties",
         "Extra Amenities",
         "Damage Compensation",

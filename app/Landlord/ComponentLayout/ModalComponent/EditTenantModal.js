@@ -343,6 +343,7 @@ export default function EditTenantModal({
     }
   }, [response]);
 
+  console.log(formData)
   const handleSubmit = async (e) => {
     e.preventDefault();
 

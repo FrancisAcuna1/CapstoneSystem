@@ -21,6 +21,7 @@ function srcset(image, width, height, rows = 1, cols = 1) {
   }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG; 
 
 export default function TenantRegistrationComponent({propsId, apartmentId, loading, setLoading}){
     const apartmentID = apartmentId; // apartment ID
@@ -233,7 +234,7 @@ export default function TenantRegistrationComponent({propsId, apartmentId, loadi
                                     }}
                                     >
                                     <Image
-                                        src={`https://sorciproptrack.com/ApartmentImage/${image.image_path}`}
+                                        src={`${API_URL_IMG}/ApartmentImage/${image.image_path}`}
                                         alt={`Apartment image ${index + 1}`}
                                         layout="fill"
                                         objectFit="cover"

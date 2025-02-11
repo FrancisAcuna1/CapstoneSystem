@@ -163,6 +163,7 @@ export default function PaymentTransactionComponent({ loading, setLoading }) {
             handleOpen={handleOpen}
             handleClose={handleClose}
             isEdit={isEdit}
+            setIsEdit={setIsEdit}
           />
           </SnackbarProvider>
         </Grid>

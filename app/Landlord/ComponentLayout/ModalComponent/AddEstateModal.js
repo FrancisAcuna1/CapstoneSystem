@@ -103,6 +103,8 @@ const fetcher = async([url, token]) => {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
+
 
 export default function AddApartmentModal({open, handleOpen, handleClose, setLoading, editproperty, setEditProperty, refreshData}) {
   const { enqueueSnackbar } = useSnackbar();
@@ -260,8 +262,8 @@ export default function AddApartmentModal({open, handleOpen, handleClose, setLoa
         const response = await fetch(url, {
           method,
           headers:{
-              'Authorization': `Bearer ${accessToken}`, 
-              // 'Accept': 'application/json',
+            'Authorization': `Bearer ${accessToken}`, 
+            // 'Accept': 'application/json',
           },
           body: formData
         });
@@ -438,7 +440,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, setLoa
                     <Image
                       src={
                         typeof selectedImage === 'string' 
-                          ? `https://sorciproptrack.com/ApartmentImage/${selectedImage}`
+                          ? `${API_URL_IMG}/ApartmentImage/${selectedImage}`
                           : selectedImage.preview
                       }
                       alt="Property Image"

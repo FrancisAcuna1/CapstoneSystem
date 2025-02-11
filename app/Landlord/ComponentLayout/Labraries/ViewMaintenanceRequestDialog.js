@@ -84,6 +84,7 @@ const fetchUnitAddress = async ([url, token]) => {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
 
 
 const MaintenanceRequestDialog = ({
@@ -196,7 +197,7 @@ const MaintenanceRequestDialog = ({
   const images =
     (viewRequest?.maintenance_images && viewRequest?.maintenance_images) || [];
   console.log("images:", images);
-  const imageBaseUrl = "https://sorciproptrack.com/MaintenanceImages/"; // Adjust this based on your API endpoint
+  const imageBaseUrl = `${API_URL_IMG}/MaintenanceImages/`; // Adjust this based on your API endpoint
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {

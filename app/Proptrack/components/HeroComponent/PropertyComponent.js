@@ -86,7 +86,7 @@ const categories = [
 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
-
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
 
 export default function PropertyComponentPage({ loading, setLoading }) {
   const router = useRouter();
@@ -538,7 +538,7 @@ export default function PropertyComponentPage({ loading, setLoading }) {
                                   }}
                                 >
                                   <Image
-                                    src={`https://sorciproptrack.com/ApartmentImage/${image}`}
+                                    src={`${API_URL_IMG}/ApartmentImage/${image}`}
                                     alt={`Image image ${index + 1}`}
                                     layout="fill"
                                     objectFit="cover"
@@ -877,13 +877,13 @@ export default function PropertyComponentPage({ loading, setLoading }) {
                             }}
                             onClick={() => {
                               if (property.property_type === "Apartment") {
-                                router.push(
+                                router.replace(
                                   `/Proptrack/Properties/${property.property_id}/apartment/${property.id}`
                                 );
                               } else if (
                                 property.property_type === "Boarding House"
                               ) {
-                                router.push(
+                                router.replace(
                                   `/Proptrack/Properties/${property.property_id}/boardinghouse/${property.id}`
                                 );
                               }

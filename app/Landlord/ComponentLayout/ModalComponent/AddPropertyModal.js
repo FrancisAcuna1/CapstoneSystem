@@ -151,6 +151,7 @@ const AcceptToolTip = styled(({ className, ...props }) => (
 });
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
+const API_URL_IMG = process.env.NEXT_PUBLIC_API_URL_IMG;
 
 
 export default function AddPropertyType({
@@ -370,7 +371,7 @@ export default function AddPropertyType({
                 const existingImages = data.apartment.images.map((img) => ({
                   id: img.id,
                   path: img.image_path,
-                  preview: `https://sorciproptrack.com/ApartmentImage/${img.image_path}`, // Adjust URL as needed
+                  preview: `${API_URL_IMG}/ApartmentImage/${img.image_path}`, // Adjust URL as needed
                 }));
                 setSelectedImage(existingImages);
               }
@@ -394,7 +395,7 @@ export default function AddPropertyType({
                 const existingImages = data.boardinghouse.images.map((img) => ({
                   id: img.id,
                   path: img.image_path,
-                  preview: `https://sorciproptrack.com/ApartmentImage/${img.image_path}`, // Adjust URL as needed
+                  preview: `${API_URL_IMG}/ApartmentImage/${img.image_path}`, // Adjust URL as needed
                 }));
                 setSelectedImage(existingImages);
               }
@@ -504,7 +505,6 @@ export default function AddPropertyType({
       console.log("Value:", newboardinghouse);
       console.log("rooms:", rooms);
       console.log("inclusion:", selectedInclusions);
-
       try {
         const formData = new FormData();
         let hasErrors = false;
@@ -792,7 +792,7 @@ export default function AddPropertyType({
             selectedProperty === "Apartment"
               ? `${API_URL}/update_apartment/${editItem}`
               : `${API_URL}/update_boardinghouse/${editItem}`;
-          method = "POST"; // Since we're using '_method', use POST for sending
+          method = "POST"; // Since we're using '_method', use POST for sending http://127.0.0.1:8000/api https://api.sorciproptrack.com/api
         } else {
           endpoint =
             selectedProperty === "Apartment"
@@ -801,6 +801,7 @@ export default function AddPropertyType({
           method = "POST";
         }
 
+        console.log(endpoint, method, accessToken, editItem)
         const response = await fetch(endpoint, {
           method,
           headers: {
@@ -843,6 +844,7 @@ export default function AddPropertyType({
         }
       } catch (error) {
         console.error("An error occurred:", error);
+        console.log(error)
         setLoading(false);
       }
     } else {
@@ -1816,7 +1818,7 @@ export default function AddPropertyType({
                                 <Image
                                   src={
                                     image.preview ||
-                                    `https://sorciproptrack.com/ApartmentImage/${image.path}`
+                                    `${API_URL_IMG}/ApartmentImage/${image.path}`
                                   }
                                   alt={image.name}
                                   width={500} // Add specific width
@@ -2679,7 +2681,7 @@ export default function AddPropertyType({
                                 <Image
                                   src={
                                     image.preview ||
-                                    `https://sorciproptrack.com/ApartmentImage/${image.path}`
+                                    `${API_URL_IMG}/ApartmentImage/${image.path}`
                                   }
                                   alt={image.name}
                                   width={500} // Add specific width
