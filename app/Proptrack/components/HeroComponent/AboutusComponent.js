@@ -76,6 +76,8 @@ export default function FAQSection() {
               src="/aboutus.jpeg"
               width={1200} // Larger width
               height={800} // Larger height
+              priority
+              loading='eager'
               style={{
                 width: "100%", // Make the image fill the container
                 height: "auto", // Maintain aspect ratio

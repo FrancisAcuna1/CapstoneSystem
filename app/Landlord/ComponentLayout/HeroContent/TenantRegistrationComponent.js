@@ -238,6 +238,7 @@ export default function TenantRegistrationComponent({propsId, apartmentId, loadi
                                         alt={`Apartment image ${index + 1}`}
                                         layout="fill"
                                         objectFit="cover"
+                                        priority
                                         style={{ borderRadius: '10px'}}
                                     />
                                     </Box>

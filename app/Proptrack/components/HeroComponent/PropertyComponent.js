@@ -542,6 +542,8 @@ export default function PropertyComponentPage({ loading, setLoading }) {
                                     alt={`Image image ${index + 1}`}
                                     layout="fill"
                                     objectFit="cover"
+                                    priority
+                                    loading='eager'
                                     style={{ borderRadius: "10px" }}
                                   />
                                 </Box>

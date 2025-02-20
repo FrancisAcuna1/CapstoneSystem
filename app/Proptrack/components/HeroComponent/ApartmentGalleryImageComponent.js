@@ -353,6 +353,7 @@ export default function ApartmentGalleryComponent({
                         alt={`Apartment image ${index + 1}`}
                         width={200}
                         height={200}
+                        priority
                         style={{
                           width: "100%",
                           height: "100%",
@@ -412,9 +413,9 @@ export default function ApartmentGalleryComponent({
                           isTopImage ? 2 : 1
                         )}
                         alt={`Image ${index + 1}`}
-                        loading="lazy"
                         width={1000}
                         height={1000}
+                        priority
                         style={{
                           width: "100%",
                           height: "100%",
@@ -465,6 +466,8 @@ export default function ApartmentGalleryComponent({
                       alt="Active Image"
                       layout="fill"
                       objectFit="contain"
+                      priority
+                      loading="eager"
                       style={{ objectFit: "cover" }}
                     />
                   </div>

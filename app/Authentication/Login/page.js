@@ -132,7 +132,7 @@ export default function LoginPage() {
         if (updatedSession && updatedSession.user) {
           console.log("Login successful:", updatedSession.user);
           console.log("Login successful:", updatedSession.user.role);
-          router.push(`/${updatedSession.user.role}/Home`);
+          router.replace(`/${updatedSession.user.role}/Home`);
         } else {
           console.log("Login failed");
         }
@@ -374,6 +374,8 @@ export default function LoginPage() {
                 layout="fill"
                 objectFit="cover"
                 quality={100}
+                priority
+                loading="eager"
                 style={{
                   opacity: 0.7, // Slightly reduce image opacity
                   filter: 'brightness(0.8) contrast(1.4)', // Enhance image contrast

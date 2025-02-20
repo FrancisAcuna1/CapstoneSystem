@@ -320,6 +320,7 @@ export default function BoardingHouseDetailsComponent({
                               alt={`Boardinghouse image ${index + 1}`}
                               layout="fill"
                               objectFit="cover"
+                              priority
                               style={{ borderRadius: "10px" }}
                             />
                           </Box>

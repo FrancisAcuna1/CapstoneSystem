@@ -794,6 +794,7 @@ export default function AddPropertyType({
               : `${API_URL}/update_boardinghouse/${editItem}`;
           method = "POST"; // Since we're using '_method', use POST for sending http://127.0.0.1:8000/api https://api.sorciproptrack.com/api
         } else {
+          formData.append("_method", "POST");
           endpoint =
             selectedProperty === "Apartment"
               ? `${API_URL}/store_apartment`
@@ -805,10 +806,11 @@ export default function AddPropertyType({
         const response = await fetch(endpoint, {
           method,
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            'Authorization': `Bearer ${accessToken}`,
             Accept: "application/json",
           },
           body: formData,
+          mode: 'cors'
         });
 
         const data = await response.json();

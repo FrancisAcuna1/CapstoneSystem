@@ -98,6 +98,8 @@ function AppAppBar({ mode, toggleColorMode}) {
                   alt="proptrack logo"
                   width={200}
                   height={100}
+                  priority
+                  loading='eager'
                   className={mode === 'dark' ? 'dark-mode-logo' : ''}
                 />
                 <Image
@@ -106,6 +108,8 @@ function AppAppBar({ mode, toggleColorMode}) {
                   alt="proptrack logoname"
                   width={200}
                   height={80}
+                  priority
+                  loading='eager'
                   className={mode === 'dark' ? 'dark-mode-logo' : ''}
                 />
               </Box>

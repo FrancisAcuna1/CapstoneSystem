@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import AppAppBar from "../../../../components/LayoutComponent/Appbar";
 import PropTypes from 'prop-types';
-import {CssBaseline, ToggleButtonGroup, ToggleButton, Box, Grid, Typography} from '@mui/material';
+import {CssBaseline, ToggleButtonGroup, ToggleButton, Box, Grid, Typography, LinearProgress} from '@mui/material';
 import Divider from '@mui/material/Divider';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import getLPTheme from "../../../../components/LayoutComponent/getLPTheme";
@@ -11,45 +11,6 @@ import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 import BoardingHouseGallery from "@/app/Proptrack/components/HeroComponent/BoardingHouseGalleryComponent";
 import CustomAppBar from "../../../../components/LayoutComponent/ImageGalleryAppbar";
 // import Chatbot from "../../component/chatbot";
-
-
-// function ToggleCustomTheme({ showCustomTheme, toggleCustomTheme }) {
-//     return (
-//       <Box
-//         sx={{
-//           display: 'flex',
-//           flexDirection: 'column',
-//           alignItems: 'center',
-//           width: '100dvw',
-//           position: 'fixed',
-//           bottom: 24,
-//         }}
-//       >
-//         <ToggleButtonGroup
-//           color="primary"
-//           exclusive
-//           value={showCustomTheme}
-//           onChange={toggleCustomTheme}
-//           aria-label="Toggle design language"
-//           sx={{
-//             backgroundColor: 'background.default',
-//             '& .Mui-selected': {
-//               pointerEvents: 'none',
-//             },
-//           }}
-//         >
-//           <ToggleButton value={false}>Material Design 2</ToggleButton>
-//         </ToggleButtonGroup>
-//       </Box>
-//     );
-//   }
-  
-//   ToggleCustomTheme.propTypes = {
-//     showCustomTheme: PropTypes.shape({
-//       valueOf: PropTypes.func.isRequired,
-//     }).isRequired,
-//     toggleCustomTheme: PropTypes.func.isRequired,
-//   };
 
 export default function GalleryPage() {
     const params = useParams();
@@ -73,7 +34,7 @@ export default function GalleryPage() {
     return (
     <ThemeProvider theme={showCustomTheme ? defaultTheme : defaultTheme}>
       <CssBaseline />
-      {/* <AppAppBar mode={mode} toggleColorMode={toggleColorMode} /> */}
+      {loading && <LinearProgress color='secondary' sx={{ position: 'absolute',  zIndex: 2100, top: 0, left: 0, right: 0, height: 4, borderRadius: '4px 4px 0 0' }} />}
       <CustomAppBar  mode={mode} toggleColorMode={toggleColorMode} />
       <BoardingHouseGallery
         loading={loading}

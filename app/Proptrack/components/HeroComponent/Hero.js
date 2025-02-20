@@ -142,6 +142,8 @@ export default function Hero() {
                 alt="houseSearching"
                 width={590}
                 height={500}
+                priority
+                loading='eager'
                 style={{
                     maxWidth: '100%',
                     height: 'auto',

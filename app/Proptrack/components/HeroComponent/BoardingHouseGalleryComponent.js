@@ -568,6 +568,7 @@ export default function BoardingHouseGallery({
                         alt={`Apartment image ${index + 1}`}
                         width={100}
                         height={100}
+                        priority
                         style={{
                           width: "100%",
                           height: "100%",
@@ -627,9 +628,9 @@ export default function BoardingHouseGallery({
                           isTopImage ? 2 : 1
                         )}
                         alt={`Image ${index + 1}`}
-                        loading="lazy"
-                        width={900}
-                        height={900}
+                        width={500}
+                        height={500}
+                        priority
                         style={{
                           width: "100%",
                           height: "100%",
@@ -680,6 +681,7 @@ export default function BoardingHouseGallery({
                       alt="Active Image"
                       layout="fill"
                       objectFit="contain"
+                      priority
                       style={{ objectFit: "cover" }}
                     />
                   </div>

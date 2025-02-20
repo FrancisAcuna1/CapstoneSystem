@@ -994,10 +994,12 @@ const AdminProfileComponent = ({ setLoading, loading }) => {
                     }}
                     >
                     <Image
-                        src={`http://127.0.0.1:8000/ProfileImages/${profileImage.image_path}`}
+                        src={`${API_URL_IMG}/ProfileImages/${profileImage.image_path}`}
                         alt="Profile"
                         layout="fill"
                         objectFit="contain"
+                        priority
+                        loading="eager"
                     />
                     </div>
                 ) : (
