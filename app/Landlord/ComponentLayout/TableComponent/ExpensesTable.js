@@ -216,7 +216,7 @@ export default function ExpensesTable({
   const [warningOpen1, setWarningOpen1] = useState(false);
   const [warningOpen2, setWarningOpen2] = useState(false);
   const [viewExpensesId, setViewExpensesId] = useState([]);
-  const categories = ["all", "maintenance fee", "utility bill", "recurring"];
+  const categories = ["all", "maintenance fee", "utility bill", "tax", "recurring"];
 
   console.log(recurringDetails);
   console.log(selectedCategory);
@@ -626,7 +626,7 @@ export default function ExpensesTable({
       const description = expenses.description?.toLowerCase() || '';
       const bill_type = expenses.type_of_bills?.toLowerCase() || '';
       const frequency = expenses.frequency?.toLowerCase() || '';
-
+      const tax = expenses.type_of_tax?.toLowerCase() || '';
       const rental_Unit =
         expenses.unit_type === "Apartment"
           ? expenses.unit?.apartment_name?.toLowerCase() || ""
@@ -638,6 +638,7 @@ export default function ExpensesTable({
       return (
         category.includes(searchLower) ||
         bill_type.includes(searchLower) ||
+        tax.includes(searchLower) ||
         rental_Unit.includes(searchLower) ||
         description.includes(searchLower) ||
         amount.includes(searchLower) ||
@@ -995,6 +996,19 @@ export default function ExpensesTable({
                       <SouthIcon fontSize="extrasmall" />
                     ))}
                 </StyledTableCell>
+                <StyledTableCell onClick={() => handleSort("type_of_tax")}>
+                  Type of Taxes{" "}
+                  {sortConfig.key === "type_of_tax" &&
+                    (sortConfig.direction === "asc" ? (
+                      <NorthIcon
+                        fontSize="extrasmall"
+                        justifyContent="center"
+                        color="#bdbdbd"
+                      />
+                    ) : (
+                      <SouthIcon fontSize="extrasmall" />
+                    ))}
+                </StyledTableCell>
                 <StyledTableCell onClick={() => handleSort('description')}>
                   Description{" "}
                   {sortConfig.key === "description" &&
@@ -1071,9 +1085,12 @@ export default function ExpensesTable({
                           : item.unit.boarding_house_name}
                       </StyledTablebody>
                       <StyledTablebody>₱ {item.amount}</StyledTablebody>
-                      <StyledTablebody>{item.category || ""}</StyledTablebody>
+                      <StyledTablebody>{item.category.charAt(0).toUpperCase() + item.category.slice(1) || ""}</StyledTablebody>
                       <StyledTablebody>
-                        {item.type_of_bills || "N/A"}
+                        {item.type_of_bills ? item.type_of_bills.charAt(0).toUpperCase() + item.type_of_bills.slice(1) : "N/A"}
+                      </StyledTablebody>
+                      <StyledTablebody>
+                        {item.type_of_tax ? item.type_of_tax.charAt(0).toUpperCase() + item.type_of_tax.slice(1) : "N/A"}
                       </StyledTablebody>
                       <StyledTablebody
                         sx={{

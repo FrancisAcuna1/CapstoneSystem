@@ -420,10 +420,12 @@ export default function MaintenanceRequestTable({
     const property_Type = request?.tenant?.rental_agreement[0]?.rented_unit_type?.toLowerCase();
     const description = request.issue_description?.toLowerCase();
     const status = request?.status?.toLowerCase();
+    const urgency_level = request?.urgency_level.toLowerCase();
     const date = request?.date_reported;
     const formatedDate = formatDate(date);
     return (
       status?.includes(searchStr) ||
+      urgency_level?.includes(searchStr) ||
       issues?.includes(searchStr) ||
       otherissue?.includes(searchStr) ||
       formatedDate?.toLowerCase().includes(searchStr) ||
@@ -689,6 +691,22 @@ export default function MaintenanceRequestTable({
                           <SouthIcon fontSize="extrasmall" />
                         ))}
                     </StyledTableCell>
+
+                    <StyledTableCell
+                      onClick={() => handleSort("reported_issue")}
+                    >
+                      Urgency Level{" "}
+                      {sortConfig.key === "reported_issue" &&
+                        (sortConfig.direction === "asc" ? (
+                          <NorthIcon
+                            fontSize="extrasmall"
+                            justifyContent="center"
+                          />
+                        ) : (
+                          <SouthIcon fontSize="extrasmall" />
+                        ))}
+                    </StyledTableCell>
+
                     <StyledTableCell
                       sx={{ width: "200px" }}
                       onClick={() => handleSort("issue_description")}
@@ -761,6 +779,36 @@ export default function MaintenanceRequestTable({
                         </TableCell>             
                         <TableCell>
                           {info.reported_issue || info.other_issue}
+                        </TableCell>
+                        <TableCell>
+                          {/* {info.urgency_level || 'none'} */}
+                          <Chip
+                            label={info.urgency_level}
+                            variant="contained"
+                            sx={{
+                              backgroundColor: 
+                                info.urgency_level === "Low"
+                                  ? "#c8e6c9"
+                                  : info.urgency_level === "Medium"
+                                  ? "#ffe0b2"
+                                  : "#ffcdd2",
+                              color:
+                                info.urgency_level === "Low"
+                                ? "#2e7d32"
+                                : info.urgency_level === "Medium"
+                                ? "#ff8f00"
+                                : "#c62828",
+                              "& .MuiChip-label":{
+                                color:
+                                  info.urgency_level === "Low"
+                                  ? "#2e7d32"
+                                  : info.urgency_level === "Medium"
+                                  ? "#ff8f00"
+                                  : "#c62828",
+                                fontWeight: 560,
+                              },
+                            }}
+                          />
                         </TableCell>
                         <TableCell
                           sx={{

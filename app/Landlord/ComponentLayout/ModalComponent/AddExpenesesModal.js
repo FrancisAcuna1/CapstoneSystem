@@ -226,6 +226,7 @@ export default function AddExpensesTransaction({
     category: "",
     frequency: "",
     type_of_bills: "",
+    type_of_tax: "",
     startDate: null,
     endDate: null,
     includeWeekends: true,
@@ -289,6 +290,10 @@ export default function AddExpensesTransaction({
       }
       if (formData.category === "utility bill" && !formData.type_of_bills) {
         tempErrors.type_of_bills = "Type of bill is required";
+        isValid = false;
+      }
+      if(formData.category === "tax" && !formData.type_of_tax){
+        tempErrors.tax = "Type of tax is required";
         isValid = false;
       }
     }
@@ -456,6 +461,7 @@ export default function AddExpensesTransaction({
           type: formData.type,
           category: formData.category,
           type_of_bills: formData.type_of_bills,
+          type_of_tax: formData.type_of_tax,
           amount: formData.amount,
           description: formData.description,
           frequency: formData.frequency,
@@ -1150,7 +1156,7 @@ export default function AddExpensesTransaction({
                       <Grid
                         item
                         xs={12}
-                        sm={formData.category === "utility bill" ? 4 : 6}
+                        sm={formData.category === "utility bill" ? 4 : formData.category === "tax" ? 4 : 6}
                         sx={{ mt: { xs: "2rem", lg: "2.8rem" } }}
                       >
                         <FormControl
@@ -1196,7 +1202,7 @@ export default function AddExpensesTransaction({
                       <Grid
                         item
                         xs={12}
-                        sm={formData.category === "utility bill" ? 4 : 6}
+                        sm={formData.category === "utility bill" ? 4 : formData.category === "tax" ? 4 : 6}
                         sx={{ mt: 5.7 }}
                       >
                         <FormControl
@@ -1219,6 +1225,9 @@ export default function AddExpensesTransaction({
                             <MenuItem value="utility bill">
                               Utility Bill
                             </MenuItem>
+                            <MenuItem value="tax">
+                              Tax
+                            </MenuItem>
                           </Select>
                           {formError.category && (
                             <FormHelperText>
@@ -1227,6 +1236,8 @@ export default function AddExpensesTransaction({
                           )}
                         </FormControl>
                       </Grid>
+                      {formData.category === "utility bill" ? (
+                      <>
                       <Grid
                         item
                         xs={12}
@@ -1269,6 +1280,54 @@ export default function AddExpensesTransaction({
                           )}
                         </FormControl>
                       </Grid>
+                      </>
+                      ):(
+                      <>
+                        <Grid
+                          item
+                          xs={12}
+                          sm={formData.category === "tax" ? 4 : 0}
+                          sx={{ mt: 1.7 }}
+                        >
+                          <FormControl
+                            fullWidth
+                            required
+                            error={Boolean(formError.category)}
+                            sx={{
+                              display:
+                                formData.category === "tax"
+                                  ? "block"
+                                  : "none",
+                              mt: formData.category === "tax" ? 4 : -5,
+                            }}
+                          >
+                            <InputLabel>Type of Tax</InputLabel>
+                            <Select
+                              label="Type of Tax"
+                              name="type_of_tax"
+                              value={formData.type_of_tax}
+                              onChange={handleChange}
+                              required
+                              fullWidth
+                              disabled={formData.category !== "tax"}
+                              error={Boolean(formError.type_of_tax)}
+                            >
+                              <MenuItem value="bir">BIR</MenuItem>
+                              <MenuItem value="income tax">
+                                Income Tax
+                              </MenuItem>
+                              <MenuItem value="vat">VAT</MenuItem>
+                              <MenuItem value="property tax">Property Tax</MenuItem>
+                            </Select>
+                            {formError.type_of_tax && (
+                              <FormHelperText>
+                                {formError.type_of_tax}
+                              </FormHelperText>
+                            )}
+                          </FormControl>
+                        </Grid>
+                      </>
+                      )} 
                       <Grid item xs={12} sm={6} sx={{ mt: -1 }}>
                         <FormControl
                           fullWidth

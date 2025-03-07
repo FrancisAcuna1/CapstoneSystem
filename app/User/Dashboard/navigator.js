@@ -65,6 +65,7 @@ export default function Navigator(props) {
             alt="proptrack logo"
             width={200}
             height={125}
+            priority
           />
         </Grid>
         <Grid item>
@@ -74,6 +75,7 @@ export default function Navigator(props) {
             alt="proptrack logo"
             width={300}
             height={100}
+            priority
           />
         </Grid>
       </Grid>

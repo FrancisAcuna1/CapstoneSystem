@@ -26,7 +26,6 @@ import { format, parseISO } from "date-fns";
 import { SnackbarProvider, useSnackbar } from "notistack";
 import AddRemarksForm from "../ModalComponent/AddRemarkModal";
 import useSWR from "swr";
-
 import {
   Close as CloseIcon,
   Phone as PhoneIcon,
@@ -39,8 +38,12 @@ import {
   Image as ImageIcon,
   Fullscreen as MaximizeIcon,
   Home as HomeSharpIcon,
+  Info as InfoOutlinedIcon,
 } from "@mui/icons-material";
 import Image from "next/image";
+import { green, orange, red } from '@mui/material/colors';
+
+
 const GradientHeader = styled(Box)(({ theme }) => ({
   background: `linear-gradient(to right, ${theme.palette.primary[50]}, ${theme.palette.primary[100]}, ${theme.palette.primary[50]})`,
   padding: theme.spacing(3),
@@ -66,6 +69,22 @@ const ContactBox = styled(Box)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   "&:hover": {
     backgroundColor: theme.palette.grey[100],
+  },
+}));
+
+const UrgencyCard = styled(Box)(({ theme, level }) => ({
+  backgroundColor: level === 'Low' ? green[50] : level === 'Medium' ? orange[50] : red[50],
+  borderRadius: '8px',
+  padding: '16px',
+  display: 'flex',
+  flexDirection: 'column',
+  // alignItems: 'center',
+  // justifyContent: 'center',
+  border: `1px solid ${level === 'Low' ? green[500] : level === 'Medium' ? orange[500] : red[500]}`,
+  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  transition: "box-shadow 0.3s",
+  '&:hover': {
+    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.2)',
   },
 }));
 
@@ -246,6 +265,8 @@ const MaintenanceRequestDialog = ({
     );
   };
 
+ 
+
   return (
     <Box>
       <Dialog
@@ -344,6 +365,43 @@ const MaintenanceRequestDialog = ({
             </Box>
           ) : (
             <Box sx={{ py: 3, px: 2 }}>
+              <UrgencyCard level={viewRequest.urgency_level} sx={{mb:4}}>
+                <Typography variant="body2" sx={{display: 'flex', alignItems:'start', fontSize:'15px' }}>
+                  Urgency Level:
+                </Typography>
+                <Typography 
+                  variant="body1" 
+                  sx={{
+                    fontSize:'18px', 
+                    fontWeight:600, 
+                    mt:1, 
+                    color: viewRequest.urgency_level === "Low" 
+                      ? '#2e7d32'
+                      : viewRequest.urgency_level === "Medium"
+                      ? '#f57c00'
+                      : '#d32f2f',
+                  }}>
+                  {viewRequest.urgency_level} Priority
+                </Typography>
+                <Typography>
+                  {viewRequest.urgency_level === "Low" 
+                    ? <p style={{display:'flex', alignItems:'center', fontSize:'15px', color:'#616161'}}>
+                        <InfoOutlinedIcon sx={{ mr: 1, color: "#757575", fontSize:'18px'}} />
+                        Non-critical issues that can be addressed within 48-72 hours
+                      </p>
+                    : viewRequest.urgency_level === "Medium" 
+                    ? <p style={{display:'flex', alignItems:'center', fontSize:'15px', color:'#616161'}}>
+                        <InfoOutlinedIcon sx={{ mr: 1, color: "#757575", fontSize:'18px'}} />
+                        Important issues that need attention within 24 hours.
+                      </p>
+                    : <p style={{display:'flex', alignItems:'center', fontSize:'15px', color:'#616161'}}>
+                        <InfoOutlinedIcon sx={{ mr: 1, color: "#757575", fontSize:'18px'}} />
+                        Critical issues requiring immediate attention. Response expected within 2-4 hours.
+                      </p>
+                  }
+                </Typography>
+              </UrgencyCard>
+
               <InfoCard elevation={0}>
                 <Box
                   sx={{
@@ -363,7 +421,7 @@ const MaintenanceRequestDialog = ({
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <HomeSharpIcon fontSize="small" color="action" />
                       <Typography variant="body2" color="text.secondary">
-                        {unitAddress[0]?.rented_unit?.boarding_house_name ||
+                        {unitAddress[0]?.rented_unit?.apartment_name ||
                           unitAddress[0]?.rented_unit?.boarding_house_name ||
                           "Not specified"}
                       </Typography>

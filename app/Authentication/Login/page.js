@@ -315,7 +315,7 @@ export default function LoginPage() {
                     }}
                   />
 
-                  <Link
+                  {/* <Link
                     href="#"
                     variant="body2"
                     sx={{ 
@@ -329,7 +329,7 @@ export default function LoginPage() {
                     }}
                   >
                     Forgot password?
-                  </Link>
+                  </Link> */}
 
                   <Button
                     type="submit"

@@ -343,6 +343,7 @@ export default function RequestMaintenanceTable({
         const issue = request?.reported_issue?.toLowerCase();
         const otherissue = request?.other_issue?.toLowerCase();
         const status = request?.status.toLowerCase();
+        const urgency = request?.urgency_level.toLowerCase();
         const description = request.issue_description?.toLowerCase();
         const date = request?.date_reported;
         const formatedDate = formatDate(date);
@@ -351,6 +352,7 @@ export default function RequestMaintenanceTable({
         issue?.includes(searchStr) ||
         otherissue?.includes(searchStr) ||
         status?.includes(searchStr) ||
+        urgency?.includes(searchStr) ||
         formatedDate?.toLowerCase().includes(searchStr) ||
         description.includes(searchStr)
         );
@@ -493,6 +495,20 @@ export default function RequestMaintenanceTable({
                             ))}
                         </StyledTableCell>
                         <StyledTableCell
+                        onClick={() => handleSort("urgency_level")}
+                        >
+                        Urgency Level{" "}
+                        {sortConfig.key === "urgency_level" &&
+                            (sortConfig.direction === "asc" ? (
+                            <NorthIcon
+                                fontSize="extrasmall"
+                                justifyContent="center"
+                            />
+                            ) : (
+                            <SouthIcon fontSize="extrasmall" />
+                            ))}
+                        </StyledTableCell>
+                        <StyledTableCell
                         onClick={() => handleSort("issue_description")}
                         >
                         Description{" "}
@@ -542,6 +558,9 @@ export default function RequestMaintenanceTable({
                             <TableCell>{formatDate(info.date_reported)}</TableCell>
                             <TableCell>
                             {info.reported_issue || info.other_issue}
+                            </TableCell>
+                            <TableCell>
+                            {info.urgency_level}
                             </TableCell>
                             <TableCell
                                 sx={{

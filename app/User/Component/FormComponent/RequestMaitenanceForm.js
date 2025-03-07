@@ -281,17 +281,18 @@ export default function RequestMaintenanceForm({
     issue_description: "",
     date_reported: null,
     status: "Pending",
+    urgency: "",
   });
 
   console.log(editId);
-  console.log(parseInt(userId))
+  console.log(parseInt(userId));
   console.log(formData);
   console.log(selectedItem);
   console.log(selectedImage);
   console.log("unitInfo;", unitInformation);
   console.log("inclusions:", unitInformation?.rented_unit?.inclusions);
-  console.log(deleteImage)
-  console.log(loading)
+  console.log(deleteImage);
+  console.log(loading);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -390,7 +391,7 @@ export default function RequestMaintenanceForm({
           item_name: data.reported_issue || "others", // Ensure this is set correctly
           issue_description: data.issue_description || "",
           status: data.status || "pending", // Default to pending if not set
-          date_reported: dayjs(data.date_reported)
+          date_reported: dayjs(data.date_reported),
         });
         setSelectedItem(data.reported_issue || "others"); // Set selected item
       }
@@ -409,8 +410,8 @@ export default function RequestMaintenanceForm({
     }
   }, [responseEdit]);
 
-  console.log(formData)
-  console.log(editId)
+  console.log(formData);
+  console.log(editId);
   // {
   //   tenant_id: 10,
   //   otherissues: '',
@@ -422,12 +423,12 @@ export default function RequestMaintenanceForm({
   // }
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (accessToken) {
       try {
         let hasErrors = false;
         let newErrors = {};
-  
+
         // Validation checks
         if (!formData.tenant_id) {
           hasErrors = true;
@@ -441,6 +442,10 @@ export default function RequestMaintenanceForm({
           hasErrors = true;
           newErrors.otherissues = "Other issues description is required!";
         }
+        if (!formData.urgency) {
+          hasErrors = true;
+          newErrors.urgency = "Urgency level is required!";
+        }
         if (!formData.issue_description) {
           hasErrors = true;
           newErrors.issue_description = "Issue Description is required!";
@@ -449,25 +454,37 @@ export default function RequestMaintenanceForm({
           hasErrors = true;
           newErrors.images = "At least one image is required";
         }
-  
+
         if (hasErrors) {
           setErrors(newErrors);
           setLoading(false);
           return;
         }
-        
-        console.log(formData)
+
+        console.log(formData);
         const formDataToSubmit = new FormData();
-        formDataToSubmit.append("tenant_id", formData.tenant_id || '');
-        formDataToSubmit.append("reported_issue", formData.item_name === "others" ? "" : formData.item_name || '');
+        formDataToSubmit.append("tenant_id", formData.tenant_id || "");
+        formDataToSubmit.append(
+          "reported_issue",
+          formData.item_name === "others" ? "" : formData.item_name || ""
+        );
         formDataToSubmit.append("otherissues", formData.otherissues || "");
-        formDataToSubmit.append("issue_description", formData.issue_description || '');
+        formDataToSubmit.append(
+          "issue_description",
+          formData.issue_description || ""
+        );
         formDataToSubmit.append(
           "date_reported",
           dayjs(formData.date_reported).format("MM/DD/YYYY")
         );
         formDataToSubmit.append("status", "Pending");
-        formDataToSubmit.append('unitName', unitInformation.rented_unit.boarding_house_name || unitInformation.rented_unit.apartment_name || '') //for notication unit name purpose
+        formDataToSubmit.append("urgency", formData.urgency);
+        formDataToSubmit.append(
+          "unitName",
+          unitInformation.rented_unit.boarding_house_name ||
+            unitInformation.rented_unit.apartment_name ||
+            ""
+        ); //for notication unit name purpose
 
         if (selectedImage && selectedImage.length > 0) {
           selectedImage.forEach((image, index) => {
@@ -481,14 +498,14 @@ export default function RequestMaintenanceForm({
             formDataToSubmit.append(`remove_images[${index}]`, imageId);
           });
         }
-        
-        if(editId){
-          formDataToSubmit.append('_method', 'PUT');
+
+        if (editId) {
+          formDataToSubmit.append("_method", "PUT");
         }
         setLoading(true);
         const endPoint = editId
-        ? `${API_URL}/update_request/${editId}`
-        : `${API_URL}/requestmaintenance`;
+          ? `${API_URL}/update_request/${editId}`
+          : `${API_URL}/requestmaintenance`;
 
         const response = await fetch(endPoint, {
           method: "POST",
@@ -515,7 +532,10 @@ export default function RequestMaintenanceForm({
         }
       } catch (error) {
         setLoading(false);
-        setError("Failed to submit maintenance request. Please try again.", error);
+        setError(
+          "Failed to submit maintenance request. Please try again.",
+          error
+        );
       }
     } else {
       setError("You must be logged in to submit a maintenance request.");
@@ -623,8 +643,8 @@ export default function RequestMaintenanceForm({
         variant="contained"
         onClick={handleOpen}
         sx={{
-          background: "primary",
-          "&:hover": { backgroundColor: "#b6bdf1" },
+          background: "#673ab7",
+          "&:hover": { backgroundColor: "#7e57c2" },
           borderRadius: "15px",
           p: 1.1,
           mb: 2,
@@ -643,16 +663,15 @@ export default function RequestMaintenanceForm({
           setSelectedItem([]);
           setSelectedImage([]);
           setEditId(null);
-          resetForm()
+          resetForm();
         }}
         sx={{
-          '& .MuiDialog-paper': {
-            borderRadius: '12px',
-            overflowY: 'auto',
-            maxHeight: '80vh', // Max height for mobile
+          "& .MuiDialog-paper": {
+            borderRadius: "12px",
+            overflowY: "auto",
+            maxHeight: "80vh", // Max height for mobile
           },
         }}
-        
       >
         <DialogTitle>
           <Typography
@@ -660,10 +679,10 @@ export default function RequestMaintenanceForm({
             letterSpacing={3}
             sx={{ fontSize: "20px", mt: 0.2 }}
           >
-            {editId ? 'Edit Request Maintenance' : 'Add Request Maintenance'}
+            {editId ? "Edit Request Maintenance" : "Add Request Maintenance"}
           </Typography>
         </DialogTitle>
-        <DialogContent 
+        <DialogContent
           sx={{
             overflow: "auto", // Allow scrolling for the content
             scrollbarWidth: "none", // Hide scrollbar in Firefox
@@ -694,7 +713,7 @@ export default function RequestMaintenanceForm({
                   sx={{mt:3}}
                   /> */}
                 <Box>
-                {errors.tenant_id && (
+                  {errors.tenant_id && (
                     <FormHelperText error sx={{ fontSize: "13px" }}>
                       {errors.tenant_id}
                     </FormHelperText>
@@ -771,6 +790,85 @@ export default function RequestMaintenanceForm({
                 </FormHelperText>
               </>
             )}
+
+            {/* urgency */}
+            <FormControl
+              fullWidth
+              error={Boolean(errors.urgency)}
+              sx={{ mt: 2, mb: 2 }}
+            >
+              <InputLabel>Select urgency</InputLabel>
+              <Select
+                labelId="select urgency"
+                id="urgency"
+                label="Select urgency"
+                value={formData.urgency} // The selected value
+                onChange={handleChange}
+                name="urgency"
+                sx={{
+                  "&:focus": { borderColor: "primary.main" },
+                }}
+              >
+                <MenuItem disabled value="">
+                  <em>Select an urgency level</em>
+                </MenuItem>
+                <MenuItem value="Low">
+                  <div>
+                    <strong style={{ color: "#4caf50" }}>Low</strong>
+                    <p
+                      style={{
+                        fontSize: "0.85em",
+                        color: "#757575",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <InfoOutlinedIcon sx={{ mr: 1, color: "#757575" }} />{" "}
+                      Non-critical issues that can be addressed within 48-72
+                      hours.
+                    </p>
+                  </div>
+                </MenuItem>
+                <MenuItem value="Medium">
+                  <div>
+                    <strong style={{ color: "#fdd835" }}>Medium</strong>
+                    <p
+                      style={{
+                        fontSize: "0.85em",
+                        color: "#757575",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <InfoOutlinedIcon sx={{ mr: 1, color: "#757575" }} />{" "}
+                      Important issues that need attention within 24 hours.
+                    </p>
+                  </div>
+                </MenuItem>
+                <MenuItem value="High">
+                  <div>
+                    <strong style={{ color: "#f44336" }}>High</strong>
+                    <p
+                      style={{
+                        fontSize: "0.85em",
+                        color: "#757575",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <InfoOutlinedIcon sx={{ mr: 1, color: "#757575" }} />{" "}
+                      Critical issues requiring immediate attention. Response
+                      expected within 2-4 hours.
+                    </p>
+                  </div>
+                </MenuItem>
+              </Select>
+              {errors.urgency && (
+                <FormHelperText error sx={{ fontSize: "13px" }}>
+                  {errors.urgency}
+                </FormHelperText>
+              )}
+            </FormControl>
 
             {/* Issue Description */}
             <TextField
@@ -944,7 +1042,7 @@ export default function RequestMaintenanceForm({
                 setSelectedItem([]);
                 setSelectedImage([]);
                 setEditId(null);
-                resetForm()
+                resetForm();
               }}
             >
               Cancel

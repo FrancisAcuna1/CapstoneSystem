@@ -9,6 +9,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import getLPTheme from "../components/LayoutComponent/getLPTheme";
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import Footer from "../components/LayoutComponent/Footer";
+
 // import dynamic from "next/dynamic";
 // const Layout = dynamic(() => import('../../Proptack-website/components/Appbar'), {
 //     ssr: false
@@ -33,20 +34,6 @@ import Footer from "../components/LayoutComponent/Footer";
 // });
   
 
-const properties = [
-  {
-    id: 1,
-    name: "Modern Apartment",
-    description: "A beautiful modern apartment in the heart of the city.",
-    image: "https://via.placeholder.com/300",
-  },
-  {
-    id: 2,
-    name: "Cozy House",
-    description: "A cozy house perfect for families.",
-    image: "https://via.placeholder.com/300",
-  },
-];
 
 
 export default function Properties() {
