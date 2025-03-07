@@ -248,7 +248,9 @@ export default function PaymentTransactionTable({
                     payment.transaction_type === "Advance Payment" ||
                     payment.transaction_type === "Rental Fee"
                 ) {
-                    const startDate = parseISO(payment.paid_for_month);
+                    const startDate = payment.paid_for_month 
+                    ? parseISO(payment.paid_for_month) 
+                    : null;
                     let monthsCovered = payment.months_covered || 0; 
 
                     // Check if Advance Payment and there's an Initial Payment to calculate from
@@ -293,10 +295,16 @@ export default function PaymentTransactionTable({
                         const endDate = addMonths(adjustedStartDate, monthsCovered);
     
                         // Add date coverage to the payment object
-                        payment.date_coverage = {
+                        try {
+                          payment.date_coverage = {
                             start_date: format(adjustedStartDate, "yyyy-MM-dd"),
                             end_date: format(endDate, "yyyy-MM-dd"),
-                        };
+                          };
+                        } catch (error) {
+                            console.error("Date formatting error:", error);
+                            console.log(payment.date_coverage)
+                            payment.date_coverage = null;
+                        }
                     } else {
                         // Fallback if no lease start date is found
                         const endDate = addMonths(startDate, monthsCovered);
