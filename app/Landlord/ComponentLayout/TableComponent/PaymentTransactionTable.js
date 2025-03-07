@@ -295,16 +295,10 @@ export default function PaymentTransactionTable({
                         const endDate = addMonths(adjustedStartDate, monthsCovered);
     
                         // Add date coverage to the payment object
-                        try {
-                            payment.date_coverage = {
-                                start_date: format(adjustedStartDate, "yyyy-MM-dd"),
-                                end_date: format(endDate, "yyyy-MM-dd"),
-                            };
-                        } catch (error) {
-                            console.error("Date formatting error:", error);
-                            console.log(payment.date_coverage)
-                            payment.date_coverage = null;
-                        }
+                        payment.date_coverage = {
+                            start_date: format(adjustedStartDate, "yyyy-MM-dd"),
+                            end_date: format(endDate, "yyyy-MM-dd"),
+                        };
                     } else {
                         // Fallback if no lease start date is found
                         const endDate = addMonths(startDate, monthsCovered);
