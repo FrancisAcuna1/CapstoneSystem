@@ -485,7 +485,7 @@ export default function TenantInformationTable({ setLoading, loading }) {
                     component="div"
                     letterSpacing={2}
                     >
-                    Status of Maintenace
+                    Status of Maintenance
                     </Typography>
                     <Box
                     sx={{

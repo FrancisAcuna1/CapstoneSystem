@@ -57,7 +57,7 @@ export default function Navigator(props) {
     { text: 'Property', Icon: <NightShelterOutlinedIcon sx={{ mx: '0.4rem', fontSize: 27 }} />, href: '/Landlord/Property', category: 'Menu' },
     { text: 'Expenses Tracking', Icon: <AssessmentOutlinedIcon sx={{ mx: '0.4rem', fontSize: 27 }} />, href: '/Landlord/ExpensesTracking', category: 'Menu' },
     { text: 'Income Tracking', Icon: <CurrencyExchangeIcon sx={{ mx: '0.4rem', fontSize: 27 }} />, category: 'Menu', href: '/Landlord/IncomeTracking'},
-    { text: 'Amenities/Equipment', Icon: <DnsOutlinedIcon sx={{ mx: '0.4rem', fontSize: 27 }} />, href: '/Landlord/Equipment', category: 'Maintenance' },
+    { text: 'Amenities & Inclusion', Icon: <DnsOutlinedIcon sx={{ mx: '0.4rem', fontSize: 27 }} />, href: '/Landlord/Equipment', category: 'Maintenance' },
     { text: 'Maintenance Request', Icon: <ConstructionOutlinedIcon sx={{ mx: '0.4rem', fontSize: 27 }} />, href: '/Landlord/MaintenanceRequest', category: 'Maintenance' },
     { text: 'Calendar Schedule', Icon: <CalendarMonthRoundedIcon sx={{ mx: '0.4rem', fontSize: 27 }} />, href: '/Landlord/ScheduleMaintenance', category: 'Maintenance' },
     { text: 'Status', Icon: <AutorenewOutlinedIcon sx={{ mx: '0.4rem', fontSize: 27 }} />, href: '/Landlord/MaintenanceStatus', category: 'Maintenance' },

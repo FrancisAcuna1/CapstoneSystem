@@ -535,7 +535,7 @@ export default function MaintenanceRequestTable({
                 component="div"
                 letterSpacing={2}
               >
-                List of Maintenace Request
+                List of Maintenance Request
                 </Typography>
             
                

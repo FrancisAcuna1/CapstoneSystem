@@ -359,7 +359,7 @@ export default function BoardingHouseDetailsComponent({
                         gutterBottom
                         sx={{ fontWeight: 500, mt: "0.9rem" }}
                       >
-                        {details.boardinghouse.number_of_rooms} Rooms
+                        {details.boardinghouse.number_of_rooms} Room(s)
                       </Typography>
 
                       <Box sx={{ display: "flex", alignItems: "start", mt: 3 }}>

@@ -73,7 +73,7 @@ export default function MaintenaceRequestComponent({ setLoading, loading }) {
                 color="text.primary"
                 sx={{color:'#212121', fontSize: { xs: "14px", sm: "15px", md: "15px" } }}
             >
-                Maintenace Request
+                Maintenance Request
             </Typography>
             </Breadcrumbs>
         </Grid>

@@ -64,7 +64,7 @@ export default function ScheduleComponent({ loading, setLoading }) {
         letterSpacing={3}
         sx={{ marginLeft: "5px", fontSize: "24px", fontWeight: "bold", mt: 5 }}
       >
-        Schedule of All Maintenace
+        Schedule of All Maintenance
       </Typography>
       <Grid item xs={12} sx={{ marginLeft: "5px", mt: 2 }}>
         <Breadcrumbs

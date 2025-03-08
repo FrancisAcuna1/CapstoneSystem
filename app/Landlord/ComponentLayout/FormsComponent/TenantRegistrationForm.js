@@ -828,7 +828,7 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                 helperText={
                     errors.deposit 
                     ? errors.deposit 
-                    : 'Initial payment is usually the first month’s rent.' // Add explanation note
+                    : "Initial payment is usually the first month's rent." // Add explanation note
                 }
                 InputProps={{
                     inputProps: { 

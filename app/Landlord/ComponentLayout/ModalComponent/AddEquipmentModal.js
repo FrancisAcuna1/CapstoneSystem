@@ -306,10 +306,10 @@ export default function AddEquipmentModal({
       <Button
         variant="contained"
         onClick={handleOpen}
-        sx={{ borderRadius: "10px", p: 1.1, mb: 2 }}
+        sx={{ borderRadius: "10px", p: 1.1, mb: 2,pr:1.1 }}
       >
         <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
-        Add New Equipment
+        Add
       </Button>
       <Modal
         aria-labelledby="transition-modal-title"
@@ -329,12 +329,12 @@ export default function AddEquipmentModal({
               letterSpacing={3}
               sx={{ fontSize: "20px" }}
             >
-              Add New Equipment
+              Add New Amenities
             </Typography>
             <Box component="form" onSubmit={handleSubmit} noValidate>
               <TextField
                 id="taskname"
-                label="Equipment Name"
+                label="Amenities name"
                 name="name"
                 variant="outlined"
                 fullWidth

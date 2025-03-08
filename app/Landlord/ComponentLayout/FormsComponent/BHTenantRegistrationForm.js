@@ -844,6 +844,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
             </Grid>
             <Grid item xs={12} sm={4} sx={{mt:-1}}>
                 <TextField 
+                    required
                     id="street" 
                     label="Street" 
                     name='street' 
@@ -1195,7 +1196,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                 helperText={
                     errors.deposit 
                     ? errors.deposit 
-                    : 'Initial payment is usually the first month&apos;s rent.' // Add explanation note
+                    : "Initial payment is usually the first month's rent"// Add explanation note
                 }
                 InputProps={{
                     inputProps: { 

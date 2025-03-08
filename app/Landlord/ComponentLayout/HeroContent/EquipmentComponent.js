@@ -58,7 +58,7 @@ export default function EquipmentComponent({ loading, setLoading }) {
           mt: 5,
         }}
       >
-        Amenities & Equipment
+        Amenities & Inclusion
       </Typography>
       <Grid item xs={12} sx={{ marginLeft: "5px", mt: 2 }}>
         <Breadcrumbs
@@ -81,7 +81,7 @@ export default function EquipmentComponent({ loading, setLoading }) {
             color="text.primary"
             sx={{color:'#212121', fontSize: { xs: "14px", sm: "15px", md: "15px" } }}
           >
-            Amenities & Equipment
+            Amenities & Inclusion
           </Typography>
         </Breadcrumbs>
       </Grid>

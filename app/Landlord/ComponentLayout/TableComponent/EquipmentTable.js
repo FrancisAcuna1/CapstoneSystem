@@ -442,7 +442,7 @@ export default function EquipmentTable({
                 component="div"
                 letterSpacing={2}
               >
-                List of Equipment
+                List of Amenities and Inclusion
               </Typography>
             )}
             {selectedItem.length > 1 ? (
@@ -509,7 +509,7 @@ export default function EquipmentTable({
                   />
                 </StyledTableCell>
                 <StyledTableCell onClick={() => handleSort("name")}>
-                  Equipment Name{" "}
+                  Name{" "}
                   {sortConfig.key === "name" &&
                     (sortConfig.direction === "asc" ? (
                       <NorthIcon
