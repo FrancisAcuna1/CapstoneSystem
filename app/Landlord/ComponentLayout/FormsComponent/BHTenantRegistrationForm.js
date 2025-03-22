@@ -1221,7 +1221,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                 value={formData.deposit}
                 onChange={handleChange}
                 fullWidth
-                required
+                // required
                 aria-readonly
                 error={Boolean(errors.deposit)} // Add error prop
                 helperText={errors.deposit}
@@ -1265,7 +1265,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                 value={formData.prepaidrentperiod}
                 onChange={handleChange}
                 fullWidth
-                required
+                // required
                 error={Boolean(errors.prepaidrentperiod)} // Add error prop
                 helperText={errors.prepaidrentperiod}
                 >

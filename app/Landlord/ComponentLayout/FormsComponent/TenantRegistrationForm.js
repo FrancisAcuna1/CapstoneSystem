@@ -899,7 +899,7 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                 value={formData.prepaidrentperiod}
                 onChange={handleChange}
                 fullWidth
-                required
+                // required
                 error={Boolean(errors.prepaidrentperiod)} // Add error prop
                 helperText={errors.prepaidrentperiod}
                 >
@@ -919,7 +919,7 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                 value={formData.advancepayment}
                 onChange={handleChange}
                 fullWidth
-                required
+                // required
                 // aria-readonly
                 InputProps={{
                     inputProps: { 

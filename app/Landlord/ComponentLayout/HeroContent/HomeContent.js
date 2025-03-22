@@ -291,11 +291,11 @@ export default function HomeContent({ setLoading, loading }) {
   const getGreeting = () => {
     const currentHour = new Date().getHours();
     if (currentHour < 12) {
-        return "Good Morning";
+        return "Good morning";
     } else if (currentHour < 18) {
-        return "Good Afternoon";
+        return "Good efternoon";
     } else {
-        return "Good Evening";
+        return "Good evening";
     }
   };
 
@@ -353,7 +353,7 @@ export default function HomeContent({ setLoading, loading }) {
                 mb: "2.5rem",
             }}
             >
-            {getGreeting()}, Welcome to Your Admin Dashboard!
+            {getGreeting()}, welcome to your admin dashboard!
             </Typography>
             <Grid container spacing={2} sx={{ alignItems: "center", mt:6 }}>
             {cards.map((card, index) => (
