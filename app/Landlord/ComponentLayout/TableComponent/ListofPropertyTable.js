@@ -668,8 +668,11 @@ export default function UnitListTable({
                   const hasOccupiedBeds = item?.rooms?.some(room => 
                     room.beds.some(bed => bed.status === 'Occupied')
                   );
+
+                  const isApartmentOccupied = item.status === 'Occupied';
+                  const isBoardingHouseAvailableButOccupied = item.status === 'Available' && hasOccupiedBeds;
           
-                  return selectedId === item.uniqueKey && !isFullyOccupied && hasOccupiedBeds;
+                  return selectedId === item.uniqueKey && (isApartmentOccupied || isBoardingHouseAvailableButOccupied);
                 })
               ) ? (
                 <DeleteTooltip title="Delete">

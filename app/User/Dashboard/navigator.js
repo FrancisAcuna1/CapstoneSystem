@@ -36,7 +36,7 @@ export default function Navigator(props) {
 
   const menuItems = [
     { text: 'Dashboard', Icon: <DashboardCustomizeOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/Home', category: 'Menu' },
-    { text: 'Maintenance Request', Icon: <ConstructionOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/RequestMaintenance', category: 'Menu' },
+    { text: 'Request Maintenance', Icon: <ConstructionOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/RequestMaintenance', category: 'Menu' },
     { text: 'Assessment Fee', Icon: <AccountBalanceWalletOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/AssessmentFee', category: 'Menu' },
     { text: 'My Account', Icon: <AccountCircleOutlinedIcon sx={{ mx: '0.1rem', fontSize: 27 }} />, href: '/User/Profile', category: 'Menu' }
   ];

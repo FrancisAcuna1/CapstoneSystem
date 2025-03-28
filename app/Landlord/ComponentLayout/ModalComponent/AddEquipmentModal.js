@@ -312,10 +312,11 @@ export default function AddEquipmentModal({
         Add
       </Button>
       <Modal
-        aria-labelledby="transition-modal-title"
+        aria-labelledby="transition-modal-title"  
         aria-describedby="transition-modal-description"
         open={open}
         onClose={() => {
+          if (loading) return;
           handleClose();
           setEditItem(null);
         }}
@@ -348,6 +349,7 @@ export default function AddEquipmentModal({
               <Button
                 variant="contained"
                 type="submit"
+                disabled={loading}
                 sx={{
                   width: "100%",
                   background: "primary",
@@ -362,6 +364,7 @@ export default function AddEquipmentModal({
               <Button
                 variant="outlined"
                 fullWidth
+                disabled={loading}
                 sx={{
                   fontSize: "16px",
                   marginTop: "10px",

@@ -96,7 +96,9 @@ export default function WarningAlreadyPaid({ open, setWarningOpen2 }) {
             mt:2
           }}
         >
-          • The recurring has been already paid
+          • The recurring payment has already been paid.
+          <br />
+          • The selected expense is not part of the recurring expenses.
         </Typography>
       </DialogContent>
 

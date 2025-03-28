@@ -683,6 +683,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                 </Typography>
                 <IconButton 
                 onClick={() => {
+                    if (loading) return;
                     handleCloseDrawer()
                     setErrors({})
                     setSelectedRoom('')
@@ -1312,6 +1313,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
             <Button
                 variant="outlined"
                 fullWidth
+                disabled={loading}
                 sx={{
                     fontSize: '16px',
                     marginTop: '10px',
@@ -1365,6 +1367,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                 type="submit"
                 variant="contained"
                 fullWidth
+                disabled={loading}
                 sx={{
                   fontSize: '16px',
                   marginTop: '16px',
@@ -1376,7 +1379,7 @@ const BHTenantRegistrationForm = ({details, setDetails, loading, setLoading, set
                   letterSpacing: '2px'
                 }}
               >
-                Register
+                {loading ? "Registering..." : 'Register'}
             </Button>
             </Grid>       
             

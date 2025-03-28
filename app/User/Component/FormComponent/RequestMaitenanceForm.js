@@ -658,6 +658,7 @@ export default function RequestMaintenanceForm({
         maxWidth={"sm"}
         open={open}
         onClose={() => {
+          if (false) return;
           handleClose();
           setErrors({});
           setSelectedItem([]);
@@ -1011,6 +1012,7 @@ export default function RequestMaintenanceForm({
               color="primary"
               size="large"
               fullWidth
+              disabled={loading}
               sx={{
                 mt: 3,
                 py: 1.1,
@@ -1018,11 +1020,12 @@ export default function RequestMaintenanceForm({
                 fontSize: "1.1rem",
               }}
             >
-              Submit Request
+              {loading ? "Submitting..." : "Submit Request"}
             </Button>
 
             <Button
               variant="outlined"
+              disabled={loading}
               sx={{
                 fontSize: "1.1rem", // Adjust font size for smaller size
                 borderRadius: "8px", // Optional: make corners slightly rounder

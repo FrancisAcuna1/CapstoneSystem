@@ -271,7 +271,6 @@ const MaintenanceRequestDialog = ({
     <Box>
       <Dialog
         open={open}
-        onClose={handleClose}
         maxWidth="md"
         fullWidth
         PaperProps={{
@@ -651,7 +650,7 @@ const MaintenanceRequestDialog = ({
               disabled={loading}
               startIcon={<CloseIcon />}
             >
-              Reject Request
+             {loading ? "Rejecting..." : " Reject Request"}
             </Button>
             <Button
               variant="contained"
@@ -660,7 +659,7 @@ const MaintenanceRequestDialog = ({
               disabled={loading}
               startIcon={<CheckCircleIcon />}
             >
-              Accept Request
+              {loading ? "Accepting..." : "Accept Request"}
             </Button>
           </Box>
         </DialogActions>

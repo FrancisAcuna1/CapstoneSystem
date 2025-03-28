@@ -160,6 +160,12 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
             tempErrors.deposit = 'Deposit Amount is required';
             isValid = false;
         }
+
+        if(!formData.initial_payment){
+            tempErrors.initial_payment = 'Deposit Amount is required';
+            isValid = false;
+        }
+
         if (isExpanded) {
             if (!formData.advancepayment) {
                 tempErrors.advancepayment = 'Advance Payment Amount is required';
@@ -824,10 +830,10 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                 fullWidth
                 required
                 aria-readonly
-                error={Boolean(errors.deposit)} // Add error prop
+                error={Boolean(errors.initial_payment)} // Add error prop
                 helperText={
-                    errors.deposit 
-                    ? errors.deposit 
+                    errors.initial_payment 
+                    ? errors.initial_payment 
                     : "Initial payment is usually the first month's rent." // Add explanation note
                 }
                 InputProps={{
@@ -946,6 +952,7 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
             <Button
                 variant="outlined"
                 fullWidth
+                disabled={loading}
                 sx={{
                     fontSize: '16px',
                     marginTop: '10px',
@@ -995,6 +1002,7 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                 type="submit"
                 variant="contained"
                 fullWidth
+                disabled={loading}
                 sx={{
                   fontSize: '16px',
                   marginTop: '16px',
@@ -1005,7 +1013,7 @@ const TenantRegistrationForm = ({details, setSuccessful, setError , loading, set
                   letterSpacing: '2px'
                 }}
               >
-                Register
+                {loading ? "Registering..." : "Register"}
             </Button>
             </Grid>            
         </Grid>

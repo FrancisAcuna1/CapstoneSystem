@@ -831,6 +831,7 @@ export default function AddMaintenanceSchedule({
         aria-describedby="transition-modal-description"
         open={open}
         onClose={() => {
+          if (loading) return;
           handleClose();
           setScheduleData({
             maintenance_id: "",
@@ -1305,6 +1306,7 @@ export default function AddMaintenanceSchedule({
                     {/* Add gap for spacing between buttons */}
                     <Button
                       variant="outlined"
+                      disabled={loading}
                       sx={{
                         fontSize: "14px", // Adjust font size for smaller size
                         borderRadius: "8px", // Optional: make corners slightly rounder
@@ -1329,6 +1331,7 @@ export default function AddMaintenanceSchedule({
                     <Button
                       variant="contained"
                       type="submit"
+                      disabled={loading}
                       sx={{
                         background: "primary",
                         "&:hover": { backgroundColor: "#b6bdf1" },
@@ -1336,7 +1339,7 @@ export default function AddMaintenanceSchedule({
                         fontSize: "14px", // Adjust font size for smaller size
                       }}
                     >
-                      Add
+                      {loading ? "Adding..." : "Add"}
                     </Button>
                   </Box>
                 )}

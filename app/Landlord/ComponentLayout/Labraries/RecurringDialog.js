@@ -152,6 +152,7 @@ export default function RecurringDialog({
   handleClose,
   selectedRecurringItem,
   setLoading,
+  loading,
   setSuccessful,
   setError,
   refreshData,
@@ -467,6 +468,7 @@ export default function RecurringDialog({
             maxWidth={"xl"}
             open={openDialog}
             onClose={() => {
+                if (loading) return;
                 handleClose();
                 setSelectedItem([]);
                 setSelectedToPaid([]);
@@ -822,6 +824,7 @@ export default function RecurringDialog({
             <Button
                 variant="outlined"
                 color="primary"
+                disabled={loading}
                 sx={{
                 borderRadius: "8px",
                 color: "#000",
@@ -846,6 +849,7 @@ export default function RecurringDialog({
                 size="medium"
                 sx={{ mr: 2, mt: 0.5, mb: 0.5 }}
                 onClick={handleSave}
+                disabled={selectedToPaid.length === 0 || loading}
             >
                 Save
             </Button>

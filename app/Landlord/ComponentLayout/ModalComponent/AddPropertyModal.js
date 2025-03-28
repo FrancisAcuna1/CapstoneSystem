@@ -261,6 +261,62 @@ export default function AddPropertyType({
     });
   };
 
+  
+  // this code is the latest changes
+  // Resize the image resolution
+  const resizeImage = (file, maxWidth = 800, maxHeight = 600) => {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image(); // Using the browser's Image constructor
+      const reader = new FileReader();
+  
+      reader.onloadend = () => {
+        img.src = reader.result;
+  
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+  
+          let width = img.width;
+          let height = img.height;
+  
+          // Calculate the new dimensions based on maxWidth and maxHeight
+          if (width > height) {
+            if (width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+          }
+  
+          // Resize the canvas to the new dimensions
+          canvas.width = width;
+          canvas.height = height;
+  
+          // Draw the image onto the canvas with the new dimensions
+          ctx.drawImage(img, 0, 0, width, height);
+  
+          // Convert the canvas to a Blob and resolve with a resized File object
+          canvas.toBlob(
+            (blob) => {
+              const resizedFile = new File([blob], file.name, { type: file.type });
+              resolve(resizedFile);
+            },
+            file.type,
+            0.7 // Adjust quality (0.7 = 70% quality)
+          );
+        };
+      };
+  
+      reader.onerror = reject;
+      reader.readAsDataURL(file); // Read the image file as a data URL
+    });
+  };
+  
+
   useEffect(() => {
     const fetchDataAddress = async () => {
       const userDataString = localStorage.getItem("userDetails"); // get the user data from local storage
@@ -899,11 +955,17 @@ export default function AddPropertyType({
     fetchedInclusionData();
   }, [setError]);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async(e) => {
     if (e.target.files && e.target.files.length > 0) {
       const filesArray = Array.from(e.target.files);
+
+       // Resize the files before adding them to state
+      const resizedFiles = await Promise.all(
+        filesArray.map((file) => resizeImage(file)) // Resize each selected image
+      ); // this code is the changes
+      
       // Create preview URLs for new files
-      const newPreviews = filesArray.map((file) => ({
+      const newPreviews = resizedFiles.map((file) => ({
         file: file,
         name: file.name,
         preview: URL.createObjectURL(file),
@@ -1229,6 +1291,7 @@ export default function AddPropertyType({
         aria-describedby="transition-modal-description"
         open={open}
         onClose={() => {
+          if (isLoading) return;
           setErrors({});
           handleClose();
           setEditItem(null);
@@ -2763,7 +2826,7 @@ export default function AddPropertyType({
               <Button
                 type="submit"
                 variant="contained"
-                disabled={!selectedProperty}
+                disabled={!selectedProperty || isLoading}
                 fullWidth
                 sx={{
                   fontSize: "16px",
@@ -2796,6 +2859,7 @@ export default function AddPropertyType({
                     borderColor: "#000",
                   },
                 }}
+                disabled={isLoading}
                 onClick={() => {
                   setErrors({});
                   handleClose();

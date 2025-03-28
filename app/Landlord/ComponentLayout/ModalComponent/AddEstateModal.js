@@ -352,6 +352,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, setLoa
         aria-describedby="transition-modal-description"
         open={open}
         onClose={() => {
+          if (isloading) return;
           setErrors({})
           handleClose();
           setEditProperty(null);
@@ -369,13 +370,13 @@ export default function AddApartmentModal({open, handleOpen, handleClose, setLoa
         <Fade in={open}>
           <ModalContent> 
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 550, letterSpacing: 1, textTransform: 'uppercase' }}>
-              {editItem ? 'Edit Estate' : 'Add New Estate'}
+              {editItem ? 'Edit Property' : 'Add New Property'}
             </Typography>
             <Box onSubmit={handleSubmit} component="form"  noValidate>
               <TextField 
                 required 
                 id="apartmentName"
-                label="Estate Property Name" 
+                label="Property Name" 
                 fullWidth 
                 margin="normal"
                 name="propertyname"
@@ -395,6 +396,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, setLoa
                   onChange={handleChange}
                   error={Boolean(errors.barangay)}
                   helperText={errors.barangay}
+                  required
                 >
                   {sortedBarangays.map((item) =>(
                     <MenuItem key={item.code} value={item.name}>{item.name}</MenuItem>
@@ -488,6 +490,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, setLoa
                 type="submit"
                 variant="contained"
                 fullWidth
+                disabled={isloading}
                 sx={{
                   fontSize: '16px',
                   marginTop: '16px',
@@ -527,6 +530,7 @@ export default function AddApartmentModal({open, handleOpen, handleClose, setLoa
                   });
                   setSelectedImage(null);
                 }}
+                disabled={isloading}
               >
                 Cancel
               </Button>

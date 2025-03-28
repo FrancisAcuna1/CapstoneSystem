@@ -1196,6 +1196,7 @@ export default function TenantListDialog({
         <DialogActions>
           <Button
             autoFocus
+            disabled={selectedItem.length === 0 || loading}
             onClick={handleSave}
             variant="contained"
             size="medium"

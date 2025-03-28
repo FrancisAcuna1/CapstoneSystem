@@ -767,6 +767,7 @@ export default function AddExpensesTransaction({
         aria-describedby="transition-modal-description"
         open={open}
         onClose={() => {
+          if (false) return;
           handleClose();
           setFormError({});
           setFormData({});
@@ -1312,7 +1313,6 @@ export default function AddExpensesTransaction({
                               disabled={formData.category !== "tax"}
                               error={Boolean(formError.type_of_tax)}
                             >
-                              <MenuItem value="bir">BIR</MenuItem>
                               <MenuItem value="income tax">
                                 Income Tax
                               </MenuItem>
@@ -1490,6 +1490,7 @@ export default function AddExpensesTransaction({
               <Button
                 variant="contained"
                 type="submit"
+                disabled={loading}
                 sx={{
                   width: "100%",
                   background: "#7e57c2",
@@ -1504,6 +1505,7 @@ export default function AddExpensesTransaction({
               <Button
                 variant="outlined"
                 fullWidth
+                disabled={loading}
                 sx={{
                   fontSize: "16px",
                   marginTop: "10px",

@@ -159,7 +159,7 @@ const Backdrop = React.forwardRef((props, ref) => {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
 
-export default function AddPaymentTransaction({open, handleOpen, handleClose, setLoading, setSuccessful, isEdit, setIsEdit, editPayment, setEditPayment}){
+export default function AddPaymentTransaction({open, handleOpen, handleClose, setLoading, loading, setSuccessful, isEdit, setIsEdit, editPayment, setEditPayment}){
     const { enqueueSnackbar } = useSnackbar();
     const [errors, setErrors] = useState({});
     const [tenantlist, setTenantList] = useState([]);
@@ -419,6 +419,7 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
             aria-describedby="transition-modal-description"
             open={open}
             onClose={() => {
+                if (loading) return
                 handleClose()
                 setIsEdit(false);
                 setErrors({})
@@ -570,15 +571,17 @@ export default function AddPaymentTransaction({open, handleOpen, handleClose, se
                 <Button 
                     variant='contained'
                     type='submit' 
+                    disabled={loading}
                     sx={{
                         width: '100%',background: '#7e57c2','&:hover': {backgroundColor: '#9575cd',}, padding: '8px', fontSize: '16px', mt:4 
                     }}
                 >
-                    Add
+                    {loading ? "Adding..." : "Add"}
                 </Button>
                 <Button
                 variant="outlined"
                 fullWidth
+                disabled={loading}
                 sx={{
                     fontSize: '16px',
                     marginTop: '10px',
