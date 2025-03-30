@@ -479,7 +479,6 @@ export default function HomeContent({ setLoading, loading }) {
             ))}
 
             <Grid item xs={12} sm={6} md={4} lg={4}>
-                <Link href="/Landlord/IncomeTracking" passHref style={{ textDecoration: 'none' }}>
                 <IncomeCard
                 color={theme.palette.info.main}
                 onMouseEnter={() => setHoveredCard(1)}
@@ -592,7 +591,7 @@ export default function HomeContent({ setLoading, loading }) {
                             </ToggleButtonGroup>
                             </Box>
                         </Box>
-
+                        
                         <IconWrapper color={theme.palette.info.main}>
                             <AccountBalanceWalletOutlinedIcon
                             fontSize="large"
@@ -601,67 +600,69 @@ export default function HomeContent({ setLoading, loading }) {
                         </IconWrapper>
                         </Box>
 
+                        <Link href="/Landlord/IncomeTracking" passHref style={{ textDecoration: 'none' }}>
                         <Box sx={{ position: "relative", minHeight: "60px" }}>
-                        {isloading ? (
-                            <CircularProgress
-                            size={24}
-                            sx={{ position: "absolute" }}
-                            />
-                        ) : (
-                            <Fade in={!loading}>
-                            <Box>
-                                <Typography
-                                variant="h4"
-                                component="div"
-                                sx={{
-                                    fontWeight: 700,
-                                    color: theme.palette.info.main,
-                                    mb: 1,
-                                    mt: -2,
-                                }}
-                                >
-                                {Number(
-                                    countIncome?.total_revenue || "0"
-                                )?.toLocaleString("en-US", {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                })}
-                                </Typography>
-                                <Box sx={{ display: "flex", alignItems: "center" }}>
-                                <Typography
-                                    variant="body2"
-                                    sx={{ color: theme.palette.text.secondary }}
-                                >
-                                    {isSelectedTypeIncome === "monthly"
-                                    ? "vs last month"
-                                    : "vs last year"}
-                                </Typography>
+                            {isloading ? (
+                                <CircularProgress
+                                size={24}
+                                sx={{ position: "absolute" }}
+                                />
+                            ) : (
+                                <Fade in={!loading}>
+                                <Box>
+                                    <Typography
+                                    variant="h4"
+                                    component="div"
+                                    sx={{
+                                        fontWeight: 700,
+                                        color: theme.palette.info.main,
+                                        mb: 1,
+                                        mt: -2,
+                                    }}
+                                    >
+                                    {Number(
+                                        countIncome?.total_revenue || "0"
+                                    )?.toLocaleString("en-US", {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                    })}
+                                    </Typography>
+                                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{ color: theme.palette.text.secondary }}
+                                    >
+                                        {isSelectedTypeIncome === "monthly"
+                                        ? "vs last month"
+                                        : "vs last year"}
+                                    </Typography>
 
-                                <ValueChangeIndicator
-                                    positive={
-                                    countIncome?.percentage_change === "Increase"
-                                        ? true
-                                        : false
-                                    }
-                                >
-                                    {countIncome?.percentage_change === "Increase"
-                                    ? `+${countIncome?.income_percentage} %`
-                                    : `${countIncome?.income_percentage} %`}
-                                </ValueChangeIndicator>
+                                    <ValueChangeIndicator
+                                        positive={
+                                        countIncome?.percentage_change === "Increase"
+                                            ? true
+                                            : false
+                                        }
+                                    >
+                                        {countIncome?.percentage_change === "Increase"
+                                        ? `+${countIncome?.income_percentage} %`
+                                        : `${countIncome?.income_percentage} %`}
+                                    </ValueChangeIndicator>
+                                    </Box>
                                 </Box>
-                            </Box>
-                            </Fade>
-                        )}
+                                </Fade>
+                                
+                            )}
                         </Box>
+                        </Link>
+                       
                     </Box>
                     )}
                 </CardContent>
                 </IncomeCard>
-                </Link>
             </Grid>
 
             <Grid item xs={12} sm={6} md={4} lg={4}>
-                <Link href="/Landlord/ExpensesTracking" passHref style={{ textDecoration: 'none' }}>
                 <ExpenseCard
                 color={theme.palette.warning.main}
                 onMouseEnter={() => setHoveredCard(1)}
@@ -782,7 +783,7 @@ export default function HomeContent({ setLoading, loading }) {
                             />
                         </IconWrapper>
                         </Box>
-
+                        <Link href="/Landlord/ExpensesTracking" passHref style={{ textDecoration: 'none' }}>
                         <Box sx={{ position: "relative", minHeight: "60px" }}>
                         {isloading1 ? (
                             <CircularProgress
@@ -835,11 +836,11 @@ export default function HomeContent({ setLoading, loading }) {
                             </Fade>
                         )}
                         </Box>
+                        </Link>
                     </Box>
                     )}
                 </CardContent>
                 </ExpenseCard>
-                </Link>
             </Grid>
             </Grid>
 
