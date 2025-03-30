@@ -295,6 +295,9 @@ export default function AddPropertyType({
           // Resize the canvas to the new dimensions
           canvas.width = width;
           canvas.height = height;
+
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high'; // Set image smoothing to 'high' for better quality  
   
           // Draw the image onto the canvas with the new dimensions
           ctx.drawImage(img, 0, 0, width, height);
@@ -306,7 +309,7 @@ export default function AddPropertyType({
               resolve(resizedFile);
             },
             file.type,
-            0.7 // Adjust quality (0.7 = 70% quality)
+            0.9 // Adjust quality (0.7 = 70% quality)
           );
         };
       };
