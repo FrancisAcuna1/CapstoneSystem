@@ -313,7 +313,7 @@ export default function ExpensesComponent({ loading, setLoading }) {
                 letterSpacing={2}
                 gutterBottom
                 >
-                Monthly Income
+                Monthly Expenses
                 </Typography>
                 <ExpenseChart
                 selectedMonth={selectedMonth}

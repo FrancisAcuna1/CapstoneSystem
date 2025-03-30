@@ -34,6 +34,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { styled } from "@mui/system";
 import useSWR from "swr";
+import Link from "next/link";
 
 const IncomeChartHeader = dynamic(
   () => import("../ChartComponent/incomechart"),
@@ -305,6 +306,7 @@ export default function HomeContent({ setLoading, loading }) {
       value: countTenant?.tenant || "0",
       icon: PeopleTwoToneIcon,
       color: theme.palette.primary.main,
+      url: "/Landlord/TenantInformation",
       tooltip: "Total number of tenants currently occupying units",
       backgroundImage:
         " linear-gradient(90deg, hsla(238, 82%, 70%, 1) 0%, hsla(246, 100%, 96%, 1) 0%, hsla(0, 0%, 100%, 1) 100%)",
@@ -314,6 +316,7 @@ export default function HomeContent({ setLoading, loading }) {
       value: countProperty?.apartment || "0",
       icon: NightShelterTwoToneIcon,
       color: theme.palette.success.main,
+      url: "/Landlord/Property",
       tooltip: "Total number of Apartment",
       backgroundImage:
         "linear-gradient(90deg, hsla(136, 100%, 96%, 1) 15%, hsla(0, 0%, 100%, 1) 100%)",
@@ -323,6 +326,7 @@ export default function HomeContent({ setLoading, loading }) {
       value: countProperty?.boardingHouse || "0",
       icon: BedroomChildTwoToneIcon,
       color: theme.palette.error.main,
+      url: "/Landlord/Property",
       tooltip: "Total number of Boarding House",
       backgroundImage:
         "linear-gradient(90deg, hsla(0, 100%, 96%, 1) 6%, hsla(0, 0%, 100%, 1) 100%)",
@@ -332,6 +336,7 @@ export default function HomeContent({ setLoading, loading }) {
       value: countRequest?.totalReqeust || "0",
       icon: EngineeringIcon,
       color: theme.palette.secondary.main,
+      url: "/Landlord/MaintenanceRequest",
       tooltip: "Total number of pending maintenance requests",
       backgroundImage:
         "linear-gradient(90deg, hsla(49, 100%, 93%, 1) 18%, hsla(0, 0%, 100%, 1) 100%)",
@@ -358,120 +363,123 @@ export default function HomeContent({ setLoading, loading }) {
             <Grid container spacing={2} sx={{ alignItems: "center", mt:6 }}>
             {cards.map((card, index) => (
                 <Grid key={index} item xs={12} sm={6} md={4} lg={4}>
-                <StyledCard
-                    color={card.color}
-                    onMouseEnter={() => setHoveredCard(index)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                >
-                    <CardContent
-                    sx={{
-                        backgroundImage: card.backgroundImage,
-                        height: "100%",
-                        p: 3,
-                    }}
-                    >
-                    {loading ? (
-                        <>
-                        <Box>
-                            <Skeleton
-                            variant="rectangular"
-                            animation="wave"
-                            height={55}
-                            />
-                            <Skeleton width={100} animation="wave" height={30} />
-                            <Skeleton width={100} animation="wave" height={30} />
-                        </Box>
-                        </>
-                    ) : (
-                        <Box>
-                        <Box
-                            sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            mb: 3,
-                            }}
+                    <Link href={card.url} passHref style={{ textDecoration: 'none' }}>
+                        <StyledCard
+                            color={card.color}
+                            onMouseEnter={() => setHoveredCard(index)}
+                            onMouseLeave={() => setHoveredCard(null)}
                         >
-                            <Box>
-                            <Box
-                                sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                mb: 0.5,
-                                }}
+                            <CardContent
+                            sx={{
+                                backgroundImage: card.backgroundImage,
+                                height: "100%",
+                                p: 3,
+                            }}
                             >
-                                <Typography
-                                variant="h6"
-                                component="div"
-                                sx={{
-                                    fontWeight: 600,
-                                    color: "#263238",
-                                    mr: 1,
-                                    fontSize: {
-                                    xs: "20px",
-                                    sm: "16px",
-                                    md: "18px",
-                                    lg: "20px",
-                                    },
-                                }}
-                                >
-                                {card.title}
-                                </Typography>
-                                <Tooltip title={card.tooltip} arrow>
-                                <IconButton size="small" sx={{ opacity: 0.6 }}>
-                                    <InfoOutlined fontSize="small" />
-                                </IconButton>
-                                </Tooltip>
-                            </Box>
-                            </Box>
-                            <IconWrapper color={card.color}>
-                            <card.icon
-                                fontSize="large"
-                                sx={{ color: card.color }}
-                            />
-                            </IconWrapper>
-                        </Box>
-                        <Box sx={{ position: "relative", minHeight: "65px" }}>
-                            <Fade in={!loading}>
-                            <Box>
-                                <Typography
-                                variant="h4"
-                                component="div"
-                                sx={{
-                                    fontWeight: 700,
-                                    color: card.color,
-                                    mb: 1,
-                                    mt: -2,
-                                }}
-                                >
-                                {card.value}
-                                </Typography>
-                                <Box sx={{ display: "flex", alignItems: "center" }}>
-                                <Typography
-                                    variant="body2"
+                            {loading ? (
+                                <>
+                                <Box>
+                                    <Skeleton
+                                    variant="rectangular"
+                                    animation="wave"
+                                    height={55}
+                                    />
+                                    <Skeleton width={100} animation="wave" height={30} />
+                                    <Skeleton width={100} animation="wave" height={30} />
+                                </Box>
+                                </>
+                            ) : (
+                                <Box>
+                                <Box
                                     sx={{
-                                    color: theme.palette.text.secondary,
-                                    mt: 3,
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    mb: 3,
                                     }}
                                 >
-                                    {/* {item.subtitle1} */}
-                                    {/* asdasd */}
-                                </Typography>
-
-                                {/* <ValueChangeIndicator>
-                                        asdasd
-                                    </ValueChangeIndicator> */}
+                                    <Box>
+                                    <Box
+                                        sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        mb: 0.5,
+                                        }}
+                                    >
+                                        <Typography
+                                        variant="h6"
+                                        component="div"
+                                        sx={{
+                                            fontWeight: 600,
+                                            color: "#263238",
+                                            mr: 1,
+                                            fontSize: {
+                                            xs: "20px",
+                                            sm: "16px",
+                                            md: "18px",
+                                            lg: "20px",
+                                            },
+                                        }}
+                                        >
+                                        {card.title}
+                                        </Typography>
+                                        <Tooltip title={card.tooltip} arrow>
+                                        <IconButton size="small" sx={{ opacity: 0.6 }}>
+                                            <InfoOutlined fontSize="small" />
+                                        </IconButton>
+                                        </Tooltip>
+                                    </Box>
+                                    </Box>
+                                    <IconWrapper color={card.color}>
+                                    <card.icon
+                                        fontSize="large"
+                                        sx={{ color: card.color }}
+                                    />
+                                    </IconWrapper>
                                 </Box>
-                            </Box>
-                            </Fade>
-                        </Box>
-                        </Box>
-                    )}
-                    </CardContent>
-                </StyledCard>
+                                <Box sx={{ position: "relative", minHeight: "65px" }}>
+                                    <Fade in={!loading}>
+                                    <Box>
+                                        <Typography
+                                        variant="h4"
+                                        component="div"
+                                        sx={{
+                                            fontWeight: 700,
+                                            color: card.color,
+                                            mb: 1,
+                                            mt: -2,
+                                        }}
+                                        >
+                                        {card.value}
+                                        </Typography>
+                                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{
+                                            color: theme.palette.text.secondary,
+                                            mt: 3,
+                                            }}
+                                        >
+                                            {/* {item.subtitle1} */}
+                                            {/* asdasd */}
+                                        </Typography>
+
+                                        {/* <ValueChangeIndicator>
+                                                asdasd
+                                            </ValueChangeIndicator> */}
+                                        </Box>
+                                    </Box>
+                                    </Fade>
+                                </Box>
+                                </Box>
+                            )}
+                            </CardContent>
+                        </StyledCard>
+                    </Link>
                 </Grid>
             ))}
 
             <Grid item xs={12} sm={6} md={4} lg={4}>
+                <Link href="/Landlord/IncomeTracking" passHref style={{ textDecoration: 'none' }}>
                 <IncomeCard
                 color={theme.palette.info.main}
                 onMouseEnter={() => setHoveredCard(1)}
@@ -649,9 +657,11 @@ export default function HomeContent({ setLoading, loading }) {
                     )}
                 </CardContent>
                 </IncomeCard>
+                </Link>
             </Grid>
 
             <Grid item xs={12} sm={6} md={4} lg={4}>
+                <Link href="/Landlord/ExpensesTracking" passHref style={{ textDecoration: 'none' }}>
                 <ExpenseCard
                 color={theme.palette.warning.main}
                 onMouseEnter={() => setHoveredCard(1)}
@@ -829,6 +839,7 @@ export default function HomeContent({ setLoading, loading }) {
                     )}
                 </CardContent>
                 </ExpenseCard>
+                </Link>
             </Grid>
             </Grid>
 
