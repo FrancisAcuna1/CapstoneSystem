@@ -366,7 +366,13 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
                         <>
                         {lastPayment && lastPayment.length > 0 ? (
                             lastPayment.map(payment => {
-                                const nextDueDate = calculateNextDueDate(payment.last_payment.paid_for_month, payment.last_payment.months_covered);
+                                const nextDueDate = calculateNextDueDate(
+                                    payment.last_payment.paid_for_month, 
+                                    payment.last_payment.months_covered
+                                );
+                                console.log(nextDueDate)
+                                console.log(payment.last_payment.paid_for_month)
+                                console.log( payment.last_payment.months_covered)
                                 const overDueDetails = delinquentData.find((item) => item.tenantId === payment.rental_agreement?.tenant_id)
                                     ?.delinquentData.filter((delinquentItem) => delinquentItem.status === "Overdue") || [];
                                 console.log(overDueDetails);

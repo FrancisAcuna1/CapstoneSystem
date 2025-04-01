@@ -449,6 +449,7 @@ export default function BoardingHouseDetailsComponent({
               setSuccessful={setSuccessful}
               setError={setError}
               setLoading={setLoading}
+              loading={loading}
               handleCloseDrawer={handleCloseDrawer}
             />
             </SnackbarProvider>
