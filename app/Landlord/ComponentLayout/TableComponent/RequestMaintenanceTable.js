@@ -756,12 +756,12 @@ export default function MaintenanceRequestTable({
                         <TableCell>
                           {rentedUnit
                             ? `Bldg no. ${rentedUnit.building_no}. ${rentedUnit.street}. ${rentedUnit.barangay}, ${rentedUnit.municipality}`
-                            : ""}
+                            : "N/A"}
                         </TableCell>
 
                         <TableCell>
                           {info.tenant.rental_agreement[0]?.rented_unit?.apartment_name || 
-                          info.tenant.rental_agreement[0]?.rented_unit?.boarding_house_name}
+                          info.tenant.rental_agreement[0]?.rented_unit?.boarding_house_name || "N/A"}
                         </TableCell>
                         <TableCell>
                           {info.tenant.firstname} {info.tenant.lastname}

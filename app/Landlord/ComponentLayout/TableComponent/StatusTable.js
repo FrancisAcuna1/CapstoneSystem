@@ -675,24 +675,24 @@ export default function TenantInformationTable({ setLoading, loading }) {
                             </TableCell> */}
                             <TableCell>
                             {info.maintenance_request?.tenant.rental_agreement[0]
-                                .rented_unit?.boarding_house_name ||
+                                ?.rented_unit?.boarding_house_name ||
                                 info.maintenance_request?.tenant.rental_agreement[0]
-                                .rented_unit?.apartment_name}
+                                ?.rented_unit?.apartment_name || 'N/A'}
                             {info.unit?.apartment_name ||
-                                info.unit?.boarding_house_name}
+                                info.unit?.boarding_house_name }
                             </TableCell>
                             <TableCell>
                             {/* bldg.{" "} */}
                             {/* {info.maintenance_request?.tenant.rental_agreement[0].rented_unit?.building_no}{" "} */}
-                            {info.maintenance_request?.tenant.rental_agreement[0] .rented_unit?.street ? `${info.maintenance_request.tenant.rental_agreement[0].rented_unit.street} St.` : ""}{" "}
-                            {info.maintenance_request?.tenant.rental_agreement[0].rented_unit?.barangay}{" "}
-                            {info.maintenance_request?.tenant.rental_agreement[0].rented_unit?.municipality}{" "}
+                            {info.maintenance_request?.tenant.rental_agreement[0]?.rented_unit?.street ? `${info.maintenance_request.tenant.rental_agreement[0].rented_unit.street} St.` : ""}{" "}
+                            {info.maintenance_request?.tenant.rental_agreement[0]?.rented_unit?.barangay}{" "}
+                            {info.maintenance_request?.tenant.rental_agreement[0]?.rented_unit?.municipality || 'N/A'}{" "}
                             {/* {info.unit?.building_no}{" "} */}
                             {info.unit?.street ? `${info.unit.street} St.` : ""}{" "}
                             {info.unit?.barangay} {info.unit?.municipality}
                             </TableCell>
                             <TableCell>
-                            {info.maintenance_request?.tenant.rental_agreement[0] .rented_unit_type || info.unit?.property_type}  
+                            {info.maintenance_request?.tenant.rental_agreement[0]?.rented_unit_type || info.unit?.property_type || "N/A"}  
                             </TableCell>
                             <TableCell>{formatDate(info.start_date)}</TableCell>
                             <TableCell>{formatDate(info.end_date)}</TableCell>
