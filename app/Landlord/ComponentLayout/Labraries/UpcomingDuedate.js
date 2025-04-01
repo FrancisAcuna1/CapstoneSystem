@@ -85,9 +85,9 @@ const getBorderDueDateColor = (dueDateString) => {
 };
 
 const legendItem = [
-    {label: 'Overdue/Due date', color: '#d50000', tooltip: "Upcoming payment due date" },
-    {label: 'Due within a week', color: '#e57373', tooltip: "Upcoming payment due date" },
-    {label: 'Upcoming', color: '#263238', tooltip: "Upcoming payment due date" },
+    {label: 'Overdue/Due date', color: '#d50000'},
+    {label: 'Due within a week', color: '#e57373'},
+    {label: 'Upcoming', color: '#263238'},
 ]
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
@@ -326,7 +326,7 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
                 <DialogContentText id="alert-dialog-slide-description">
                     <Stack sx={{flexDirection:'row', justifyContent:'start', gap:1, mb:3, mt:1}}>
                         {legendItem.map((item, index) => (
-                        <Tooltip key={index} title={item.tooltip} arrow>
+                        <Tooltip key={index} arrow>
                             <Box sx={{ display: 'flex', alignItems: 'center', marginRight: 2 }}>
                                 <Box
                                 sx={{

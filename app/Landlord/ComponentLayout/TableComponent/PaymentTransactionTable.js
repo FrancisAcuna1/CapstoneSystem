@@ -852,7 +852,7 @@ export default function PaymentTransactionTable({
                         {item.date_coverage ? (
                             <GeneralTooltip title={`The Payment Coverage start's in the month of 
                             ${formatDate(item?.date_coverage?.start_date)} 
-                            unitl ${formatDate(item?.date_coverage?.end_date)}`}
+                            until ${formatDate(item?.date_coverage?.end_date)}`}
                             placement="top-start"
                             >
                             <TableCell>

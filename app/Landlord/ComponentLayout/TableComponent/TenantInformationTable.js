@@ -389,8 +389,8 @@ export default function TenantInformationTable({
       const location = `${tenant?.street || ""} ${tenant?.barangay || ""}  ${tenant?.municipality || ""}`?.toLowerCase()
       const unit = `${tenant?.rental_agreement[0]?.rented_unit?.apartment_name || tenant?.rental_agreement[0]?.rented_unit?.boarding_house_name}`?.toLowerCase()
       const contact = tenant?.contact?.toString()?.toLowerCase()
-      const date = tenant.rental_agreement[0].lease_start_date?.toLowerCase()
-      const date2 =  tenant.rental_agreement[0].lease_end_date?.toLowerCase()
+      const date = tenant.rental_agreement[0]?.lease_start_date?.toLowerCase()
+      const date2 =  tenant.rental_agreement[0]?.lease_end_date?.toLowerCase()
       const formatedDate = formatDate(date);
       const formatedDate2 = formatDate(date2);
       const status = tenant?.status?.toLowerCase()
@@ -612,7 +612,7 @@ export default function TenantInformationTable({
                 <Table size="small" sx={{ mt: 2 }}>
                     <TableHead sx={{ backgroundColor: "whitesmoke", p: 2 }}>
                     <TableRow>
-                        <StyledTableCell>
+                        {/* <StyledTableCell>
                         <Checkbox
                             color="primary"
                             onChange={handleSelectAllClick}
@@ -624,7 +624,7 @@ export default function TenantInformationTable({
                             "aria-label": "select all desserts",
                             }}
                         />
-                        </StyledTableCell>
+                        </StyledTableCell> */}
                         <StyledTableCell onClick={() => handleSort("tenantName")}>
                         Tenant{" "}
                         {sortConfig.key === "tenantName" &&
@@ -745,7 +745,7 @@ export default function TenantInformationTable({
                             handleCheckBoxChange(event, unit.id)
                             }
                         >
-                            <TableCell>
+                            {/* <TableCell>
                             <Checkbox
                                 color="primary"
                                 checked={isSelected}
@@ -753,7 +753,7 @@ export default function TenantInformationTable({
                                 "aria-labelledby": labelId,
                                 }}
                             />
-                            </TableCell>
+                            </TableCell> */}
                             <TableCell>{`${unit.firstname || ""} ${
                             unit.middlename || ""
                             } ${unit.lastname || ""}`}</TableCell>

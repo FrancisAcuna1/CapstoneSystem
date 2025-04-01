@@ -267,9 +267,10 @@ export default function TenantListDialog({
       return prev;
     });
   };
-
-  console.log(selectedMonths);
-
+  
+  console.log("To Paid selected Months:", selectedMonths);
+  console.log("SElected Tenant to Paid:", selectedItem);
+  
   const handleAdvancePaymentChange = (tenantId, numMonths) => {
     setAdvancePayments((prev) => ({
       ...prev,
@@ -285,7 +286,6 @@ export default function TenantListDialog({
   console.log(advancePayments);
   console.log(selectedMonths);
   console.log(selectedItem);
-  console.log(selectedMonths);
   console.log(advancePayments);
   const handleSave = async (e) => {
     e.preventDefault();
@@ -371,6 +371,7 @@ export default function TenantListDialog({
             });
             setSelectedItem([]);
             handleCloseDialog();
+            setSelectedMonths({});
             window.location.reload();
           } else {
             console.log(data.error);
@@ -389,6 +390,7 @@ export default function TenantListDialog({
             } else {
               console.log(data.message); // for duplicate entry
               setError(data.message);
+              enqueueSnackbar(data.message, {variant: 'error'});
               setSelectedItem([]);
               handleCloseDialog();
               setLoading(false);
@@ -684,35 +686,54 @@ export default function TenantListDialog({
     // return () => clearInterval(intervalId);
   }, [payorList, lastPayments, checkAndSubmitOverdues]);
 
-  // const handleCheckBoxChange = (event, uniqueKey) => {
-  //     setSelectedItem(prev => prev.includes(uniqueKey) ? prev.filter(id => id !== uniqueKey) : [...prev, uniqueKey]);
-  // };
-  const handleCheckBoxChange = (event, tenantId) => {
+ 
+  const handleCheckBoxChange = (event, tenantId) => { 
     const isChecked = event.target.checked;
     if (isChecked) {
-      // Add the tenant ID to the selected list
+      // Add tenant to selected list
       setSelectedItem((prev) => [...prev, tenantId]);
-
-      // Include all delinquent months for this tenant if applicable
+  
+      // Get any delinquent data for this tenant
       const tenantOverdueData =
-        deliquent.find((item) => item.tenantId === tenantId)?.deliquentData ||
-        [];
-      const overdueMonths = tenantOverdueData.map((item) => {
-        const date = new Date(item.month_overdue);
-        const formattedMonth = date.toLocaleString("default", {
-          month: "long",
+        deliquent.find((item) => item.tenantId === tenantId)?.deliquentData || [];
+  
+      // Filter for delinquent records that are NOT paid
+      const unpaidOverdueData = tenantOverdueData.filter(
+        (record) => record.status !== "Paid"
+      );
+  
+      if (unpaidOverdueData.length > 0) {
+        // Map unpaid delinquent records to formatted month strings
+        const overdueMonths = unpaidOverdueData.map((item) => {
+          const date = new Date(item.month_overdue);
+          const formattedMonth = date.toLocaleString("default", { month: "long" });
+          const day = date.getDate();
+          const year = date.getFullYear();
+          return `${formattedMonth} ${day}, ${year}`;
         });
-        const day = date.getDate();
-        const year = date.getFullYear();
-        return `${formattedMonth} ${day}, ${year}`;
-      });
-
-      setSelectedMonths((prev) => ({
-        ...prev,
-        [tenantId]: overdueMonths,
-      }));
+        setSelectedMonths((prev) => ({
+          ...prev,
+          [tenantId]: overdueMonths,
+        }));
+      } else {
+        // If there are no unpaid delinquent records,
+        // use the next due date for this tenant.
+        const tenant = payorList.find((p) => p.tenant.id === tenantId);
+        if (tenant) {
+          const { dueDate } = formatDueDate(tenant);
+          const formattedDueDate = new Date(dueDate).toLocaleDateString("default", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          });
+          setSelectedMonths((prev) => ({
+            ...prev,
+            [tenantId]: [formattedDueDate],
+          }));
+        }
+      }
     } else {
-      // Remove the tenant ID and their selected months
+      // Remove tenant from selected list and clear their selected months
       setSelectedItem((prev) => prev.filter((id) => id !== tenantId));
       setSelectedMonths((prev) => {
         const updated = { ...prev };
@@ -721,6 +742,43 @@ export default function TenantListDialog({
       });
     }
   };
+
+  
+  // old code
+  // const handleCheckBoxChange = (event, tenantId) => {
+  //   const isChecked = event.target.checked;
+  //   if (isChecked) {
+  //     // Add the tenant ID to the selected list
+  //     setSelectedItem((prev) => [...prev, tenantId]);
+
+  //     // Include all delinquent months for this tenant if applicable
+  //     const tenantOverdueData =
+  //       deliquent.find((item) => item.tenantId === tenantId)?.deliquentData ||
+  //       [];
+  //     const overdueMonths = tenantOverdueData.map((item) => {
+  //       const date = new Date(item.month_overdue);
+  //       const formattedMonth = date.toLocaleString("default", {
+  //         month: "long",
+  //       });
+  //       const day = date.getDate();
+  //       const year = date.getFullYear();
+  //       return `${formattedMonth} ${day}, ${year}`;
+  //     });
+
+  //     setSelectedMonths((prev) => ({
+  //       ...prev,
+  //       [tenantId]: overdueMonths,
+  //     }));
+  //   } else {
+  //     // Remove the tenant ID and their selected months
+  //     setSelectedItem((prev) => prev.filter((id) => id !== tenantId));
+  //     setSelectedMonths((prev) => {
+  //       const updated = { ...prev };
+  //       delete updated[tenantId];
+  //       return updated;
+  //     });
+  //   }
+  // };
 
   useEffect(() => {
     const fetchDeliquentData = async () => {
@@ -815,7 +873,11 @@ export default function TenantListDialog({
       >
         <DialogTitle sx={{ m: 0, p: 2 }}>Tenant Payment Status</DialogTitle>
         <IconButton
-          onClick={handleCloseDialog}
+          onClick={() => {
+            handleCloseDialog(); 
+            setSelectedItem([]);
+            setSelectedMonths({});
+          }}
           sx={{
             "&:hover": { backgroundColor: "#263238" },
             position: "absolute",
@@ -1049,7 +1111,7 @@ export default function TenantListDialog({
                               }}
                             />
                           ) : (
-                            <Checkbox color="primary" checked={isSelected} />
+                            <Checkbox color="primary"  disabled={payor.is_last_month === 1} checked={isSelected} />
                           )}
                         </TableCell>
                         <TableCell align="start">
@@ -1145,6 +1207,51 @@ export default function TenantListDialog({
                                   gap: 2,
                                 }}
                               >
+                                {(tenantOverdueData.length > 0
+                                  ? tenantOverdueData
+                                  : [{ month_overdue: dueDate }]).map(
+                                  (item, index) => {
+                                    const date = new Date(item.month_overdue);
+                                    const formattedMonth = date.toLocaleString("default", {
+                                      month: "long",
+                                    });
+                                    const day = date.getDate();
+                                    const year = date.getFullYear();
+                                    const monthYear = `${formattedMonth} ${day}, ${year}`;
+                                    return (
+                                      <FormControlLabel
+                                        key={index}
+                                        control={
+                                          <Checkbox
+                                            checked={tenantSelectedMonths.includes(monthYear)}
+                                            onChange={() =>
+                                              handleMonthSelection(payor.tenant.id, monthYear)
+                                            }
+                                            size="small"
+                                          />
+                                        }
+                                        label={monthYear}
+                                        sx={{
+                                          "& .MuiFormControlLabel-label": {
+                                            fontSize: "0.875rem",
+                                            color: "#455a64",
+                                          },
+                                        }}
+                                      />
+                                    );
+                                  }
+                                )}
+                              </FormGroup>
+
+                                {/* old code */}
+                              {/* <FormGroup
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "row",
+                                  flexWrap: "wrap",
+                                  gap: 2,
+                                }}
+                              >
                                 {tenantOverdueData.map((item, index) => {
                                   const date = new Date(item.month_overdue);
                                   const formattedMonth = date.toLocaleString(
@@ -1181,7 +1288,7 @@ export default function TenantListDialog({
                                     />
                                   );
                                 })}
-                              </FormGroup>
+                              </FormGroup> */}
                             </Box>
                           </Collapse>
                         </TableCell>

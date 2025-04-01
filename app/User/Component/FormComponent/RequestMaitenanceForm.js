@@ -380,13 +380,14 @@ export default function RequestMaintenanceForm({
       onLoadingSlow: () => setLoading(true),
     }
   );
-  console.log(responseEdit);
+  console.log("Edit value:", responseEdit);
   useEffect(() => {
     if (responseEdit) {
       const data = responseEdit?.data || "";
       if (data) {
         setFormData({
           tenant_id: data.tenant_id || "",
+          urgency: data.urgency_level || "",
           otherissues: data.other_issue || "",
           item_name: data.reported_issue || "others", // Ensure this is set correctly
           issue_description: data.issue_description || "",
@@ -410,7 +411,7 @@ export default function RequestMaintenanceForm({
     }
   }, [responseEdit]);
 
-  console.log(formData);
+  console.log("Edit data:", formData);
   console.log(editId);
   // {
   //   tenant_id: 10,
@@ -803,7 +804,7 @@ export default function RequestMaintenanceForm({
                 labelId="select urgency"
                 id="urgency"
                 label="Select urgency"
-                value={formData.urgency} // The selected value
+                value={formData.urgency || ''} // The selected value
                 onChange={handleChange}
                 name="urgency"
                 sx={{

@@ -435,7 +435,13 @@ export default function AddPropertyType({
                 setSelectedImage(existingImages);
               }
               setSelectedProperty(data?.apartment?.property_type);
-              setMoveOutDate(data?.apartment?.move_out_date);
+
+              if (data?.apartment?.move_out_date) {
+                setMoveOutDate(dayjs(data.apartment.move_out_date));
+                setIsMovingOut(true);
+              } else {
+                setMoveOutDate(null);
+              }
             } else if (selectedProperty === "Boarding House") {
               setNewBoardinghouse({
                 propertyid: data?.boardinghouse?.property_id,
@@ -1431,6 +1437,7 @@ export default function AddPropertyType({
                       fullWidth
                       error={Boolean(errors.numberofrooms)}
                       helperText={errors.numberofrooms}
+                      inputProps={{ min: 0 }}
                       onKeyDown={(e) => {
                         // Prevent 'e', 'E', '+', and '-' from being entered
                         if (
@@ -1455,6 +1462,7 @@ export default function AddPropertyType({
                       onChange={handleChangeApartment}
                       margin="normal"
                       fullWidth
+                      inputProps={{ min: 0 }}
                       error={Boolean(errors.rentalfee)}
                       helperText={errors.rentalfee}
                       onKeyDown={(e) => {
@@ -1712,7 +1720,7 @@ export default function AddPropertyType({
                         option.id === value.id
                       }
                       renderOption={(props, option, { selected }) => (
-                        <li {...props}>
+                        <li key={option.id} {...props}>
                           <Checkbox
                             style={{ marginRight: 8 }}
                             checked={selected}
