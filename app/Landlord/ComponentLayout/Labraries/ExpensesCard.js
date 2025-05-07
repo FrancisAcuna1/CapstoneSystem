@@ -145,40 +145,54 @@ export default function ExpensesCard({ loading, setLoading, selectedMonth, selec
   const cards = [
     {
       title: 'Total Expenses',
-      value: totalExpenses?.total_expenses,
+      value: totalExpenses?.total_expenses_current_year,
       icon: AccountBalanceWalletOutlined,
       color: theme.palette.primary.main,
       tooltip: 'Sum of all expenses for the selected period',
-      change:  selectedMonth !== "all" ? totalExpenses.monthly_change_type === 'Increase' ? `+${totalExpenses?.monthly_percentage_change}%` : `${totalExpenses?.monthly_percentage_change}%` 
-      : totalExpenses.yearly_change_type === 'Increase'
-      ? `+${totalExpenses.total_expense_percentage_yearly}%`
-      : `${totalExpenses.total_expense_percentage_yearly}%`,
-      positive: totalExpenses.yearly_change_type === 'Increase' ? false : true,
+      change:  totalExpenses && totalExpenses.total_expenses_change_type 
+      ? (totalExpenses.total_expenses_change_type === 'Increase' 
+          ? `+${totalExpenses.total_expenses_change_percentage}%` 
+          : `${totalExpenses.total_expenses_change_percentage}%`) 
+      : '0.00%',
+      // : totalExpenses.yearly_change_type === 'Increase'
+      // ? `+${totalExpenses.total_expense_percentage_yearly}%`
+      // : `${totalExpenses.total_expense_percentage_yearly}%`,
+      positive: totalExpenses.total_expenses_change_type === 'Increase' ? false : true,
       subtitle1: selectedMonth === 'all' ? `vs last year` : 'vs last month',
     },
     {
       title: 'Highest Expenses',
-      value: totalExpenses?.max_expenses,
+      value: totalExpenses?.highest_expenses_current_year,
       icon: TrendingUpOutlined,
       color: theme.palette.error.main,
+      subtitle: totalExpenses && totalExpenses?.highest_month_current_year 
+      ? `Month of ${totalExpenses?.highest_month_current_year}`
+      : 'No Expenses recorded',
       tooltip: 'Highest spending recorded in the selected period',
-      change: totalExpenses.highest_expense_change_type === 'Increase' 
-      ? `+${totalExpenses?.highest_expense_percentage}%`
-      : `${totalExpenses?.highest_expense_percentage}%`,
-      positive: totalExpenses.highest_expense_change_type === 'Increase' ? false : true,
+      change: totalExpenses && totalExpenses.highest_expenses_change_type
+      ?  (totalExpenses.highest_expenses_change_type === 'Increase' 
+          ? `+${totalExpenses?.highest_expenses_change_percentage}%`
+          : `${totalExpenses?.highest_expenses_change_percentage}%`)
+      : '0.00%',
+      positive: totalExpenses.highest_expenses_change_type === 'Increase' ? false : true,
       subtitle1: selectedMonth === 'all' ? `vs last year` : 'vs last month',
     },
     {
       title: 'Lowest Expenses',
-      value: totalExpenses?.min_expense_amount,
+      value: totalExpenses?.lowest_expenses_current_year,
       icon: TrendingDownOutlined,
       color: theme.palette.success.main,
+      subtitle: totalExpenses && totalExpenses?.lowest_month_current_year
+      ? `Month of ${totalExpenses?.lowest_month_current_year}`
+      : 'No Expenses recorded',
       tooltip: 'Lowest spending recorded in the selected period',
-      subtitle: totalExpenses?.min_expense_month,
-      change: totalExpenses.lowest_expense_change_type === 'Increase'
-      ? `+${totalExpenses.lowest_expense_percentage}%`
-      : `${totalExpenses.lowest_expense_percentage}%`,
-      positive: totalExpenses.lowest_expense_change_type === 'Increase'  ? false : true,
+      // subtitle: totalExpenses?.min_expense_month,
+      change: totalExpenses && totalExpenses.lowest_expenses_change_type 
+      ? (totalExpenses.lowest_expenses_change_type === 'Increase'
+        ? `+${totalExpenses.lowest_expenses_change_percentage}%`
+        : `${totalExpenses.lowest_expenses_change_percentage}%`)
+      : '0.00%',
+      positive: totalExpenses.lowest_expenses_change_type === 'Increase'  ? false : true,
       subtitle1: selectedMonth === 'all' ? `vs last year` : 'vs last month',
     },
   ];
@@ -219,7 +233,7 @@ export default function ExpensesCard({ loading, setLoading, selectedMonth, selec
                         variant="body2"
                         sx={{ color: theme.palette.text.secondary }}
                       >
-                        Month of {card.subtitle}
+                       {card.subtitle}
                       </Typography>
                     )}
                   </Box>

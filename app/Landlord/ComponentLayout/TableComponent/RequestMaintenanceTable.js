@@ -343,6 +343,7 @@ export default function MaintenanceRequestTable({
       };
 
       let aValue, bValue;
+      const urgencyOrder = {High: 1, Medium: 2, Low: 3};
 
       switch (sortConfig.key) {
         case "tenant_name":
@@ -385,6 +386,11 @@ export default function MaintenanceRequestTable({
           ].join(" ").trim().toLowerCase();
           
           break;
+        case "urgency_level":
+          aValue = urgencyOrder[a.urgency_level] || 4;
+          bValue = urgencyOrder[b.urgency_level] || 4;
+          break;
+
         default:
           aValue = getNestedValue(a, sortConfig.key) || "";
           bValue = getNestedValue(b, sortConfig.key) || "";
@@ -693,10 +699,10 @@ export default function MaintenanceRequestTable({
                     </StyledTableCell>
 
                     <StyledTableCell
-                      onClick={() => handleSort("reported_issue")}
+                      onClick={() => handleSort("urgency_level")}
                     >
                       Urgency Level{" "}
-                      {sortConfig.key === "reported_issue" &&
+                      {sortConfig.key === "urgency_level" &&
                         (sortConfig.direction === "asc" ? (
                           <NorthIcon
                             fontSize="extrasmall"

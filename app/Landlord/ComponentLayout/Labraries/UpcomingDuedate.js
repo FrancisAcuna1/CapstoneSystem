@@ -44,8 +44,10 @@ const calculateNextDueDate = (lastPaymentDate, monthsCovered) => {
 // Function to determine the color based on days remaining
 const getDueDateColor = (dueDateString) => {
     const dueDate = dayjs(dueDateString); // Convert the string to a dayjs object
+    console.log("date: ", dueDate)
     const now = dayjs();
     const daysRemaining = dueDate.diff(now, 'day');
+    console.log("days: ", daysRemaining)
   
     if (daysRemaining <= 0) {
       return '#d50000'; // Dark red for overdue or due today
@@ -85,9 +87,9 @@ const getBorderDueDateColor = (dueDateString) => {
 };
 
 const legendItem = [
-    {label: 'Overdue/Due date', color: '#d50000'},
-    {label: 'Due within a week', color: '#e57373'},
-    {label: 'Upcoming', color: '#263238'},
+    {label: 'Overdue/Due date', color: '#d50000', tooltip: 'Overdue or due today'},
+    {label: 'Due within a week', color: '#e57373' , tooltip: "Due within a one week or 7 day's"},
+    {label: 'Upcoming', color: '#263238', tooltip: 'Upcoming due date'},
 ]
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Store API URL in a variable
@@ -326,7 +328,7 @@ export default function UpComingDuedates({propId, openDialog, handleDialogClose,
                 <DialogContentText id="alert-dialog-slide-description">
                     <Stack sx={{flexDirection:'row', justifyContent:'start', gap:1, mb:3, mt:1}}>
                         {legendItem.map((item, index) => (
-                        <Tooltip key={index} arrow>
+                        <Tooltip key={index} title={item.tooltip} arrow>
                             <Box sx={{ display: 'flex', alignItems: 'center', marginRight: 2 }}>
                                 <Box
                                 sx={{
